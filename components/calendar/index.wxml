@@ -1,0 +1,174 @@
+<wxs module="calendar_wxs" src="./index.wxs"></wxs>
+<view class="wd-calendar-container" style="{{ style }}">
+    <view 
+        id="calendar" 
+        class="wd-calendar {{ !loading ? 'load' : '' }}" 
+        style="height: {{ view == 'week' ? minHeight : calendarHeight }}px;"
+        catchtransitionend="handleCalendarTransEnd"
+        mark:panel="{{ panelHeight }}"
+        mark:calendar="{{ calendarHeight }}"
+        mark:max="{{ maxHeight }}"
+        mark:min="{{ minHeight }}"
+        mark:view="{{ currView }}"
+        data-panel="{{ panelHeight }}"
+        data-calendar="{{ calendarHeight }}"
+        data-min="{{ minHeight }}">
+        <view class="wd-calendar-bar">
+            <view class="wd-calendar-title" data-info="{{ titleInfo }}" bindtap="{{ calendar_wxs.handleYearPanelShow }}">
+                <text >{{ months[currTab].year }}</text><text class="wd-calendar-title-cn">年</text>
+                <text >{{ months[currTab].month }}</text>
+                <text class="wd-calendar-title-cn">月</text>
+            </view>
+            <view class="wd-calendar-options">
+                <view class="wd-calendar-option">
+                    <view class="wd-calendar-option-it ">
+                        <view class="wd-calendar-option-views today {{ tdOpShow ? 'show' : '' }}" catchtap="toToday">
+                            <view class="wd-calendar-option-view">今</view>
+                        </view>
+                    </view>
+                </view>
+                <view class="wd-calendar-option">
+                    <view class="wd-calendar-option-it">
+                        <view class="wd-calendar-option-views" catchtap="{{ calendar_wxs.toggleView }}">
+                            <view catchtransitionend="handleOpBarTransEnd" class="wd-calendar-option-view {{ (currView == 1 || currView == 3)? 'curr' : '' }}">月</view>
+                            <view catchtransitionend="handleOpBarTransEnd" class="wd-calendar-option-view {{ currView == 2 ? 'curr' : '' }}">周</view>
+                            <view class="wd-calendar-option-view-bar" style="transform: translateX({{ currView == 2 ? '70rpx' : 0 }}) translateZ(0px);"></view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="wd-calendar-week-bar">
+            <view class="wd-calendar-week-item" wx:for="{{ Weeks }}">{{ item }}</view>
+        </view>
+        <view 
+            class="wd-calendar-month-body {{ solidDay ? '' : 'solid' }}" 
+            change:weektabchange="{{ calendar_wxs.handleWeekSwiperChange }}" weektabchange="{{ weektabchange }}"
+            change:monthchange="{{ calendar_wxs.handleMonthChange }}" monthchange="{{ monthchange }}"
+            change:needInitTrans="{{ calendar_wxs.handleInitTrans }}" needInitTrans="{{ needInitTrans }}"
+            change:viewchange="{{ calendar_wxs.handleViewChange }}" viewchange="{{ viewchange }}"
+            bindtouchstart="{{ calendar_wxs.touchStart }}"
+            catchtouchmove="{{ calendar_wxs.touchMove }}" 
+            catchtouchend="{{ calendar_wxs.touchEnd }}">
+            <swiper circular duration="{{ 300 }}" current="{{ currTab }}" class="wd-calendar-swiper" bindanimationfinish="handleSwiperAniEnd">
+                <swiper-item
+                    wx:for="{{ months }}" 
+                    wx:for-item="month" 
+                    wx:for-index="mdx"
+                    skip-hidden-item-layout
+                    class="wd-calendar-swiper-item" >
+                    <view 
+                        class="wd-calendar-month-panel {{ currTab === mdx ? 'curr' : 'other' }}" 
+                        style="height: {{ panelHeight }}px;min-height: {{ panelHeight }}px;"
+                        data-trans="{{ month.trans }}">
+                        <view 
+                            wx:if="{{ month.bar.s && currTab === mdx }}"
+                            class="wd-calendar-day-sel {{ barAni ? '' : 'no-ani' }} {{ month.bar.t ? 'today' : '' }} " 
+                            style="top: {{ month.bar.y }};left: {{ month.bar.x }}px;" >
+                            <view class="wd-calendar-day-sel-bar {{ month.bar.a ? 'animation' : '' }}" bindanimationend="handleSelBarAniEnd"></view>
+                        </view>
+                        <view 
+                            class="wd-calendar-week-row l-{{ month.days.length }}" 
+                            wx:for="{{ month.days }}" 
+                            wx:for-item="w" 
+                            wx:for-index="wdx" >
+                            <view 
+                                wx:for="{{ w.days }}" 
+                                wx:for-item="d" 
+                                wx:for-index="ddx"
+                                class="wd-calendar-day {{ d.type }} {{ d.isToday ? 'today' : ''  }} {{ ((wdx * 7 + ddx) == month.bar.i && currTab === mdx) ? 'curr' : '' }}" 
+                                catchtap="selDate"
+                                data-wdx="{{ wdx }}"
+                                data-ddx="{{ ddx }}">
+                                <view class="wd-calendar-gregorian {{ (currView != 3 && d.marker && d.marker.schedule.length > 0) ? 'dot' : '' }}">
+                                    <text>{{ d.day }}</text>
+                                    <view 
+                                        class="wd-calendar-gregorian-corner" 
+                                        wx:if="{{ d.marker && d.marker.corner.length > 0 }}"
+                                        style="{{ d.marker.corner[0].color ? 'color:' + d.marker.corner[0].color + ';' : '' }}"
+                                        >{{ d.marker.corner[0].mark }}</view>
+                                </view>
+                                <view class="wd-calendar-solar {{ d.lunar_type }}">
+                                    <text 
+                                        wx:if="{{ d.marker && d.marker.holiday.length > 0 }}"
+                                        style="color: {{ d.marker.corner[0].color ? d.marker.corner[0].color : '#2a97ff' }};">{{ d.marker.holiday[0].mark }}</text>
+                                    <text wx:else>{{ d.lunar_day }}</text>
+                                    <view class="wd-calendar-schedules" wx:if="{{ d.marker && d.marker.schedule.length > 0 }}">
+                                        <view 
+                                            class="wd-calendar-schedule"
+                                            style="{{ d.marker.schedule[0].color ? 'color:' + d.marker.schedule[0].color + ';' : '' }}{{ d.marker.schedule[0].bgColor ? 'background-color:' + d.marker.schedule[0].bgColor + ';' : '' }}">{{ d.marker.schedule[0].mark }}</view>
+                                        <view class="wd-calendar-schedule-more" wx:if="{{ d.marker.schedule.length - 1 > 0 }}">+{{ d.marker.schedule.length - 1 }}</view>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </swiper-item>
+            </swiper>
+        </view>
+        <view 
+            class="wd-calendar-bt-bar"
+            bindtouchstart="{{ calendar_wxs.touchStart }}"
+            catchtouchmove="{{ calendar_wxs.touchMove }}" 
+            catchtouchend="{{ calendar_wxs.touchEnd }}">
+            <view class="wd-calendar-bt-control">
+                <view class="wd-calendar-bt-control-item" >
+                    <view class="wd-calendar-bt-control-bar" id="control_1"></view>
+                </view>
+                <view class="wd-calendar-bt-control-item" >
+                    <view class="wd-calendar-bt-control-bar" id="control_2"></view>
+                </view>
+            </view>
+        </view>
+
+        <view class="wd-calendar-years-panel {{ yearPanelShow ? 'show' : '' }}">
+            <view class="wd-calendar-bar">
+                <view class="wd-calendar-title show ym" data-info="{{ yearMs[currYmTab].lunar_year }}">
+                    <text >{{ yearMs[currYmTab].year }}</text><text class="wd-calendar-title-cn margin-left">年</text>
+                </view>
+            </view>
+            <view class="wd-calendar-years-panel-body">
+                <swiper 
+                    circular
+                    duration="{{ 300 }}"
+                    current="{{ currYmTab }}" 
+                    class="wd-calendar-ym-swiper" 
+                    bindanimationfinish="handleYmSwiperAniEnd">
+                    <swiper-item
+                        wx:for="{{ yearMs }}" 
+                        wx:for-item="year" 
+                        wx:for-index="ydx"
+                        skip-hidden-item-layout
+                        class="wd-calendar-ym-swiper-item" >
+                        <view class="wd-calendar-ym-months">
+                            <view class="wd-calendar-ym-row" wx:for="{{ 3 }}" wx:for-item="mr" wx:for-index="mrdx" >
+                                <view 
+                                    wx:for="{{ 4 }}" 
+                                    wx:for-item="m" 
+                                    wx:for-index="mdx"
+                                    class="wd-calendar-ym-month {{ year.months[mrdx * 4 + mdx].curr ? 'curr' : '' }}"
+                                    bindtap="handleYearPanelDayClick"
+                                    data-year="{{ year.year }}"
+                                    data-month="{{ year.months[mrdx * 4 + mdx].month }}">
+                                    <view class="wd-calendar-ym-month-contaner">
+                                        <view class="wd-calendar-ym-m-r">
+                                            <view class="wd-calendar-ym-m">{{ year.months[mrdx * 4 + mdx].month }}</view>
+                                        </view> 
+                                        <view wx:for="{{ year.months[mrdx * 4 + mdx].lunar }}" wx:for-item="l" wx:for-index="idx" class="wd-calendar-ym-l" >
+                                            <view class="wd-calendar-ym-l-i"><text data-order="{{ l.order }}">{{ l.day }}</text></view>
+                                            <view class="wd-calendar-ym-l-i"><text >{{ l.lunar }}</text></view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                    </swiper-item>
+                </swiper>
+            </view>
+        </view>
+    </view>
+    <view class="wd-calendar-content">
+        <slot></slot>
+    </view>
+</view>
+
