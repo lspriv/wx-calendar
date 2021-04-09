@@ -8,7 +8,7 @@
 
 ### 预览
 
-![demo_img](images/demo.jpg)
+![demo_img](https://chat.qilianyun.net/static/git/calendar/demo.jpg)
 
 
 
@@ -182,5 +182,5 @@
 >    忙的时候还请见谅
 >    有兴趣开发维护的小伙伴加微信
 
-![wx_qr](images/wx.jpeg)
+![wx_qr](https://chat.qilianyun.net/static/git/calendar/wx.jpeg)
  
