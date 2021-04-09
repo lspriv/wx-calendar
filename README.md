@@ -122,9 +122,9 @@
 ### Methods 方法
 
 [**`toDate`**](#toDate)  跳转到日期
->     function(date|year, month, day)
+>     function(date|year, [month], [day])
 >     # 接受1个或3个参数
->     # 只有1个参数时，可以为Date|String类型，当为String时形如 2021-4-10
+>     # 只有1个参数时，可以为[Date|String]类型，当为String时形如 2021-4-10
 >     # 3个参数时，则为具体的 年,月,日
 
 [**`toMonth`**](#toMonth)  跳转到月份
@@ -140,7 +140,7 @@
 >     # 参数 view 为切换至 月month|周week
  
 [**`getDateInfo`**](#getDateInfo)  获取某个日期的信息
->     function(date|year, month, day)
+>     function(date|year, [month], [day])
 >     # 参数同 toDate
 
 [**`setMarkers`**](#setMarkers)  设置日期标记
@@ -159,7 +159,7 @@
 [**`delMarker`**](#delMarker) 删除日期标记
 >     function(date, type, key)
 >     # 参数 date = { year, month, day } 某个日期 
->     # 参数 type = holiday|corner|schedule 当type为空时，会删除掉date下的所有类型标记
+>     # 参数 type = [holiday|corner|schedule] 当type为空时，会删除掉date下的所有类型标记
 >     # 参数 key 为标记标识字段的值，当key为空时，会删除掉date下的所有type类型的标记
 > 关于 [marker.type](#marker说明)
 
