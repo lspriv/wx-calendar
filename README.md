@@ -198,5 +198,5 @@
 >     忙的时候还请见谅
 >     有兴趣开发维护的小伙伴加微信
 
-![wx_qr](https://chat.qilianyun.net/static/git/calendar/wx.jpeg)
+![wx_qr](https://chat.qilianyun.net/static/git/calendar/wx.png)
  
