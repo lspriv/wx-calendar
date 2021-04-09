@@ -7,7 +7,10 @@
 >     · 农历信息
 
 ### 预览
-![](assets/16179361913641.jpg)
+
+![demo_img](images/demo.jpg)
+
+
 
 ### 使用
 
@@ -152,7 +155,7 @@
 [**`delMarker`**](#) 删除日期标记
 >     function(date, type, key)
 >     # 参数 date = { year, month, day } 某个日期 
->     # 参数 type = holiday|corner|schedule 当type为空时，会删除掉date下的所有类型标记（关于标记类型，后面会说明）
+>     # 参数 type = holiday|corner|schedule 当type为空时，会删除掉date下的所有类型标记
 >     # 参数 key 为标记标识字段的值，当key为空时，会删除掉date下的所有type类型的标记
 
 [**`reloadMarkers`**](#) 重新加载所有日期标记
@@ -177,7 +180,7 @@
 
 >    有任何问题或是需求请到 `Issues` 面板提交
 >    忙的时候还请见谅
->    有意开发维护的小伙伴加微信
+>    有兴趣开发维护的小伙伴加微信
 
-![WechatIMG707](assets/WechatIMG707.jpeg)
+![wx_qr](images/wx.jpeg)
  
