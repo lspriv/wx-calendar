@@ -79,18 +79,20 @@
     </tr>
 </table>
 
+> 关于 [_markers](#说明)
+
 ### Events 事件
 
-[**`bindload`**](#)  日历加载完成
+[**`bindload`**](#Events事件)  日历加载完成
 >     e.detail = { date } 
 >     # date为当前选择日期
 
 
-[**`binddatechange`**](#)  日期选择变化
+[**`binddatechange`**](#Events事件)  日期选择变化
 >     e.detail = { date } 
 >     # date为当前选择日期
 
-[**`bindrangechange`**](#)  日期范围变化
+[**`bindrangechange`**](#Events事件)  日期范围变化
 >     e.detail = { curr, range, view, visual, markerCommit } 
 >     # curr: 当前选择日期
 >     # range: 当前swiper日期范围
@@ -98,7 +100,7 @@
 >     # view: 当前面板视图，月/周
 >     # markerCommit(markers): 提交日期标记的方法，参数markers和属性_markers一致
 
-[**`bindviewchange`**](#)   面板视图变化
+[**`bindviewchange`**](#Events事件)   面板视图变化
 >     e.detail = { view } 
 >     # view: 当前面板视图，月/周
    
@@ -117,48 +119,49 @@
 
 ### Methods 方法
 
-[**`toDate`**](#)  跳转到日期
+[**`toDate`**](#Methods方法)  跳转到日期
 >     function(date|year, month, day)
 >     # 接受1个或3个参数
 >     # 只有1个参数时，可以为Date|String类型，当为String时形如 2021-4-10
 >     # 3个参数时，则为具体的 年,月,日
 
-[**`toMonth`**](#)  跳转到月份
+[**`toMonth`**](#Methods方法)  跳转到月份
 >     function(year, month)
 >     # 参数为 年,月
 
-[**`prev`**](#)  向前一个月
+[**`prev`**](#Methods方法)  向前一个月
 
-[**`next`**](#)  向后一个月
+[**`next`**](#Methods方法)  向后一个月
 
-[**`toggleView`**](#)  切换面板视图
+[**`toggleView`**](#Methods方法)  切换面板视图
 >     function(view)
 >     # 参数 view 为切换至 月month|周week
  
-[**`getDateInfo`**](#)  获取某个日期的信息
+[**`getDateInfo`**](#Methods方法)  获取某个日期的信息
 >     function(date|year, month, day)
 >     # 参数同 toDate
 
-[**`setMarkers`**](#)  设置日期标记
+[**`setMarkers`**](#Methods方法)  设置日期标记
 >     function(markers)
 >     # 参数 markers 同属性 _markers
 
-[**`addMarker`**](#)  设置日期标记
+[**`addMarker`**](#Methods方法)  设置日期标记
 >     function(marker)
 >     # 参数 marker = { year, month, day, type, mark, color, bgColor }
 
-[**`editMarker`**](#) 修改日期标记
+[**`editMarker`**](#Methods方法) 修改日期标记
 >     function(marker)
 >     # 参数 marker = { [_markerKey], year, month, day, type, mark, color, bgColor }
 >     # [_markerKey] 标记标识字段，可以由属性_markerKey定义，默认为id
 
-[**`delMarker`**](#) 删除日期标记
+[**`delMarker`**](#Methods方法) 删除日期标记
 >     function(date, type, key)
 >     # 参数 date = { year, month, day } 某个日期 
 >     # 参数 type = holiday|corner|schedule 当type为空时，会删除掉date下的所有类型标记
 >     # 参数 key 为标记标识字段的值，当key为空时，会删除掉date下的所有type类型的标记
+> 关于 [marker.type](#marker说明)
 
-[**`reloadMarkers`**](#) 重新加载所有日期标记
+[**`reloadMarkers`**](#Methods方法) 重新加载所有日期标记
 
 ### 说明
 
@@ -166,7 +169,7 @@
 >      marker = { year, month, day, type, mark, color, bgColor }
 >      markers = [{ year, month, day, type, mark, color, bgColor }]
 
-#### marker 说明
+#### marker说明
 
 >     year,month,day 年月日
 >     type = [holiday|corner|schedule] 节假日|角标｜日程 
@@ -181,11 +184,11 @@
 >     实用于公历 1901 年至 2100 年之间的 200 年 
 >     参考了eleworld.com上的算法，并修正了5处节气错误
 > 
->     2014年3月5日 惊蛰
->     2051年3月21日 春分
->     2083年2月4日 立春
->     2084年3月20日 春分
->     2094年6月6日 芒种
+>     * 2014年3月5日 惊蛰
+>     * 2051年3月21日 春分
+>     * 2083年2月4日 立春
+>     * 2084年3月20日 春分
+>     * 2094年6月6日 芒种
 
 ### 关于
 
