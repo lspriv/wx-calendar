@@ -8,7 +8,7 @@
 >     · 日期标记
 >     · 农历信息
 
-> [欢迎到issues面板提出建议和BUG](https://github.com/lspriv/wx-calendar/issues)
+> [欢迎到issues面板提出建议和BUG](https://github.com/lspriv/wx-calendar/issues/new?assignees=&labels=&template=bug_report.md&title=)
 
 ### 预览
 
