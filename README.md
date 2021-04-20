@@ -79,6 +79,18 @@
         <td>点选日期是否震动</td>
         <td>true</td>
     </tr>
+    <tr>
+        <td>darkmode</td>
+        <td>Boolean</td>
+        <td>黑暗模式</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>_date</td>
+        <td>Date|String|Number</td>
+        <td>选择初始日期</td>
+        <td>date｜xxxx-xx-xx｜timestamp</td>
+    </tr>
 </table>
 
 > 关于 [_markers](#说明)
@@ -147,7 +159,7 @@
 >     function(markers)
 >     # 参数 markers 同属性 _markers
 
-[**`addMarker`**](#addMarker)  设置日期标记
+[**`addMarker`**](#addMarker)  新增日期标记
 >     function(marker)
 >     # 参数 marker = { year, month, day, type, mark, color, bgColor }
 
