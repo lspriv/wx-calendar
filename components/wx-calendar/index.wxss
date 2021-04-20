@@ -47,6 +47,12 @@ text {
     position: relative;
     width: 100vw;
     --wd-calendar-main-bg: #fff;
+    --wd-calendar-second-bg: #f8f8f8;
+    --wd-calendar-main-font-color: #313313;
+    --wd-calendar-second-font-color: #ababab;
+    --wd-calendar-info-font-color: #7a7a7a;
+    --wd-calendar-sel-bar: #f5f5f5;
+    --wd-calendar-view-bar: #fff9f3;
 }
 
 .wd-calendar {
@@ -77,7 +83,7 @@ text {
 
 .wd-calendar-title {
     padding: 0 0 0 42rpx;
-    color: #313131;
+    color: var(--wd-calendar-main-font-color);
     font-size: 42rpx;
     position: relative;
     line-height: 42rpx;
@@ -88,7 +94,7 @@ text {
 }
 
 .wd-calendar-title text {
-    color: #313131;
+    color: var(--wd-calendar-main-font-color);
     font-size: 42rpx;
     vertical-align: middle;
 }
@@ -106,7 +112,7 @@ text {
     content: attr(data-info);
     position: relative;
     font-size: 20rpx;
-    color: #7a7a7a;
+    color: var(--wd-calendar-info-font-color);
     margin-left: 8rpx;
     font-weight: normal;
     letter-spacing: 0px;
@@ -143,7 +149,7 @@ text {
     line-height: 44rpx;
     font-size: 42rpx;
     font-weight: 500;
-    color: #313131;
+    color: var(--wd-calendar-main-font-color);
     text-align: center;
     letter-spacing: -2px;
     padding-right: 2px;
@@ -184,7 +190,7 @@ text {
 .wd-calendar-week-item {
     text-align: center;
     font-size: 20rpx;
-    color: #ababab;
+    color: var(--wd-calendar-second-font-color);
     font-weight: bold;
 }
 
@@ -253,7 +259,7 @@ text {
     font-size: 34rpx;
     font-weight: bold;
     line-height: 34rpx;
-    color: #313131;
+    color: var(--wd-calendar-main-font-color);
     transition: color .3s ease 0s;
     position: relative;
 }
@@ -283,7 +289,7 @@ text {
 
 .wd-calendar-solar {
     font-size: 20rpx;
-    color: #ababab;
+    color: var(--wd-calendar-second-font-color);
     font-weight: bold;
     line-height: 20rpx;
     margin-top: 8rpx;
@@ -458,7 +464,7 @@ text {
     top: 0;
     left: 0;
     border-radius: inherit;
-    background-color: #f5f5f5;
+    background-color: var(--wd-calendar-sel-bar);
     will-change: transform;
 }
 
@@ -512,7 +518,7 @@ text {
     align-items: center;
     justify-content: space-between;
     border-radius: 30rpx;
-    background-color: #fff9f3;
+    background-color: var(--wd-calendar-view-bar);
     overflow: hidden;
     position: relative;
 }
@@ -655,7 +661,7 @@ text {
 .wd-calendar-ym-month {
     width: calc(25% - 10rpx);
     height: 100%;
-    background-color: #f8f8f8;
+    background-color: var(--wd-calendar-second-bg);
 }
 
 .wd-calendar-ym-month.curr {
@@ -680,7 +686,7 @@ text {
 .wd-calendar-ym-m-r {}
 
 .wd-calendar-ym-m {
-    color: #313131;
+    color: var(--wd-calendar-main-font-color);
     font-weight: bold;
     font-size: 36rpx;
     line-height: 36rpx;
@@ -742,4 +748,16 @@ text {
 .wd-calendar-content {
     position: relative;
     background-color: var(--wd-calendar-main-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+    .wd-calendar-container.darkmode {
+        --wd-calendar-main-bg: #111;
+        --wd-calendar-second-bg: #4a4a4a;
+        --wd-calendar-main-font-color: #eee;
+        --wd-calendar-second-font-color: #bebebe;
+        --wd-calendar-info-font-color: #999999;
+        --wd-calendar-sel-bar: #4a4a4a;
+        --wd-calendar-view-bar: #332d2d;
+    }
 }

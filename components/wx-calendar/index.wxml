@@ -1,5 +1,5 @@
 <wxs module="calendar_wxs" src="./index.wxs"></wxs>
-<view class="wd-calendar-container" style="{{ style }}">
+<view class="wd-calendar-container {{ darkmode ? 'darkmode' : '' }}" style="{{ style }}">
     <view 
         id="calendar" 
         class="wd-calendar {{ !loading ? 'load' : '' }}" 
@@ -32,7 +32,7 @@
                         <view class="wd-calendar-option-views" catchtap="{{ calendar_wxs.toggleView }}">
                             <view catchtransitionend="handleOpBarTransEnd" class="wd-calendar-option-view {{ (currView == 1 || currView == 3)? 'curr' : '' }}">月</view>
                             <view catchtransitionend="handleOpBarTransEnd" class="wd-calendar-option-view {{ currView == 2 ? 'curr' : '' }}">周</view>
-                            <view class="wd-calendar-option-view-bar" style="transform: translateX({{ currView == 2 ? '70rpx' : 0 }}) translateZ(0px);"></view>
+                            <view class="wd-calendar-option-view-bar" style="transform: translateX({{ currView == 2 ? '60rpx' : 0 }}) translateZ(0px);"></view>
                         </view>
                     </view>
                 </view>

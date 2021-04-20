@@ -1,68 +1,68 @@
 {
-    "description": "项目配置文件",
-    "packOptions": {
-        "ignore": []
+  "description": "项目配置文件",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "bundle": false,
+    "userConfirmedBundleSwitch": false,
+    "urlCheck": true,
+    "scopeDataCheck": false,
+    "coverView": true,
+    "es6": true,
+    "postcss": true,
+    "compileHotReLoad": false,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "autoAudits": false,
+    "newFeature": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "useIsolateContext": true,
+    "nodeModules": false,
+    "enhance": false,
+    "useCompilerModule": true,
+    "userConfirmedUseCompilerModuleSwitch": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": false,
+    "showShadowRootInWxmlPanel": true,
+    "packNpmManually": false,
+    "enableEngineNative": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "2.16.1",
+  "appid": "wx972e972e4d0efd61",
+  "projectname": "wx-calendar",
+  "debugOptions": {
+    "hidedInDevtools": []
+  },
+  "scripts": {},
+  "staticServerOptions": {
+    "baseURL": "",
+    "servePath": ""
+  },
+  "isGameTourist": false,
+  "condition": {
+    "search": {
+      "list": []
     },
-    "setting": {
-        "bundle": false,
-        "userConfirmedBundleSwitch": false,
-        "urlCheck": true,
-        "scopeDataCheck": false,
-        "coverView": true,
-        "es6": true,
-        "postcss": true,
-        "compileHotReLoad": false,
-        "preloadBackgroundData": false,
-        "minified": true,
-        "autoAudits": false,
-        "newFeature": false,
-        "uglifyFileName": false,
-        "uploadWithSourceMap": true,
-        "useIsolateContext": true,
-        "nodeModules": false,
-        "enhance": false,
-        "useCompilerModule": true,
-        "userConfirmedUseCompilerModuleSwitch": false,
-        "useMultiFrameRuntime": true,
-        "useApiHook": true,
-        "useApiHostProcess": false,
-        "showShadowRootInWxmlPanel": true,
-        "packNpmManually": false,
-        "enableEngineNative": false,
-        "packNpmRelationList": [],
-        "minifyWXSS": true
+    "conversation": {
+      "list": []
     },
-    "compileType": "miniprogram",
-    "libVersion": "2.16.1",
-    "appid": "wx972e972e4d0efd61",
-    "projectname": "wx-calendar",
-    "debugOptions": {
-        "hidedInDevtools": []
+    "game": {
+      "list": []
     },
-    "scripts": {},
-    "staticServerOptions": {
-        "baseURL": "",
-        "servePath": ""
+    "plugin": {
+      "list": []
     },
-    "isGameTourist": false,
-    "condition": {
-        "search": {
-            "list": []
-        },
-        "conversation": {
-            "list": []
-        },
-        "game": {
-            "list": []
-        },
-        "plugin": {
-            "list": []
-        },
-        "gamePlugin": {
-            "list": []
-        },
-        "miniprogram": {
-            "list": []
-        }
+    "gamePlugin": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": []
     }
+  }
 }

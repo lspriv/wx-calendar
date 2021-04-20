@@ -9,11 +9,13 @@ const initCurrInfo = { i: 0, x: 0, y: 0, t: false, d: 0, a: false, v: false, s: 
 const ConsoleStyle = {
     info: {
         label: 'color: #409EFF; font-weight:bold',
-        content: 'color: #8cc5ff'
+        content: 'color: #8cc5ff',
+        title: '提示'
     },
     warn: {
         label: 'color: #f37b1d; font-weight:bold',
-        content: 'color: #fcdabd'
+        content: 'color: #fcdabd',
+        title: '警告'
     }
 }
 

@@ -16,7 +16,7 @@ import {
 
 const CalendarPositions = ['relative', 'absolute', 'fixed']
 const CalendarHeight = 820 //日历高度，单位rpx
-const Version = '1.0.0'
+const Version = '1.0.1'
 
 Component({
     behaviors: ['wx://component-export'],
@@ -74,6 +74,15 @@ Component({
         _markerKey: {
             type: String,
             value: 'id'
+        },
+        darkmode: {
+            type: Boolean,
+            value: false
+        },
+        _date: {
+            type: Object,
+            optionalTypes: [Number, String],
+            value: new Date
         }
     },
     data: {
@@ -110,16 +119,16 @@ Component({
         this._year_panel_show = false
         this._curr_view = this.data.view == 'week' ? 2 : 1
         const current = this.data.currTab
-        this.initialize(current, today => {
+        this.initialize(current, _date => {
             this.getRects().then(() => {
                 if (this._curr_view == 2) {
-                    this.setWeeks(today, current).then(() => {
-                        this.getDayCurr(current, today.month)
+                    this.setWeeks(_date, current).then(() => {
+                        this.getDayCurr(current, _date.month)
                         this.bindLoad(true)
                     })
                 } else {
-                    this.setMonths(today, current).then(() => {
-                        this.getDayCurr(current, today.month)
+                    this.setMonths(_date, current).then(() => {
+                        this.getDayCurr(current, _date.month)
                         this.bindLoad()
                     })
                 }
@@ -136,6 +145,8 @@ Component({
             const panelHeight = calendarHeight - _otherHeight
             const maxHeight = Math.floor(system.windowHeight * 0.8)
             const minHeight = panelHeight / 5 + _otherHeight
+            let _date = this.getCorrectDate(this.data._date)
+            _date = _date ? DayDetail(_date.year, _date.month, _date.day) : _today
             this.setData({
                 _today,
                 style: this.initStyle(),
@@ -144,13 +155,13 @@ Component({
                 calendarHeight,
                 panelHeight,
                 currView: this._curr_view,
-                _selDay: _today,
-                _selWeek: _today.week,
-                titleInfo: _today.week_name,
+                _selDay: _date,
+                _selWeek: _date.week,
+                titleInfo: this.setTitleInfo(_date, _today),
                 yearMs: this.setYearMs(_today.year, current, _today),
                 _markerdays: this.initMarkDays()
             }, () => {
-                typeof callback === 'function' && callback.call(this, _today)
+                typeof callback === 'function' && callback.call(this, _date)
             })
         },
         initStyle() {
@@ -170,6 +181,7 @@ Component({
             if (needInitTrans) setData.needInitTrans = true
             const view = this.data.currView == 2 ? 'week' : 'month'
             this.setData(setData, () => {
+                this.console('欢迎到%chttps:\/\/github.com\/lspriv\/wx-calendar\/issues%c提出建议或Bug', 'info', 'font-weight:bold;margin: 0 2px;', 'color: #8cc5ff')
                 this.trigger('load', { date: this.data._selDay }, view)
                 this.triggerChange(view)
             })
@@ -675,8 +687,8 @@ Component({
                 })
             }
         },
-        setTitleInfo(d) {
-            const today = this.data._today
+        setTitleInfo(d, today = null) {
+            today = today ? today : this.data._today
             let titleInfo = this.data.titleInfo
             if (d.year == today.year && d.month == today.month && d.day == today.day) {
                 titleInfo = this._curr_view == 2 ? `第${ YearWeekOrder(today.year, today.month, today.day) }周  ${ today.week_name }` : today.week_name
@@ -1099,9 +1111,9 @@ Component({
             const { year, month, day } = this.getCorrectDate(...arguments)
             return this.replenishDateInfo(DayDetail(year, month, day), this.data._today)
         },
-        console(tips, type = 'info') {
-            const { label, content } = ConsoleStyle[type]
-            console.log(`%c${ type.toLocaleUpperCase() } %c${ tips }`, label, content)
+        console(tips, type = 'info', ...args) {
+            const { label, content, title } = ConsoleStyle[type]
+            console.log(`%cWxCalendar${ title } %c${ tips }`, label, content, ...args)
         }
     },
     export () {
@@ -1112,7 +1124,7 @@ Component({
         const { minHeight, maxHeight, calendarHeight } = this.data
         const calendarInstance = this
         return {
-            name: 'wm-calendar',
+            name: 'wx-calendar',
             version: Version,
             minHeight,
             maxHeight,

@@ -9,5 +9,6 @@
         "navigationBarTextStyle": "black"
     },
     "style": "v2",
+    "darkmode": true,
     "sitemapLocation": "sitemap.json"
 }
