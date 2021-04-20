@@ -8,6 +8,8 @@
 >     · 日期标记
 >     · 农历信息
 
+> [欢迎到issues面板提出建议和BUG](https://github.com/lspriv/wx-calendar/issues)
+
 ### 预览
 
 ![demo_img](https://chat.qilianyun.net/static/git/calendar/demo.jpg)
