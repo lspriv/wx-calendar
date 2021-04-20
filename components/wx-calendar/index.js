@@ -80,9 +80,9 @@ Component({
             value: false
         },
         _date: {
-            type: Object,
-            optionalTypes: [Number, String],
-            value: new Date
+            type: Number,
+            optionalTypes: [String],
+            value: (new Date).getTime()
         }
     },
     data: {

@@ -89,9 +89,9 @@
     </tr>
     <tr>
         <td>_date</td>
-        <td>Date|String|Number</td>
+        <td>String|Number</td>
         <td>选择初始日期</td>
-        <td>date｜xxxx-xx-xx｜timestamp</td>
+        <td>xxxx-xx-xx｜timestamp</td>
     </tr>
 </table>
 
