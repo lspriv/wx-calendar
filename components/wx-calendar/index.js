@@ -181,7 +181,7 @@ Component({
             if (needInitTrans) setData.needInitTrans = true
             const view = this.data.currView == 2 ? 'week' : 'month'
             this.setData(setData, () => {
-                this.console('欢迎到%chttps:\/\/github.com\/lspriv\/wx-calendar\/issues%c提出建议或Bug', 'info', 'font-weight:bold;margin: 0 2px;', 'color: #8cc5ff')
+                this.console('欢迎到%chttps:\/\/github.com\/lspriv\/wx-calendar\/issues%c提出建议或Bug或✭ ♪', 'info', 'font-weight:bold;margin: 0 2px;', 'color: #8cc5ff')
                 this.trigger('load', { date: this.data._selDay }, view)
                 this.triggerChange(view)
             })

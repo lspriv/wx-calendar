@@ -53,6 +53,7 @@ text {
     --wd-calendar-info-font-color: #7a7a7a;
     --wd-calendar-sel-bar: #f5f5f5;
     --wd-calendar-view-bar: #fff9f3;
+    --wd-calendar-ym: #ecf5ff;
 }
 
 .wd-calendar {
@@ -665,7 +666,7 @@ text {
 }
 
 .wd-calendar-ym-month.curr {
-    background-color: #ecf5ff;
+    background-color: var(--wd-calendar-ym);
 }
 
 .wd-calendar-ym-month-contaner {
@@ -759,5 +760,6 @@ text {
         --wd-calendar-info-font-color: #999999;
         --wd-calendar-sel-bar: #4a4a4a;
         --wd-calendar-view-bar: #332d2d;
+        --wd-calendar-ym: #515963;
     }
 }
