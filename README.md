@@ -93,6 +93,12 @@
         <td>选择初始日期</td>
         <td>xxxx-xx-xx｜timestamp</td>
     </tr>
+    <tr>
+        <td>checkedShow</td>
+        <td>Boolean</td>
+        <td>选中状态显示</td>
+        <td>true</td>
+    </tr>
 </table>
 
 > 关于 [_markers](#说明)
@@ -178,6 +184,8 @@
 > 关于 [marker.type](#marker说明)
 
 [**`reloadMarkers`**](#reloadMarkers) 重新加载所有日期标记
+
+[**`reloadPos`**](#reloadPos) 重新计算calendar和选中状态的位置
 
 ### 说明
 

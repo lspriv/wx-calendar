@@ -328,8 +328,17 @@ text {
     color: #fff !important;
 }
 
+.wd-calendar-container.sel-hidden .wd-calendar-day.today.curr .wd-calendar-gregorian,
+.wd-calendar-container.sel-hidden .wd-calendar-day.today.curr .wd-calendar-solar {
+    color: #2a97ff !important;
+}
+
 .wd-calendar-day.today.curr .wd-calendar-gregorian.dot::before {
     color: #eee !important;
+}
+
+.wd-calendar-container.sel-hidden .wd-calendar-day.today.curr .wd-calendar-gregorian.dot::before {
+    color: #f37b1d !important;
 }
 
 .wd-calendar-gregorian-corner {

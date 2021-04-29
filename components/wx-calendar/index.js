@@ -83,6 +83,10 @@ Component({
             type: Number,
             optionalTypes: [String],
             value: (new Date).getTime()
+        },
+        checkedShow: {
+            type: Boolean,
+            value: true
         }
     },
     data: {
@@ -469,6 +473,11 @@ Component({
                     if (rects.length > 0) resolve(rects)
                     else reject(rects)
                 }).exec()
+            })
+        },
+        reloadPos() {
+            this.getRects().then(() => {
+                this.getDayCurr(this.data.currTab, this.data._selDay.month)
             })
         },
         initSelBar(i, d, l, w, v) {
@@ -1173,6 +1182,9 @@ Component({
             },
             next() {
                 calendarInstance.calendarNext()
+            },
+            reloadPos() {
+                calendarInstance.reloadPos()
             }
         }
     }
