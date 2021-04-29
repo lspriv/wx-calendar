@@ -446,18 +446,28 @@ Component({
         getRects() {
             this._rectsLoading = true
             return new Promise(resolve => {
+                Promise.all([this.getPos('#calendar'), this.getPos('.wd-calendar-week-item')])
+                    .then(([calendar, rects]) => {
+                        const _initX = calendar[0].left
+                        const _rects = rects.map(item => {
+                            item.center = item.left + item.width / 2 - _initX
+                            return item
+                        })
+                        this.setData({
+                            _rects
+                        }, () => {
+                            this._rectsLoading = false
+                            resolve()
+                        })
+                    })
+            })
+        },
+        getPos(selector) {
+            return new Promise((resolve, reject) => {
                 const query = this.createSelectorQuery()
-                query.selectAll(`.wd-calendar-week-item`).boundingClientRect(rects => {
-                    const _rects = rects.map(item => {
-                        item.center = item.left + item.width / 2
-                        return item
-                    })
-                    this.setData({
-                        _rects
-                    }, () => {
-                        this._rectsLoading = false
-                        resolve()
-                    })
+                query.selectAll(selector).boundingClientRect(rects => {
+                    if (rects.length > 0) resolve(rects)
+                    else reject(rects)
                 }).exec()
             })
         },
