@@ -141,51 +141,51 @@
 
 ### Methods 方法
 
-[**`toDate`**](#toDate)  跳转到日期
+[**`toDate`**](#toDate)  void 跳转到日期
 >     function(date|year, [month], [day])
 >     # 接受1个或3个参数
 >     # 只有1个参数时，可以为[Date|String]类型，当为String时形如 2021-4-10
 >     # 3个参数时，则为具体的 年,月,日
 
-[**`toMonth`**](#toMonth)  跳转到月份
+[**`toMonth`**](#toMonth) void 跳转到月份
 >     function(year, month)
 >     # 参数为 年,月
 
-[**`prev`**](#prev)  向前一个月
+[**`prev`**](#prev) void 向前一个月
 
-[**`next`**](#next)  向后一个月
+[**`next`**](#next) void 向后一个月
 
-[**`toggleView`**](#toggleView)  切换面板视图
+[**`toggleView`**](#toggleView) void 切换面板视图
 >     function(view)
 >     # 参数 view 为切换至 月month|周week
  
-[**`getDateInfo`**](#getDateInfo)  获取某个日期的信息
+[**`getDateInfo`**](#getDateInfo) object 获取某个日期的信息
 >     function(date|year, [month], [day])
 >     # 参数同 toDate
 
-[**`setMarkers`**](#setMarkers)  设置日期标记
+[**`setMarkers`**](#setMarkers) void 设置日期标记
 >     function(markers)
 >     # 参数 markers 同属性 _markers
 
-[**`addMarker`**](#addMarker)  新增日期标记
+[**`addMarker`**](#addMarker) void 新增日期标记
 >     function(marker)
 >     # 参数 marker = { year, month, day, type, mark, color, bgColor }
 
-[**`editMarker`**](#editMarker) 修改日期标记
+[**`editMarker`**](#editMarker) void 修改日期标记
 >     function(marker)
 >     # 参数 marker = { [_markerKey], year, month, day, type, mark, color, bgColor }
 >     # [_markerKey] 标记标识字段，可以由属性_markerKey定义，默认为id
 
-[**`delMarker`**](#delMarker) 删除日期标记
+[**`delMarker`**](#delMarker) void 删除日期标记
 >     function(date, type, key)
 >     # 参数 date = { year, month, day } 某个日期 
 >     # 参数 type = [holiday|corner|schedule] 当type为空时，会删除掉date下的所有类型标记
 >     # 参数 key 为标记标识字段的值，当key为空时，会删除掉date下的所有type类型的标记
 > 关于 [marker.type](#marker说明)
 
-[**`reloadMarkers`**](#reloadMarkers) 重新加载所有日期标记
+[**`reloadMarkers`**](#reloadMarkers) void 重新加载所有日期标记
 
-[**`reloadPos`**](#reloadPos) 重新计算calendar和选中状态的位置
+[**`reloadPos`**](#reloadPos) Promise 重新计算calendar和选中状态的位置
 
 ### 说明
 
