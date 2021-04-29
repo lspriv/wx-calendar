@@ -1,5 +1,5 @@
 <wxs module="calendar_wxs" src="./index.wxs"></wxs>
-<view class="wd-calendar-container {{ darkmode ? 'darkmode' : '' }}" style="{{ style }}">
+<view class="wd-calendar-container {{ darkmode ? 'darkmode' : '' }} {{ checkedShow ? '' : 'sel-hidden' }}" style="{{ style }}">
     <view 
         id="calendar" 
         class="wd-calendar {{ !loading ? 'load' : '' }}" 
@@ -62,7 +62,7 @@
                         style="height: {{ panelHeight }}px;min-height: {{ panelHeight }}px;"
                         data-trans="{{ month.trans }}">
                         <view 
-                            wx:if="{{ month.bar.s && currTab === mdx }}"
+                            wx:if="{{ month.bar.s && currTab === mdx && checkedShow }}"
                             class="wd-calendar-day-sel {{ barAni ? '' : 'no-ani' }} {{ month.bar.t ? 'today' : '' }} " 
                             style="top: {{ month.bar.y }};left: {{ month.bar.x }}px;" >
                             <view class="wd-calendar-day-sel-bar {{ month.bar.a ? 'animation' : '' }}" bindanimationend="handleSelBarAniEnd"></view>
