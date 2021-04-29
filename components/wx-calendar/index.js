@@ -476,8 +476,11 @@ Component({
             })
         },
         reloadPos() {
-            this.getRects().then(() => {
-                this.getDayCurr(this.data.currTab, this.data._selDay.month)
+            return new Promise((resolve, reject) => {
+                this.getRects().then(() => {
+                    this.getDayCurr(this.data.currTab, this.data._selDay.month)
+                    resolve()
+                })
             })
         },
         initSelBar(i, d, l, w, v) {
@@ -1184,7 +1187,7 @@ Component({
                 calendarInstance.calendarNext()
             },
             reloadPos() {
-                calendarInstance.reloadPos()
+                return calendarInstance.reloadPos()
             }
         }
     }
