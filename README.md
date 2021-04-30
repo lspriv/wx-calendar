@@ -35,7 +35,8 @@
 > 
 
 > **`注意`** 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
-
+>
+> **`注意`** 日历最大高度可达到屏幕高度80%，请注意布局
 ### Props 属性
 
 <table>
