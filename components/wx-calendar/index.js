@@ -143,11 +143,12 @@ Component({
         initialize(current, callback) {
             const _today = Today()
             const system = wx.getSystemInfoSync()
+            const maxRate = this.judgeScreen(system) ? 0.8 : 0.9
             const _clientWidth = system.windowWidth
             const _otherHeight = Math.floor(200 * _clientWidth / 750)
             const calendarHeight = Math.floor(CalendarHeight * _clientWidth / 750)
             const panelHeight = calendarHeight - _otherHeight
-            const maxHeight = Math.floor(system.windowHeight * 0.8)
+            const maxHeight = Math.floor(system.windowHeight * maxRate)
             const minHeight = panelHeight / 5 + _otherHeight
             let _date = this.getCorrectDate(this.data._date)
             _date = _date ? DayDetail(_date.year, _date.month, _date.day) : _today
@@ -167,6 +168,11 @@ Component({
             }, () => {
                 typeof callback === 'function' && callback.call(this, _date)
             })
+        },
+        judgeScreen(system) {
+            const rate = system.windowHeight / system.windowWidth
+            const limit = system.windowHeight == system.screenHeight ? 1.8 : 1.65
+            return rate > limit
         },
         initStyle() {
             const position = CalendarPositions.includes(this.data._position) ? this.data._position : 'relative'
