@@ -20,7 +20,19 @@ Page({
     handleCalendarLoad({ detail }) {
         // console.log('calendar-load', detail)
         this.calendar = this.selectComponent('#calendar')
-        console.log('calendar', this.calendar)
+            // 新增日期标记
+        let date = new Date
+        this.calendar.addMarker({
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            day: 10,
+            type: 'schedule',
+            mark: '测试',
+            color: '#2a97ff',
+            bgColor: '#cce6ff'
+        })
+
+        this.calendar.del
     },
     handleCalendarDateChange({ detail }) {
         // console.log('calendar-date-change', detail)

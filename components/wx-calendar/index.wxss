@@ -214,7 +214,7 @@ text {
 
 .wd-calendar-swiper {
     width: 100%;
-    height: calc(80vh - 200rpx);
+    height: 100%;
 }
 
 .wd-calendar-swiper-item {}
