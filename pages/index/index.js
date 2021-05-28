@@ -22,7 +22,6 @@ Page({
         this.calendar = this.selectComponent('#calendar')
             // 新增日期标记
         let date = new Date
-        console.log('1')
         this.calendar.setMarkers([{
             year: date.getFullYear(),
             month: date.getMonth() + 1,
@@ -32,18 +31,6 @@ Page({
             color: '#2a97ff',
             bgColor: '#cce6ff'
         }])
-        console.log('2')
-        this.calendar.setMarkers([{
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            day: 12,
-            type: 'schedule',
-            mark: '测试',
-            color: '#2a97ff',
-            bgColor: '#cce6ff'
-        }])
-
-        this.calendar.del
     },
     handleCalendarDateChange({ detail }) {
         // console.log('calendar-date-change', detail)
