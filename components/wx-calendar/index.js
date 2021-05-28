@@ -355,11 +355,11 @@ Component({
         },
         handleDynamicMarkers(markers) {
             if (Array.isArray(markers) && markers.length > 0) {
+                this.clearMarkers()
                 const _ms = markers.filter(_ => _.year && _.month && _.day)
                 const _markers = this.initMarkDays(_ms)
-                this.setData({ _markerdays: _markers }, () => {
-                    this.setDynamicMarkers(_markers)
-                })
+                this.setData({ _markerdays: _markers })
+                this.setDynamicMarkers(_markers)
             }
         },
         setDynamicMarkers(markers) {
@@ -384,6 +384,30 @@ Component({
                 }
             }
             this.setData({ months })
+        },
+        clearMarkers() {
+            const markers = Object.values(this.data._markerdays)
+            const months = this.data.months
+            let setData = new Object
+            for (let i = 0; i < markers.length; i++) {
+                let _marker = markers[i]
+                for (let j = 0; j < months.length; j++) {
+                    let _month = months[j]
+                    if (
+                        Math.abs(_month.year - _marker.year) < 2 &&
+                        Math.abs(_month.month - _marker.month) < 2
+                    ) {
+                        let _idx = _month.idays.findIndex(_ => _.year == _marker.year && _.month == _marker.month && _.day == _marker.day)
+                        if (_idx >= 0) {
+                            let _wdx = Math.floor(_idx / 7)
+                            let _widx = _idx % 7
+                            setData[`months[${ j }].idays[${ _idx }].marker`] = null
+                            setData[`months[${ j }].days[${ _wdx }].days[${ _widx }].marker`] = null
+                        }
+                    }
+                }
+            }
+            this.setData(setData)
         },
         initCalendarMonth(d, trans = '', wf = null) {
             const { year, month, lunar_order, lunar_year } = d
