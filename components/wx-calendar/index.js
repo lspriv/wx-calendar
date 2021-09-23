@@ -102,7 +102,7 @@ Component({
         currView: 1,
         tdOpShow: false,
         monthchange: false,
-        barAni: true,
+        barAnimation: true,
         weektabchange: -1,
         viewchange: '',
         solidDay: true,
@@ -120,12 +120,12 @@ Component({
     },
     attached() {
         this._rectsLoading = true
-        this._year_panel_show = false
-        this._curr_view = this.data.view == 'week' ? 2 : 1
+        this._yearPanelShow = false
+        this._currView = this.data.view == 'week' ? 2 : 1
         const current = this.data.currTab
         this.initialize(current, _date => {
-            this.getRects().then(() => {
-                if (this._curr_view == 2) {
+            this.calcWeekRects().then(() => {
+                if (this._currView == 2) {
                     this.setWeeks(_date, current).then(() => {
                         this.getDayCurr(current, _date.month)
                         this.bindLoad(true)
@@ -145,8 +145,8 @@ Component({
             const system = wx.getSystemInfoSync()
             const maxRate = this.judgeScreen(system) ? 0.8 : 0.9
             const _clientWidth = system.windowWidth
-            const _otherHeight = Math.floor(200 * _clientWidth / 750)
-            const calendarHeight = Math.floor(CalendarHeight * _clientWidth / 750)
+            const _otherHeight = Math.floor(200 * _clientWidth / 750) //
+            const calendarHeight = Math.floor(CalendarHeight * _clientWidth / 750) //
             const panelHeight = calendarHeight - _otherHeight
             const maxHeight = Math.floor(system.windowHeight * maxRate)
             const minHeight = panelHeight / 5 + _otherHeight
@@ -159,7 +159,7 @@ Component({
                 minHeight,
                 calendarHeight,
                 panelHeight,
-                currView: this._curr_view,
+                currView: this._currView,
                 _selDay: _date,
                 _selWeek: _date.week,
                 titleInfo: this.setTitleInfo(_date, _today),
@@ -212,7 +212,7 @@ Component({
             const _first = this.data.months[(currTab + 3) % 5]
             const _last = this.data.months[(currTab + 2) % 5]
             const _curr = this.data.months[currTab]
-            const _detail = this._curr_view == 2 ? this.getTriggerWeekDetail(_curr, _first, _last) : this.getTriggerMonthDetail(_curr, _first, _last)
+            const _detail = this._currView == 2 ? this.getTriggerWeekDetail(_curr, _first, _last) : this.getTriggerMonthDetail(_curr, _first, _last)
             return Object.assign({}, _detail, { curr: this.data._selDay })
         },
         getTriggerWeekDetail(_curr, _first, _last) {
@@ -477,7 +477,7 @@ Component({
                 })
             })
         },
-        getRects() {
+        calcWeekRects() {
             this._rectsLoading = true
             return new Promise(resolve => {
                 Promise.all([this.getPos('#calendar'), this.getPos('.wd-calendar-week-item')])
@@ -507,7 +507,7 @@ Component({
         },
         reloadPos() {
             return new Promise((resolve, reject) => {
-                this.getRects().then(() => {
+                this.calcWeekRects().then(() => {
                     this.getDayCurr(this.data.currTab, this.data._selDay.month)
                     resolve()
                 })
@@ -576,7 +576,7 @@ Component({
                     this.setData({
                         [`months[${ currTab }]`]: this.handelWeekMonthChange(this.data._selDay, newMonth),
                         monthchange: true,
-                        barAni: false
+                        barAnimation: false
                     }, () => {
                         this.handleWeekMonthChangeSel(seek, currTab, newMonth)
                     })
@@ -602,7 +602,7 @@ Component({
                     _currWeekIdx: wdx,
                     _selDay: seekDay,
                     _selWeek: seekDay.week,
-                    barAni: true,
+                    barAnimation: true,
                     [`months[${ currTab }].bar`]: this.initSelBar(seekIdx, seekDay, month.days.length, wdx, true)
                 }
                 this.setData(setData, () => {
@@ -743,10 +743,10 @@ Component({
             today = today ? today : this.data._today
             let titleInfo = this.data.titleInfo
             if (d.year == today.year && d.month == today.month && d.day == today.day) {
-                titleInfo = this._curr_view == 2 ? `第${ YearWeekOrder(today.year, today.month, today.day) }周  ${ today.week_name }` : today.week_name
+                titleInfo = this._currView == 2 ? `第${ YearWeekOrder(today.year, today.month, today.day) }周  ${ today.week_name }` : today.week_name
             } else {
                 const count = this.getDateDiff(new Date(today.year, today.month - 1, today.day), new Date(d.year, d.month - 1, d.day))
-                titleInfo = `${ this._curr_view == 2 ? '第' + YearWeekOrder(d.year, d.month, d.day) + '周  ' : ''}${ Math.abs(count) }天${ count < 0 ? '前' : '后' }`
+                titleInfo = `${ this._currView == 2 ? '第' + YearWeekOrder(d.year, d.month, d.day) + '周  ' : ''}${ Math.abs(count) }天${ count < 0 ? '前' : '后' }`
             }
             this.setData({ titleInfo })
         },
@@ -754,20 +754,20 @@ Component({
             return Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
         },
         toggleView({ state }) {
-            this._curr_view = state
+            this._currView = state
         },
         handleCalendarTransEnd() {
-            const noChanged = ((this.data.currView == 1 || this.data.currView == 3) && (this._curr_view == 1 || this._curr_view == 3) || this._curr_view == this.data.currView)
+            const noChanged = ((this.data.currView == 1 || this.data.currView == 3) && (this._currView == 1 || this._currView == 3) || this._currView == this.data.currView)
             if (!noChanged) {
-                this.triggerView(this._curr_view)
+                this.triggerView(this._currView)
                 this.setData({
-                    currView: this._curr_view
+                    currView: this._currView
                 }, () => {
                     const { _selDay, currTab } = this.data
-                    if (this._curr_view == 2) {
+                    if (this._currView == 2) {
                         this.setMonthsForWeek(currTab, setData => {
                             setData.weektabchange = currTab
-                            if (this._curr_view == 1) setData.yearPanelShow = this._year_panel_show
+                            if (this._currView == 1) setData.yearPanelShow = this._yearPanelShow
                             return setData
                         }, () => {
                             this.triggerChange('week')
@@ -775,7 +775,7 @@ Component({
                     } else {
                         const _trans = this.getMonthsTrans(_selDay, this.data.months[currTab].trans, true)
                         this.refreshAllMonth(_selDay, currTab, _trans, setData => {
-                            if (this._curr_view == 1) setData.yearPanelShow = this._year_panel_show
+                            if (this._currView == 1) setData.yearPanelShow = this._yearPanelShow
                             return setData
                         }, () => {
                             this.triggerChange('month')
@@ -783,15 +783,15 @@ Component({
                     }
                     this.setTitleInfo(_selDay)
                 })
-            } else if (this._curr_view != this.data.currView) {
-                let setData = { currView: this._curr_view }
-                if (this._curr_view == 1) setData.yearPanelShow = this._year_panel_show
+            } else if (this._currView != this.data.currView) {
+                let setData = { currView: this._currView }
+                if (this._currView == 1) setData.yearPanelShow = this._yearPanelShow
                 this.setData(setData)
             }
         },
         handleOpBarTransEnd() {
             this.setData({
-                solidDay: this._curr_view != 2
+                solidDay: this._currView != 2
             })
         },
         toToday() {
@@ -810,7 +810,7 @@ Component({
                 this.setData({
                     [`months[${ tab }]`]: this.handelWeekMonthChange(this.data._selDay, newMonth),
                     monthchange: true,
-                    barAni: false
+                    barAnimation: false
                 }, () => {
                     typeof callback === 'function' && callback()
                 })
@@ -833,7 +833,7 @@ Component({
                         if (idx >= 0) this.setDate(idx, currTab, (setData, _s, _w) => {
                             if (_w === this.data._currWeekIdx) return setData
                             setData = Object.assign({}, setData, this.refreshAllTrans(_s))
-                            setData.barAni = true
+                            setData.barAnimation = true
                             return setData
                         })
                     })
@@ -845,7 +845,7 @@ Component({
                             const _idx = this.data.months[isInSwiper].idays.findIndex(_d => (_d.month == date.month && _d.day == date.day))
                             this.setDate(_idx, isInSwiper, (setData, _s, _w) => {
                                 setData = Object.assign({}, setData, this.refreshAllTrans(_s))
-                                setData.barAni = true
+                                setData.barAnimation = true
                                 return setData
                             })
                         })
@@ -1051,27 +1051,27 @@ Component({
             }
         },
         justYearPanelShow() {
-            this._year_panel_show = true
+            this._yearPanelShow = true
             this.setData({
                 yearPanelShow: true
             })
         },
         handleYearPanelShow() {
-            this._year_panel_show = true
+            this._yearPanelShow = true
         },
         handleYearPanelDayClick(e) {
             const { year, month } = e.currentTarget.dataset
             const currTab = this.data.currTab
             const currMonth = this.data.months[currTab]
             if (currMonth.year == year && currMonth.month == month) {
-                this._year_panel_show = false
+                this._yearPanelShow = false
                 this.setData({
                     yearPanelShow: false
                 })
             } else {
                 const d = this.getMonthDay(year, month, this.data._selDay.day)
                 const _trans = this.getMonthsTrans(d, currTab)
-                this._year_panel_show = false
+                this._yearPanelShow = false
                 this.setData({
                     [`months[${ currTab }]`]: this.refreshMonth(d, currTab, _trans),
                     _selDay: d,

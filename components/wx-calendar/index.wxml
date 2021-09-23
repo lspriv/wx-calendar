@@ -63,7 +63,7 @@
                         data-trans="{{ month.trans }}">
                         <view 
                             wx:if="{{ month.bar.s && currTab === mdx && checkedShow }}"
-                            class="wd-calendar-day-sel {{ barAni ? '' : 'no-ani' }} {{ month.bar.t ? 'today' : '' }} " 
+                            class="wd-calendar-day-sel {{ barAnimation ? '' : 'no-ani' }} {{ month.bar.t ? 'today' : '' }} " 
                             style="top: {{ month.bar.y }};left: {{ month.bar.x }}px;" >
                             <view class="wd-calendar-day-sel-bar {{ month.bar.a ? 'animation' : '' }}" bindanimationend="handleSelBarAniEnd"></view>
                         </view>
