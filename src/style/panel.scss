@@ -1,0 +1,245 @@
+.wx-calendar-weeks {
+    @include column-rect;
+    height: 50rpx;
+    padding: 10rpx 10rpx 0;
+    position: absolute;
+    width: 100%;
+    top: 100rpx;
+    left: 0;
+    z-index: 1024;
+    background: transparent;
+    transition: all .28s ease 0s;
+    opacity: 0;
+    &-item {
+        text-align: center;
+        font-size: $wx-calendar-week-size;
+        color: theme(week-color);
+        font-weight: bold;
+        @include column-width;
+    }
+}
+
+.wx-calendar-panel {
+    width: 100%;
+    height: calc(100% - 200rpx);
+    position: absolute;
+    top: 150rpx;
+    left: 0;
+    z-index: 10;
+    background: transparent;
+    overflow: hidden;
+    &.solid {
+        .wx-calendar-panel-date.prev,
+        .wx-calendar-panel-date.next {
+            opacity: 1;
+        }
+    }
+    &-month {
+        width: 100%;
+        /* height: 620rpx;
+        min-height: 620rpx; */
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    &-sel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100rpx;
+        height: 100rpx;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all .28s ease 0s;
+        z-index: -1;
+        will-change: top, left;
+        overflow: hidden;
+        &.no-ani {
+            transition: unset;
+        }
+        &.today {
+            .wx-calendar-panel-sel-bar {
+                /* background-color: #2a97ff !important; */
+                background: theme(sel-today-bg);
+            }
+        }
+        &-bar {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: inherit;
+            background: theme(sel-bg);
+            // will-change: transform;
+            &.animation {
+                @include animation-sel-bar;
+            }
+        }
+    }
+    &-row {
+        width: 100%;
+        padding: 0 10rpx;
+        @include column-rect;
+        @include month-week-rows(4);
+        @include month-week-rows(5);
+        @include month-week-rows(6);
+    }
+    &-date {
+        @include column-width;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity .28s ease 0s;
+        overflow: hidden;
+        &.prev,
+        &.next {
+            opacity: .3;
+            // will-change: opacity;
+        }
+        &.curr {
+            .wx-calendar-panel-day {
+                color: theme(sel-color);
+                &.dot::before {
+                    color: theme(sel-dot-color);
+                }
+            }
+            .wx-calendar-panel-solar {
+                color: theme(sel-solar-color);
+            }
+            &.today {
+                .wx-calendar-panel-day {
+                    color: theme(sel-today-color);
+                    &.dot::before {
+                        color: theme(sel-today-dot-color);
+                    }
+                }
+                .wx-calendar-panel-solar {
+                    color: theme(sel-today-solar-color);
+                }
+            }
+        }
+        &.today {
+            .wx-calendar-panel-day {
+                color: theme(date-today-color);
+            }
+        }
+    }
+    &-day {
+        font-size: $wx-calendar-date-size;
+        line-height: $wx-calendar-date-size;
+        font-weight: bold;
+        color: theme(date-color);
+        transition: color .3s ease 0s;
+        position: relative;
+        &.dot {
+            &::before {
+                content: "･";
+                position: absolute;
+                top: -22rpx;
+                left: 50%;
+                transform: translateX(-50%) translateZ(0px);
+                color: theme(date-dot-color);
+                @include animation-dot-fade;
+                opacity: 0;
+                // will-change: opacity;
+            }
+        }
+        &-corner {
+            position: absolute;
+            top: -8rpx;
+            right: -26rpx;
+            font-size: $wx-calendar-corner-size;
+            line-height: $wx-calendar-corner-size;
+            font-weight: bold;
+            padding: 4rpx;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4rpx;
+        }
+    }
+    &-solar {
+        font-size: $wx-calendar-solar-size;
+        line-height: $wx-calendar-solar-size;
+        color: theme(date-info-color);
+        font-weight: bold;
+        margin-top: 8rpx;
+        transition: color .3s ease 0s;
+        letter-spacing: 2rpx;
+        padding-left: 2rpx;
+        position: relative;
+        width: 100%;
+        text-align: center;
+        &.solar {
+            color: theme(date-solar-color);
+        }
+        &-schedules {
+            position: absolute;
+            width: 100%;
+            padding: 0 8rpx;
+            top: 30rpx;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transition: all .28s ease 0s;
+            // will-change: opacity;
+            &.show {
+                opacity: 1;
+            }
+            &-item {
+                font-size: $wx-calendar-schedule-size;
+                line-height: $wx-calendar-schedule-size; // 26rpx
+                font-weight: bold;
+                color: theme(schedule-color);
+                background-color: theme(schedule-bg);
+                padding: 4rpx;
+                border-radius: 6rpx;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                word-break: break-all;
+                -webkit-line-clamp: 1;
+            }
+            &-more {
+                color: theme(schedule-color);
+                font-size: $wx-calendar-schedule-size;
+                font-weight: bold;
+                margin-top: 6rpx;
+            }
+        }
+    }
+}
+
+.wx-calendar-container {
+    &.sel-hidden {
+        .wx-calendar-panel-date {
+            &.today {
+                &.curr {
+                    .wx-calendar-panel-day {
+                        color: theme(sel-hidden-today);
+                    }
+                    .wx-calendar-panel-solar {
+                        color: theme(sel-hidden-solar);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.wx-calendar {
+    &.load {
+        .wx-calendar-weeks {
+            opacity: 1;
+        }
+    }
+}

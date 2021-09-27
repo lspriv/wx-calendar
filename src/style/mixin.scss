@@ -1,0 +1,38 @@
+@use "sass:map";
+@mixin column-width ($columms: 7) {
+    width: calc(100% / #{$columms});
+}
+
+@mixin column-rect {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin month-week-rows ($length) {
+    &.l-#{$length} {
+        height: calc(100% / #{$length});
+    }
+}
+
+@mixin animation($name, $timing-func: ease, $duration: .3s, $delay: 0s, $count: 1, $direction: normal, $fill-mode: none) {
+    $-name: #{$name}-#{unique-id()};
+    @keyframes #{$-name} {
+        @content;
+    }
+    animation-name: $-name;
+    animation-duration: $duration;
+    animation-timing-function: $timing-func;
+    animation-delay: $delay;
+    animation-fill-mode: $fill-mode;
+    animation-iteration-count: $count;
+    animation-direction: $direction;
+}
+
+@mixin theme-values($theme) {
+    $keys: map.keys($theme);
+    @each $key in $keys {
+        #{$wx-calendar-theme-prefix}#{$key}: map.get($theme, $key)
+    }
+}

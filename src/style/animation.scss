@@ -1,0 +1,22 @@
+@mixin animation-sel-bar {
+    @include animation(selbar, ease, .28s) {
+        0%,
+        100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(.5);
+        }
+    }
+}
+
+@mixin animation-dot-fade {
+    @include animation(dotfade, ease, .3s, $fill-mode: both) {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}

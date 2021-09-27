@@ -1,0 +1,50 @@
+{
+    "name": "wx-calendar",
+    "version": "1.2.0",
+    "description": "a calendar for wechat miniprogram",
+    "main": "index.js",
+    "scripts": {
+        "build": "NODE_ENV=production gulp build",
+        "dev": "NODE_ENV=development gulp dev",
+        "test": "npx jest"
+    },
+    "keywords": [
+        "miniprogram",
+        "calendar"
+    ],
+    "author": "lspriv",
+    "license": "MIT",
+    "standard": {
+        "globals": [
+            "App",
+            "Page",
+            "Component",
+            "wx"
+        ],
+        "envs": [
+            "jest",
+            "browser"
+        ]
+    },
+    "devDependencies": {
+        "@babel/preset-env": "^7.14.7",
+        "gulp": "^4.0.2",
+        "gulp-babel": "^8.0.0",
+        "gulp-clean": "^0.4.0",
+        "gulp-htmlmin": "^5.0.1",
+        "gulp-if": "^3.0.0",
+        "gulp-json-format": "^2.0.0",
+        "gulp-jsonmin": "^1.2.0",
+        "gulp-plumber": "^1.2.1",
+        "gulp-sass": "^5.0.0",
+        "gulp-sass-glob": "^1.1.0",
+        "gulp-size": "^4.0.1",
+        "gulp-uglify": "^3.0.2",
+        "jest": "^27.0.6",
+        "miniprogram-simulate": "^1.4.0",
+        "sass": "^1.35.1",
+        "through2": "^4.0.2",
+        "uglify-js": "^3.13.10"
+    },
+    "dependencies": {}
+}
