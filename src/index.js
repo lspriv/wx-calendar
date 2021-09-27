@@ -81,7 +81,7 @@ Component({
          * @type {boolean} true | false
          * @description 是否显示标记
          */
-        showMaker: {
+        showMark: {
             type: Boolean,
             value: true
         }
@@ -119,7 +119,7 @@ Component({
         this._yearPanelShow = false
         this._weekStart = this.data._startWeek
         this._currView = this.data.view === 'week' ? 2 : 1
-        if (this.data.showMaker) this._dateMarkers = this.initMarkers()
+        if (this.data.showMark) this._dateMarkers = this.initMarkers()
         this._handler = new DateHandler(this, this._weekStart)
 
         this.initialize(() => {
@@ -836,7 +836,7 @@ Component({
     },
     observers: {
         _markers: function(markers) {
-            if (!this.data.showMaker) return
+            if (!this.data.showMark) return
             if (this.data.loading) return
             this._dateMarkers = this.initMarkers()
                 // this.refreshPanelDays()
