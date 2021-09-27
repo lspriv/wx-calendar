@@ -1,8 +1,8 @@
-## WX Calendar
+## WX Calendar 2.0
 
 >
 
-借鉴了`MIUI 12`日历的部分设计，制作适合微信小程序的日历
+wx calendar 2.0已发布，借鉴了`MIUI 12`日历的部分设计，制作适合微信小程序的日历
 
 >     · 周月视图切换
 >     · 日期标记
@@ -17,12 +17,13 @@
 
 
 ### 使用
+直接复制dist/wx-calendar到你的项目
 
 页面json配置：
 ```json
 {
     "usingComponents": {
-        "calendar": "/components/wx-calendar/index"
+        "calendar": "/your-path/wx-calendar/index"
     }
 }
 ```
@@ -35,8 +36,58 @@
 > 
 
 > **`注意`** 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
->
-> **`注意`** 日历最大高度可达到屏幕高度80%，请注意布局
+
+### 二次开发
+启动
+```javascript
+npm install
+npm run dev
+```
+
+目录结构：  
+```
+├─dev（直接用微信开发工具打开此目录，用其它工具编辑代码可响应变化）
+├─dist（组件代码生成目录）
+├─gulpfile.js（gulp配置）
+├─test（测试）
+├─src（主要开发目录）
+│   ├─plugins
+│   │  └─lunar.js（农历）
+│   ├─utils
+│   │  ├─handler.js（日期处理）
+│   │  ├─service.js（服务注册）
+│   │  ├─tools.js（工具方法）
+│   │  └─device.js（设备布局） 
+│   ├─styles
+│   │     ├─theme.scss（主题色和字体）
+│   │     ├─mixin.scss（混入）
+│   │     ├─functions.scss（公共方法）
+│   │     ├─animation.scss（动画）
+│   │     ├─container.scss（基本样式）
+│   │     ├─topinfo.scss（标题和视图控制样式）
+│   │     ├─panel.scss（星期和月面板样式）
+│   │     ├─bar.scss（底部控制条样式）
+│   │     ├─year.scss（年面板样式）
+│   │     └─darkmode.scss（深色模式）
+|   ├─index.js
+|   ├─index.wxml
+|   ├─index.scss
+|   ├─index.json
+|   └─index.wxs
+├─.babelrc（babel配置）
+└─package.json（项目配置）
+```
+对src/styles/theme.scss定义的变量修改可满足基本的样式修改
+
+测试目录test没有完成，因为我发现用微信开发工具导入dev目录，用其他开发工具编辑代码效果很好
+
+打包
+```javascript
+npm run build
+```
+
+
+
 ### Props 属性
 
 <table>
@@ -45,64 +96,97 @@
         <th>类型</th>
         <th>说明</th>
         <th>默认值</th>
+        <th>版本</th>
     </tr>
     <tr>
         <td>view</td>
         <td>String</td>
         <td>初始化为月视图或周视图</td>
         <td>month [week]</td>
+        <td>2.0</td>
     </tr>
     <tr>
-        <td>_position</td>
+        <td><s>_position</s></td>
         <td>String</td>
         <td>定位</td>
         <td>relative [absolute, fixed]</td>
+        <td>1.0</td>
     </tr>
     <tr>
-        <td>_top</td>
+        <td><s>_top</s></td>
         <td>String | Number</td>
         <td>绝对定位有效</td>
         <td>--</td>
+        <td>1.0</td>
     </tr>
     <tr>
         <td>_markers</td>
         <td>Array</td>
         <td>日期标记</td>
         <td>--</td>
+        <td>2.0</td>
     </tr>
     <tr>
-        <td>_markerKey</td>
+        <td><s>_markerKey</s></td>
         <td>String</td>
         <td>标记标识字段，用于筛选</td>
         <td>id</td>
+        <td>1.0</td>
     </tr>
     <tr>
         <td>_vibrate</td>
         <td>Boolean</td>
         <td>点选日期是否震动</td>
         <td>true</td>
+        <td>2.0</td>
     </tr>
     <tr>
         <td>darkmode</td>
         <td>Boolean</td>
         <td>黑暗模式</td>
         <td>false</td>
+        <td>2.0</td>
     </tr>
     <tr>
         <td>_date</td>
-        <td>String|Number</td>
+        <td>String|Number|Array|Object</td>
         <td>选择初始日期</td>
-        <td>xxxx-xx-xx｜timestamp</td>
+        <td>xxxx-xx-xx | timestamp | [xxxx, xx, xx] | { year, month, day }</td>
+        <td>2.0</td>
     </tr>
     <tr>
         <td>checkedShow</td>
         <td>Boolean</td>
         <td>选中状态显示</td>
         <td>true</td>
+        <td>2.0</td>
+    </tr>
+    <tr>
+        <td>_startWeek</td>
+        <td>Number</td>
+        <td>一周开始日</td>
+        <td>0 | 1 | 2 | 3 | 4 | 5 | 6</td>
+        <td>2.0</td>
+    </tr>
+    <tr>
+        <td>showLunar</td>
+        <td>Boolean</td>
+        <td>显示农历</td>
+        <td>true</td>
+        <td>2.0</td>
+    </tr>
+   <tr>
+        <td>showMark</td>
+        <td>Boolean</td>
+        <td>显示标记</td>
+        <td>true</td>
+        <td>2.0</td>
     </tr>
 </table>
 
 > 关于 [_markers](#说明)
+> 
+> 版本号显示2.0的属性时wx-calendar2.0新增或延续的属性，版本号显示1.0的属性在2.0中已废弃
 
 ### Events 事件
 
@@ -112,10 +196,14 @@
 
 
 [**`binddatechange`**](#binddatechange)  日期选择变化
->     e.detail = { date } 
+>     e.detail = { date, range, visual, view } 
 >     # date为当前选择日期
+>     # range: 当前swiper日期范围
+>     # visual: 可视区域日期范围
+>     # view: 当前面板视图，月/周
 
-[**`bindrangechange`**](#bindrangechange)  日期范围变化
+
+<s>bindrangechange  日期范围变化</s>，2.0已废弃
 >     e.detail = { curr, range, view, visual, markerCommit } 
 >     # curr: 当前选择日期
 >     # range: 当前swiper日期范围
@@ -126,6 +214,8 @@
 [**`bindviewchange`**](#bindviewchange)   面板视图变化
 >     e.detail = { view } 
 >     # view: 当前面板视图，月/周
+
+> bindrangechange事件已于2.0版本中废弃，考虑到日期范围变化是日期选择变化的充分条件，继续注册这个事件没有多大意义，其核心字段range,visual已移到binddatechange事件中，注意日期范围变化非日期选择变化的必要条件，请对range前后比较后判断日期范围是否变化
    
 ### Slots 插槽
 
@@ -164,29 +254,40 @@
 >     function(date|year, [month], [day])
 >     # 参数同 toDate
 
-[**`setMarkers`**](#setMarkers) void 设置日期标记
+<s>setMarkers void 设置日期标记</s>，2.0已废弃
 >     function(markers)
 >     # 参数 markers 同属性 _markers
 
-[**`addMarker`**](#addMarker) void 新增日期标记
+<s>addMarker void 新增日期标记</s>，2.0已废弃
 >     function(marker)
 >     # 参数 marker = { year, month, day, type, mark, color, bgColor }
 
-[**`editMarker`**](#editMarker) void 修改日期标记
+<s>editMarker void 修改日期标记</s>，2.0已废弃
 >     function(marker)
 >     # 参数 marker = { [_markerKey], year, month, day, type, mark, color, bgColor }
 >     # [_markerKey] 标记标识字段，可以由属性_markerKey定义，默认为id
 
-[**`delMarker`**](#delMarker) void 删除日期标记
+<s>delMarker void 删除日期标记</s>，2.0已废弃
 >     function(date, type, key)
 >     # 参数 date = { year, month, day } 某个日期 
 >     # 参数 type = [holiday|corner|schedule] 当type为空时，会删除掉date下的所有类型标记
 >     # 参数 key 为标记标识字段的值，当key为空时，会删除掉date下的所有type类型的标记
 > 关于 [marker.type](#marker说明)
 
-[**`reloadMarkers`**](#reloadMarkers) void 重新加载所有日期标记
+<s>reloadMarkers void 重新加载所有日期标记</s>，2.0已废弃
 
 [**`reloadPos`**](#reloadPos) Promise 重新计算calendar和选中状态的位置
+
+> 关于日期标记的5个方法setMarkers，addMarker，editMarker，delMarker和reloadMarkers在2.0版本中已全部废弃，主要是因为对属性_markers加了监听器，如下
+
+### 监听器
+
+[**`_markers`**](#_markers)
+>     2.0版本对属性_markers添加了监听器，
+>     只需对传入的_makers进行更改，calendar即可相应变化，
+>     注意，请在bindload事件之后对传入的_makers进行变动，
+>     在日历加载期间，会略过_markers变动，不响应变化
+>     当然，赋初始值不受任何影响
 
 ### 说明
 
