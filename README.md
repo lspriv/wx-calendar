@@ -2,13 +2,13 @@
 
 >
 
-wx calendar 2.0已发布，借鉴了`MIUI 12`日历的部分设计，制作适合微信小程序的日历
+借鉴了`MIUI 12`日历的部分设计，制作适合微信小程序的日历
 
 >     · 周月视图切换
 >     · 日期标记
 >     · 农历信息
 
-> [欢迎到issues面板提出建议和BUG](https://github.com/lspriv/wx-calendar/issues/new?assignees=&labels=&template=bug_report.md&title=)
+> [wx-calendar2.0已发布，欢迎到issues面板提出建议和BUG](https://github.com/lspriv/wx-calendar/issues/new?assignees=&labels=&template=bug_report.md&title=)
 
 ### 预览
 
