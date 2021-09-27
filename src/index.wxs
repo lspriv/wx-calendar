@@ -1,0 +1,291 @@
+var touchStart = function(event, ins) {
+    var toucheY = event.changedTouches[0].pageY
+    var dataset = event.mark
+    var state = ins.getState()
+    state.calendarPageY = toucheY
+    state.calendarHeight = dataset.calendar
+    state.panelHeight = dataset.panel
+    state.calendarMax = dataset.max
+    state.calendarMin = dataset.min
+    if (!state.calendarCurrHeight) state.calendarCurrHeight = dataset.calendar
+    if (dataset.view == 1) state.calendarCurrHeight = dataset.calendar
+    if (dataset.view == 2) state.calendarCurrHeight = dataset.min
+    if (dataset.view == 3) state.calendarCurrHeight = dataset.max
+}
+
+var touchMove = function(event, ins) {
+    var state = ins.getState()
+    var diff = Math.floor(event.changedTouches[0].pageY - state.calendarPageY)
+    if (
+        state.calendarCurrHeight + diff >= state.calendarMin &&
+        state.calendarCurrHeight + diff <= state.calendarMax + 80
+    ) {
+        //calendar平移
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'unset',
+            height: (state.calendarCurrHeight + diff) + 'px'
+        })
+        var currPanel = ins.selectComponent('.wx-calendar-panel-month.curr')
+        if ((state.calendarCurrHeight + diff) >= state.calendarHeight) {
+            currPanel.setStyle({
+                transition: 'unset',
+                height: 'calc(' + (state.calendarCurrHeight + diff) + 'px - 200rpx)'
+            })
+        }
+        //面板平移
+        if ((state.calendarCurrHeight + diff) < state.calendarHeight) {
+            var totalTrans = currPanel.getDataset().trans
+            var totalTransDis = state.calendarHeight - state.calendarMin
+            var panleTrans = Math.floor(totalTrans * Math.abs(state.calendarCurrHeight + diff - state.calendarHeight) / totalTransDis)
+            currPanel.setStyle({
+                transition: 'unset',
+                transform: 'translateY(' + (-panleTrans) + 'px)'
+            })
+        }
+        //当 viewSate 3 -> 2视图 隐藏日程
+        if (((state.calendarCurrHeight + diff) < (state.calendarMax - 40))) {
+            var schedules = ins.selectAllComponents('.wx-calendar-panel-solar-schedules')
+            for (var i = 0; i < schedules.length; i++) {
+                schedules[i].removeClass('show')
+            }
+        }
+        //底部控制条样式
+        var director = diff > 0 ? 1 : -1
+        var deg = Math.abs(diff) < 120 ? director * Math.floor(Math.abs(diff) / 120 * 20) : director * 20
+        ins.selectComponent('#control_1').setStyle({
+            transition: 'unset',
+            transform: 'rotate(' + deg + 'deg)'
+        })
+        ins.selectComponent('#control_2').setStyle({
+            transition: 'unset',
+            transform: 'rotate(' + (-deg) + 'deg)'
+        })
+    }
+}
+
+var touchEnd = function(event, ins) {
+    var state = ins.getState()
+    var _pageY = event.changedTouches[0].pageY
+    var diff = Math.floor((_pageY - state.calendarPageY))
+    var position = state.calendarCurrHeight + diff
+    var viewSate = event.mark.view
+    var calendarCriticalMin = state.calendarHeight - Math.floor((state.calendarHeight - state.calendarMin) / 2)
+    var calendarCriticalMax = state.calendarHeight + Math.floor((state.calendarMax - state.calendarHeight) / 2)
+    if (position > calendarCriticalMax) {
+        viewSate = 3
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .3s ease 0s',
+            height: state.calendarMax + 'px'
+        })
+        ins.selectComponent('.wx-calendar-panel-month.curr').setStyle({
+            transition: 'all .3s ease 0s',
+            height: 'calc(' + state.calendarMax + 'px - 200rpx)',
+            transform: 'translateY(0)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            others[i].setStyle({
+                transition: 'unset',
+                height: 'calc(' + state.calendarMax + 'px - 200rpx)'
+            })
+        }
+        var schedules = ins.selectAllComponents('.wx-calendar-panel-solar-schedules')
+        for (var i = 0; i < schedules.length; i++) {
+            schedules[i].addClass('show')
+        }
+        state.schedule_show = true
+    } else if (position <= calendarCriticalMax && position > calendarCriticalMin) {
+        viewSate = 1
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .3s cubic-bezier(0.5, 0, 0.27, 1.5) 0s',
+            height: state.calendarHeight + 'px'
+        })
+        ins.selectComponent('.wx-calendar-panel-month.curr').setStyle({
+            transition: 'all .3s cubic-bezier(0.5, 0, 0.27, 1.5) 0s',
+            height: state.panelHeight + 'px',
+            transform: 'translateY(0)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            others[i].setStyle({
+                transition: 'unset',
+                height: state.panelHeight + 'px',
+                transform: 'translateY(0)'
+            })
+        }
+    } else {
+        viewSate = 2
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .3s cubic-bezier(0.5, 0, 0.27, 1.5) 0s',
+            height: state.calendarMin + 'px'
+        })
+        var curr = ins.selectComponent('.wx-calendar-panel-month.curr')
+        curr.setStyle({
+            transition: 'all .3s cubic-bezier(0.5, 0, 0.27, 1.5) 0s',
+            height: state.panelHeight + 'px',
+            transform: 'translateY(' + (-curr.getDataset().trans) + 'px)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            var trans = others[i].getDataset().trans
+            others[i].setStyle({
+                transition: 'unset',
+                height: state.panelHeight + 'px',
+                transform: 'translateY(' + (-trans) + 'px)'
+            })
+        }
+    }
+    ins.selectComponent('#control_1').setStyle({
+        transition: 'all .3s cubic-bezier(0.6, 0, 0.27, 1.5) .2s',
+        transform: 'rotate(0deg)'
+    })
+    ins.selectComponent('#control_2').setStyle({
+        transition: 'all .3s cubic-bezier(0.6, 0, 0.27, 1.5) .2s',
+        transform: 'rotate(0deg)'
+    })
+    ins.callMethod('toggleView', { state: viewSate })
+}
+
+var handleViewToggle = function(viewState, dataset, ins) {
+    if (viewState == 2) {
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.min + 'px'
+        })
+        var curr = ins.selectComponent('.wx-calendar-panel-month.curr')
+        curr.setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.panel + 'px',
+            transform: 'translateY(' + (-curr.getDataset().trans) + 'px)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            var trans = others[i].getDataset().trans
+            others[i].setStyle({
+                transition: 'unset',
+                height: dataset.panel + 'px',
+                transform: 'translateY(' + (-trans) + 'px)'
+            })
+        }
+    } else {
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.calendar + 'px'
+        })
+        ins.selectComponent('.wx-calendar-panel-month.curr').setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.panel + 'px',
+            transform: 'translateY(0)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            others[i].setStyle({
+                transition: 'unset',
+                height: dataset.panel + 'px',
+                transform: 'translateY(0)'
+            })
+        }
+    }
+    var schedules = ins.selectAllComponents('.wx-calendar-panel-solar-schedules')
+    for (var i = 0; i < schedules.length; i++) {
+        schedules[i].removeClass('show')
+    }
+}
+
+var toggleView = function(e, ins) {
+    var dataset = e.mark
+    var viewSate = dataset.view == 2 ? 1 : 2
+    ins.callMethod('toggleView', { state: viewSate })
+    handleViewToggle(viewSate, dataset, ins)
+}
+
+var handleViewChange = function(view, _, ins) {
+    if (view) {
+        var dataset = ins.selectComponent('#calendar').getDataset()
+        var viewSate = view == 'week' ? 2 : 1
+        handleViewToggle(viewSate, dataset, ins)
+        ins.callMethod('toggleView', { state: viewSate })
+    }
+}
+
+var handleWeekSwiperChange = function(weektabchange, _, ins) {
+    if (weektabchange >= 0) {
+        var dataset = ins.selectComponent('#calendar').getDataset()
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            var trans = others[i].getDataset().trans
+            others[i].setStyle({
+                transition: 'unset',
+                height: dataset.panel + 'px',
+                transform: 'translateY(' + (-trans) + 'px)'
+            })
+        }
+    }
+}
+
+var handleMonthChange = function(monthchange, _, ins) {
+    if (monthchange) {
+        var dataset = ins.selectComponent('#calendar').getDataset()
+        var curr = ins.selectComponent('.wx-calendar-panel-month.curr')
+        curr.setStyle({
+            transition: 'unset',
+            height: dataset.panel + 'px',
+            transform: 'translateY(' + (-curr.getDataset().trans) + 'px)'
+        })
+    }
+}
+
+var handleInitTrans = function(needInitTrans, _, ins) {
+    if (needInitTrans) {
+        var dataset = ins.selectComponent('#calendar').getDataset()
+        var panels = ins.selectAllComponents('.wx-calendar-panel-month')
+        for (var i = 0; i < panels.length; i++) {
+            var trans = panels[i].getDataset().trans
+            panels[i].setStyle({
+                transition: 'unset',
+                height: dataset.panel + 'px',
+                transform: 'translateY(' + (-trans) + 'px)'
+            })
+        }
+    }
+}
+
+var handleYearPanelShow = function(e, ins) {
+    var dataset = e.mark
+    var viewSate = dataset.view
+    if (viewSate == 1) {
+        ins.callMethod('justYearPanelShow')
+    } else {
+        ins.selectComponent('#calendar').setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.calendar + 'px'
+        })
+        ins.selectComponent('.wx-calendar-panel-month.curr').setStyle({
+            transition: 'all .28s ease 0s',
+            height: dataset.panel + 'px',
+            transform: 'translateY(0)'
+        })
+        var others = ins.selectAllComponents('.wx-calendar-panel-month.other')
+        for (var i = 0; i < others.length; i++) {
+            others[i].setStyle({
+                transition: 'unset',
+                height: dataset.panel + 'px',
+                transform: 'translateY(0)'
+            })
+        }
+        ins.callMethod('handleYearPanelShow')
+        ins.callMethod('toggleView', { state: 1 })
+    }
+}
+
+module.exports = {
+    touchStart: touchStart,
+    touchMove: touchMove,
+    touchEnd: touchEnd,
+    handleWeekSwiperChange: handleWeekSwiperChange,
+    handleMonthChange: handleMonthChange,
+    handleInitTrans: handleInitTrans,
+    toggleView: toggleView,
+    handleViewChange: handleViewChange,
+    handleYearPanelShow: handleYearPanelShow
+}

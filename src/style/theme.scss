@@ -1,0 +1,96 @@
+// 字体
+$wx-calendar-font: Helvetica, Tahoma, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+
+// css变量前缀
+$wx-calendar-theme-prefix: --wx-calendar-;
+
+// 主题色
+$wx-calendar-theme-normal: ( 
+    main-bg: #fff, // 主背景色
+    title-color: #313313, // 左上角日期标题字体色
+    title-info-color: #7a7a7a, // 左上角日期标题右侧描述信息字体色
+    view-bg: #fff9f3, // 视图控制按钮背景色
+    view-sel-bg: linear-gradient(145deg, #f37b1d, #e54d42), // 视图控制按钮被选择时背景色
+    view-color: #e54d42, // 视图控制按钮字体色
+    view-sel-color: #fff, // 视图控制按钮被选择时字体色
+    week-color: #ababab, // 星期字体色
+    sel-bg: #f5f5f5, // 被选择日期背景圆圈色
+    sel-today-bg: linear-gradient(145deg, #2a97ff, #4da4e6), // 被选择日期背景圆圈色（今日）
+    sel-color: #313313, // 被选日期字体色
+    sel-dot-color: #f37b1d, // 被选日期左上角‘･’的颜色
+    sel-solar-color: #ababab, // 被选日期下方信息字体色
+    sel-today-color: #fff, // 被选日期字体色（今日）
+    sel-today-dot-color: #eee, // 被选日期左上角‘･’的颜色（今日）
+    sel-today-solar-color: #fff, // 被选日期下方信息字体色（今日）
+    sel-hidden-today: #2a97ff, // 隐藏日期checked状态时今日日期字体色（今日且被选）
+    sel-hidden-solar: #2a97ff, // 隐藏日期checked状态时日期下方信息字体色（今日且被选）
+    date-today-color: #2a97ff, // 日期字体色（今日）
+    date-color: #313313, // 日期字体色
+    date-dot-color: #f37b1d, // 日期左上角‘･’的颜色
+    date-info-color: #ababab, // 日期下方信息字体色
+    date-solar-color: #2a97ff, // 日期下方信息字体色（节气，节假日）
+    schedule-bg: #f8f8f8, // 日程默认背景色
+    schedule-color: #2a97ff, // 日程默认字体色
+    control-bg: #dfdfdf, // 底部控制条背景色
+    year-panel-bg: #fff, // 年面板背景色
+    year-title-color: #313313, // 年面板左上角年份标题字体色
+    year-title-info: #e54d42, // 年面板左上角年份标题右侧农历年信息字体色
+    year-month-bg: #f8f8f8, // 年面板月份背景色
+    year-month-curr-bg: #ecf5ff, // 年面板月份背景色（当月）
+    year-month-title: #313313, // 年面板月份标题字体色
+    year-month-title-curr: #2a97ff, // 年面板月份标题字体色（当月）
+    year-month-info: #f37b1d, // 年面板月份农历信息字体色
+    year-month-curr-info: #67b4fc // 年面板月份农历信息字体色（当月）
+);
+
+// 深色主题
+$wx-calendar-theme-dark: ( 
+    main-bg: #111, 
+    title-color: #eee, 
+    title-info-color: #999,
+    view-bg: #332d2d, 
+    view-sel-bg: linear-gradient(145deg, #f37b1d, #e54d42),
+    view-color: #e54d42, 
+    view-sel-color: #fff, 
+    week-color: #bebebe, 
+    sel-bg: #262626, 
+    sel-today-bg: linear-gradient(145deg, #2a97ff, #4da4e6), 
+    sel-color: #eee,
+    sel-dot-color: #f37b1d,
+    sel-solar-color: #bebebe,
+    sel-today-color: #fff,
+    sel-today-dot-color: #eee,
+    sel-today-solar-color: #fff,
+    sel-hidden-today: #2a97ff,
+    sel-hidden-solar: #2a97ff,
+    date-today-color: #2a97ff,
+    date-color: #eee,
+    date-dot-color: #f37b1d,
+    date-info-color: #bebebe,
+    date-solar-color: #2a97ff,
+    schedule-bg: #4a4a4a,
+    schedule-color: #2a97ff,
+    control-bg: #262626,
+    year-panel-bg: #111,
+    year-title-color: #eee,
+    year-title-info: #e54d42,
+    year-month-bg: #4a4a4a,
+    year-month-curr-bg: #515963,
+    year-month-title: #eee,
+    year-month-title-curr: #2a97ff,
+    year-month-info: #f37b1d,
+    year-month-curr-info: #f37b1d
+);
+
+$wx-calendar-title-size: 44rpx; // 左上角日期标题字体大小
+$wx-calendar-title-info-size: 20rpx; // 左上角日期标题右侧信息字体大小
+$wx-calendar-week-size: 20rpx; // 星期字体大小
+$wx-calendar-date-size: 36rpx; // 日期字体大小
+$wx-calendar-solar-size: 20rpx; // 日期下方信息字体大小
+$wx-calendar-corner-size: 16rpx; // 日期角标字体大小
+$wx-calendar-schedule-size: 16rpx; // 日期日程字体大小
+$wx-calendar-year-title-size: 42rpx; // 年面板左上角年份标题字体大小
+$wx-calendar-year-title-info-size: 20rpx; // 年面板左上角年份标题右侧农历年信息字体大小
+$wx-calendar-month-title-size: 36rpx; // 年面板月份标题字体大小
+$wx-calendar-month-title-info-size: 20rpx; // 年面板月份标题右侧信息字体大小
+$wx-calendar-month-info-size: 20rpx; // 年面板月份农历信息字体大小

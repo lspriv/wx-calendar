@@ -1,0 +1,5 @@
+@media (prefers-color-scheme: dark) {
+    .wx-calendar-container.darkmode {
+        @include theme-values($wx-calendar-theme-dark);
+    }
+}

@@ -1,0 +1,3 @@
+@function theme ($theme-key) {
+    @return var(#{$wx-calendar-theme-prefix}#{$theme-key});
+}

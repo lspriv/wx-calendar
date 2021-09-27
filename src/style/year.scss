@@ -1,0 +1,162 @@
+.wx-calendar-years {
+    position: absolute;
+    width: 100%;
+    height: 820rpx;
+    top: 0;
+    left: 0;
+    z-index: 102400;
+    background: theme(year-panel-bg);
+    transition: all .3s ease 0s;
+    transform: translateY(-100%) translateZ(0px);
+    box-shadow: 0 0 0rpx rgba(0, 0, 0, 0);
+    overflow: hidden;
+    &.show {
+        transform: translateY(0);
+        box-shadow: 0 0 30rpx rgba(0, 0, 0, 0.15);
+    }
+    &-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        height: 100rpx;
+        padding-top: 20rpx;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1024;
+        background: transparent;
+        overflow: hidden;
+        &-title {
+            $sub-year-title-size: calc(#{$wx-calendar-year-title-size} - 4rpx);
+            padding: 0 0 0 42rpx;
+            font-size: $wx-calendar-year-title-size;
+            line-height: $wx-calendar-year-title-size;
+            position: relative;
+            letter-spacing: 1px;
+            font-weight: 500;
+            transition: all .28s ease 0s;
+            &::after {
+                content: attr(data-info);
+                position: relative;
+                font-size: $wx-calendar-year-title-info-size;
+                color: theme(year-title-info);
+                font-weight: bold;
+                margin-left: 8rpx;
+                letter-spacing: 0px;
+            }
+            text {
+                color: theme(year-title-color);
+                font-size: $wx-calendar-year-title-size;
+                vertical-align: middle;
+                &.wx-calendar-cn-text {
+                    font-size: $sub-year-title-size;
+                    margin: 0 2rpx;
+                    &.margin-left {
+                        margin-left: 0;
+                    }
+                }
+            }
+        }
+    }
+    &-container {
+        position: absolute;
+        top: 100rpx;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 100rpx);
+        // background: transparent;
+    }
+    &-months {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 20rpx 40rpx 50rpx;
+        // background: transparent;
+    }
+    &-row {
+        flex-grow: 1;
+        width: 100%;
+        height: calc(100% / 3 - 12rpx);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        // background: transparent;
+        &+& {
+            margin-top: 12rpx;
+        }
+    }
+    &-month {
+        width: calc(25% - 10rpx);
+        height: 100%;
+        background: theme(year-month-bg);
+        &-container {
+            width: 100%;
+            height: 100%;
+            padding: 20rpx;
+        }
+        &-title {
+            color: theme(year-month-title);
+            font-weight: bold;
+            font-size: $wx-calendar-month-title-size;
+            line-height: $wx-calendar-month-title-size;
+            position: relative;
+            display: inline-block;
+            &::after {
+                content: "月";
+                position: relative;
+                font-size: $wx-calendar-month-title-info-size;
+                font-weight: normal;
+                margin-left: 4rpx;
+                color: inherit;
+            }
+        }
+        &-content {
+            font-size: $wx-calendar-month-info-size;
+            line-height: $wx-calendar-month-info-size;
+            position: relative;
+            display: flex;
+            &-item {
+                text {
+                    font-size: $wx-calendar-month-info-size;
+                    color: theme(year-month-info);
+                    position: relative;
+                }
+                &:first-child {
+                    margin-right: 6rpx;
+                    min-width: 30rpx;
+                    text::after {
+                        content: attr(data-order);
+                        position: relative;
+                        color: inherit;
+                        font-size: 60%;
+                        opacity: .8;
+                    }
+                }
+                &:last-child {
+                    text::before {
+                        content: "农";
+                        position: relative;
+                        color: inherit;
+                        font-size: 60%;
+                        margin-right: 2rpx;
+                        opacity: .8;
+                    }
+                }
+            }
+        }
+        &.curr {
+            background: theme(year-month-curr-bg);
+            .wx-calendar-years-month-title {
+                color: theme(year-month-title-curr);
+            }
+            .wx-calendar-years-month-content-item {
+                text {
+                    color: theme(year-month-curr-info);
+                }
+            }
+        }
+    }
+}

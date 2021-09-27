@@ -1,0 +1,148 @@
+.wx-calendar-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100rpx;
+    padding-top: 20rpx;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1024;
+    background: transparent;
+    overflow: hidden;
+    &-main {
+        $sub-title-size: calc(#{$wx-calendar-title-size} - 2rpx);
+        padding: 0 0 0 40rpx;
+        font-size: $wx-calendar-title-size;
+        position: relative;
+        line-height: $sub-title-size;
+        letter-spacing: 1px;
+        font-weight: 500;
+        transition: all .28s ease 0s;
+        opacity: 0;
+        &::after {
+            content: attr(data-info);
+            position: relative;
+            font-size: $wx-calendar-title-info-size;
+            // line-height: 22rpx;
+            color: theme(title-info-color);
+            margin: 2rpx 0 0 4rpx;
+            font-weight: normal;
+            letter-spacing: 0px;
+        }
+        text {
+            color: theme(title-color);
+            font-size: $wx-calendar-title-size;
+            vertical-align: middle;
+            &.wx-calendar-cn-text {
+                font-size: $sub-title-size;
+                margin: 0 2rpx;
+            }
+        }
+    }
+}
+
+.wx-calendar-options {
+    display: flex;
+    flex-direction: row;
+    align-items: right;
+    padding: 0 50rpx 6rpx 0;
+    transition: all .28s ease 0s;
+    opacity: 0;
+    width: 270rpx;
+    max-width: 270rpx;
+    overflow: hidden;
+    .wx-calendar-option {
+        margin: 0 15rpx;
+        &-item {
+            // wx-calendar-option-item
+        }
+        &-views {
+            width: 140rpx;
+            height: 60rpx;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 30rpx;
+            background-color: theme(view-bg);
+            overflow: hidden;
+            position: relative;
+            &.today {
+                width: 60rpx;
+                justify-content: center;
+                transition: all .28s ease 0s;
+                opacity: 0;
+                max-width: 60rpx;
+                overflow: hidden;
+                border-radius: 50%;
+                // will-change: transform;
+                &.show {
+                    opacity: 1;
+                    .wx-calendar-option-view {
+                        transform: scale(1) translateZ(0px);
+                    }
+                }
+                .wx-calendar-option-view {
+                    width: 44rpx;
+                    height: 44rpx;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: theme(view-sel-color);
+                    font-size: 22rpx;
+                    font-weight: bold;
+                    position: relative;
+                    line-height: 22rpx;
+                    z-index: 1024;
+                    background: theme(view-sel-bg);
+                    transition: all .28s ease 0s;
+                    transform: scale(.3) translateZ(0px);
+                }
+            }
+            .wx-calendar-option-view {
+                width: 70rpx;
+                height: 60rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: theme(view-color);
+                font-size: 22rpx;
+                font-weight: bold;
+                transition: color .1s linear .1s;
+                position: relative;
+                line-height: 22rpx;
+                z-index: 1024;
+                // will-change: transform;
+                // transform: translateZ(0px);
+                &.curr {
+                    color: theme(view-sel-color);
+                }
+            }
+            .wx-calendar-option-view-bar {
+                position: absolute;
+                width: 44rpx;
+                height: 44rpx;
+                top: 8rpx;
+                left: calc(70rpx / 2 + 70rpx * 0 - 22rpx);
+                border-radius: 50%;
+                transform: translateX(0) translateZ(0px);
+                background: theme(view-sel-bg);
+                transition: all .3s ease 0s;
+                z-index: 10;
+                // will-change: transform;
+            }
+        }
+    }
+}
+
+.wx-calendar {
+    &.load {
+        .wx-calendar-title-main,
+        .wx-calendar-options {
+            opacity: 1;
+        }
+    }
+}

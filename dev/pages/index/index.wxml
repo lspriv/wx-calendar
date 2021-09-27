@@ -1,0 +1,8 @@
+<view class="container">
+    <calendar 
+        id="calendar" 
+        _markers="{{ markers }}" 
+        bindload="handleCalendarLoad"
+        binddatechange="handleCalendarDateChange"
+        bindviewchange="handleCalendarPanelViewChange"></calendar>
+</view>
