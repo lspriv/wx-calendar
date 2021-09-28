@@ -191,16 +191,22 @@ npm run build
 ### Events 事件
 
 [**`bindload`**](#bindload)  日历加载完成
->     e.detail = { date } 
->     # date为当前选择日期
-
-
-[**`binddatechange`**](#binddatechange)  日期选择变化
 >     e.detail = { date, range, visual, view } 
 >     # date为当前选择日期
 >     # range: 当前swiper日期范围
 >     # visual: 可视区域日期范围
+>     # visualMonth: 当前月
 >     # view: 当前面板视图，月/周
+
+
+[**`binddatechange`**](#binddatechange)  日期选择变化
+>     e.detail = { date, range, visual, view, visualMonth, rangeChange } 
+>     # date为当前选择日期
+>     # range: 当前swiper日期范围
+>     # visual: 可视区域日期范围
+>     # visualMonth: 当前月
+>     # view: 当前面板视图，月/周
+>     # rangeChange: 日期范围是否变化
 
 
 <s>bindrangechange  日期范围变化</s>，2.0已废弃
