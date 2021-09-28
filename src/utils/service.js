@@ -11,7 +11,7 @@ module.exports = [{
     },
     {
         name: 'marker',
-        regist: instance => instance.data.showMaker,
+        regist: instance => instance.data.showMark,
         handle: (date, calendar) => {
             const key = `${ date.year }_${ date.month }_${ date.day }`
             const marker = calendar._dateMarkers.hasOwnProperty(key) ? {...calendar._dateMarkers[key] } : null
