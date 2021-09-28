@@ -253,7 +253,7 @@ Component({
             if (this.data.currView == 2) {
                 if (selDay.month != month) this.refreshCurrentWeekPanel(selDay)
                 else this.setSelDate(idx)
-                this.bindDateChange(selDay)
+                this.bindDateChange(selDay, false)
             } else {
                 if (selDay.state == 'prev' || selDay.state == 'next') {
                     this._selDay = selDay
@@ -261,7 +261,7 @@ Component({
                     this.setData({ currTab: _current })
                 } else {
                     this.setSelDate(idx)
-                    this.bindDateChange(selDay)
+                    this.bindDateChange(selDay, false)
                 }
             }
         },
@@ -392,12 +392,11 @@ Component({
                 const month = this.data.months[currTab]
                 if (date.month != month.month) {
                     this.refreshCurrentWeekPanel(date)
-                    this.bindDateChange(this._today)
                 } else {
                     const idx = month.idays.findIndex(d => d.month == date.month && d.day == date.day)
                     this.setSelDate(idx)
-                    this.bindDateChange(this._today)
                 }
+                this.bindDateChange(this._today, false)
             } else if (isInSwiper >= 0) {
                 this.setData({ currTab: isInSwiper })
             } else {
@@ -412,7 +411,7 @@ Component({
                 const month = this.data.months[currTab]
                 const findIdx = month.idays.findIndex(_date => (_date.month == month.month && _date.day == date.day))
                 this.setSelDate(findIdx)
-                this.bindDateChange(this._today)
+                this.bindDateChange(this._today, false)
             } else if (isInSwiper >= 0) {
                 this.setData({ currTab: isInSwiper })
             } else {
@@ -778,13 +777,16 @@ Component({
             const view = this._currView == 2 ? 'week' : 'month'
             this.setData(setData, () => {
                 EchoInfo('欢迎到%chttps:\/\/github.com\/lspriv\/wx-calendar\/issues%c提出建议或Bug或✭', 'info', 'font-weight:bold;margin: 0 2px;', 'color: #8cc5ff')
-                this.triggerEvent('load', { date: this._selDay, view })
+                const { range, visual } = this.rangeDetail()
+                const { year, month } = this.data.months[this.data.currTab]
+                this.triggerEvent('load', { date: this._selDay, view, range, visual, visualMonth: { year, month } })
             })
         },
-        bindDateChange(date) {
+        bindDateChange(date, rangeChange = true) {
             const view = this._currView == 2 ? 'week' : 'month'
             const { range, visual } = this.rangeDetail()
-            this.triggerEvent('datechange', { date, view, range, visual })
+            const { year, month } = this.data.months[this.data.currTab]
+            this.triggerEvent('datechange', { date, view, range, visual, visualMonth: { year, month }, rangeChange })
         },
         bindViewChange(view) {
             this.triggerEvent('viewchange', { view: view == 2 ? 'week' : 'month' })
