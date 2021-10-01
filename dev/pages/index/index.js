@@ -3,7 +3,16 @@ const app = getApp()
 
 Page({
     data: {
-        markers: []
+        markers: [
+            { year: 2021, month: 9, day: 1, type: 'holiday', mark: '愚人节', color: '#2a97ff', bgColor: '#cce6ff' },
+            { year: 2021, month: 9, day: 4, type: 'holiday', mark: '清明', color: '#2a97ff', bgColor: '#cce6ff' },
+            { year: 2021, month: 9, day: 3, type: 'corner', mark: '休', color: '#61b057' },
+            { year: 2021, month: 9, day: 4, type: 'corner', mark: '休', color: '#61b057' },
+            { year: 2021, month: 9, day: 5, type: 'corner', mark: '休', color: '#61b057' },
+            { year: 2021, month: 9, day: 6, type: 'schedule', mark: '测试一下', color: '#2a97ff', bgColor: '#cce6ff' },
+            { year: 2021, month: 9, day: 6, type: 'schedule', mark: '测试一下哈哈哈', color: '#2a97ff', bgColor: '#cce6ff' },
+            { year: 2021, month: 9, day: 6, type: 'schedule', mark: '测试一下哈哈哈', color: '#2a97ff', bgColor: '#cce6ff' }
+        ]
     },
     onLoad() {
 
@@ -11,19 +20,6 @@ Page({
     handleCalendarLoad({ detail }) {
         console.log('calendar-load', detail)
         this.calendar = this.selectComponent('#calendar')
-            // 新增日期标记
-        this.setData({
-            markers: [
-                { year: 2021, month: 4, day: 1, type: 'holiday', mark: '愚人节', color: '#2a97ff', bgColor: '#cce6ff' },
-                { year: 2021, month: 4, day: 4, type: 'holiday', mark: '清明', color: '#2a97ff', bgColor: '#cce6ff' },
-                { year: 2021, month: 4, day: 3, type: 'corner', mark: '休', color: '#61b057' },
-                { year: 2021, month: 4, day: 4, type: 'corner', mark: '休', color: '#61b057' },
-                { year: 2021, month: 4, day: 5, type: 'corner', mark: '休', color: '#61b057' },
-                { year: 2021, month: 4, day: 6, type: 'schedule', mark: '测试一下', color: '#2a97ff', bgColor: '#cce6ff' },
-                { year: 2021, month: 4, day: 6, type: 'schedule', mark: '测试一下哈哈哈', color: '#2a97ff', bgColor: '#cce6ff' },
-                { year: 2021, month: 4, day: 6, type: 'schedule', mark: '测试一下哈哈哈', color: '#2a97ff', bgColor: '#cce6ff' }
-            ]
-        })
 
         const timer = setTimeout(() => {
             this.setData({

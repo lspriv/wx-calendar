@@ -841,7 +841,7 @@ Component({
             if (!this.data.showMark) return
             if (this.data.loading) return
             this._dateMarkers = this.initMarkers()
-                // this.refreshPanelDays()
+            this.refreshPanelDays()
         }
     },
     export () {
