@@ -4,8 +4,8 @@
     "description": "a calendar for wechat miniprogram",
     "main": "index.js",
     "scripts": {
-        "build": "NODE_ENV=production gulp build",
-        "dev": "NODE_ENV=development gulp dev",
+        "build": "cross-env NODE_ENV=production gulp build",
+        "dev": "cross-env NODE_ENV=development gulp dev",
         "test": "npx jest"
     },
     "keywords": [
@@ -28,6 +28,7 @@
     },
     "devDependencies": {
         "@babel/preset-env": "^7.14.7",
+        "cross-env": "^7.0.3",
         "gulp": "^4.0.2",
         "gulp-babel": "^8.0.0",
         "gulp-clean": "^0.4.0",
