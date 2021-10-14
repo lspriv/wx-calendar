@@ -142,7 +142,7 @@
         <!-- Calendar Panel Year Start -->
         <view class="wx-calendar-years {{ yearPanelShow ? 'show' : '' }}">
             <view class="wx-calendar-years-bar">
-                <view class="wx-calendar-years-bar-title" data-info="{{ yearMs[currYearsTab].lunar_year }}">
+                <view class="wx-calendar-years-bar-title" data-info="{{ yearMs[currYearsTab].lunar_year }}" catchtap="onCloseYearsPanel" >
                     <text >{{ yearMs[currYearsTab].year }}</text><text class="wx-calendar-cn-text margin-left">年</text>
                 </view>
             </view>

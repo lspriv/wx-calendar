@@ -672,16 +672,18 @@ Component({
             const currTab = this.data.currTab
             const currMonth = this.data.months[currTab]
             if (currMonth.year == year && currMonth.month == month) {
-                this._yearPanelShow = false
-                this.setData({
-                    yearPanelShow: false
-                })
+                this.onCloseYearsPanel()
             } else {
-                this._yearPanelShow = false
-                this.setData({ yearPanelShow: false })
+                this.onCloseYearsPanel()
                 this.refreshMonthsPanelByDate({ year, month, day: 1 })
                 this.bindDateChange(this._selDay)
             }
+        },
+
+        // 关闭 years 面板
+        onCloseYearsPanel() {
+            this._yearPanelShow = false
+            this.setData({ yearPanelShow: false })
         },
         /** YEAR PANEL */
 
