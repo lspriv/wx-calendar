@@ -275,6 +275,11 @@ var handleYearPanelShow = function(e, ins) {
         }
         ins.callMethod('handleYearPanelShow')
         ins.callMethod('toggleView', { state: 1 })
+
+        var schedules = ins.selectAllComponents('.wx-calendar-panel-solar-schedules')
+        for (var i = 0; i < schedules.length; i++) {
+            schedules[i].removeClass('show')
+        }
     }
 }
 
