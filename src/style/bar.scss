@@ -1,0 +1,50 @@
+.wc__bar {
+  width: 100%;
+  height: $wc-calendar-bar-height;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1024;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all .28s ease;
+  contain: layout style;
+  @include if(hidden) {
+    opacity: 0;
+    transform: translateY(100%);
+    transition: unset;
+  }
+  &-control {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    &-item {
+      width: 30rpx;
+      height: 40rpx;
+      overflow: hidden;
+      position: relative;
+      &-bar {
+        width: 60rpx;
+        height: 6rpx;
+        background: theme(control-bg);
+        position: absolute;
+        top: calc(50% - 8rpx);
+      }
+      &:first-child &-bar {
+        transform-origin: 0 50%;
+        border-radius: 4rpx 0 0 4rpx;
+        left: 0;
+      }
+      &:last-child &-bar {
+        transform-origin: 100% 50%;
+        border-radius: 0 4rpx 4rpx 0;
+        right: 0;
+      }
+    }
+  }
+}

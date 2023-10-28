@@ -1,0 +1,8 @@
+@use "sass:string";
+@function theme ($theme-key) {
+	@return var(#{$wc-theme-prefix}#{$theme-key});
+}
+
+@function start-with ($str, $substr) {
+	@return string.index($str, $substr) == 1;
+}

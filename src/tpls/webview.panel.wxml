@@ -1,0 +1,90 @@
+<wxs src="../wxs/tool.wxs" module="tool_wxs" />
+<wxs src="../wxs/transform.wxs" module="trans_wxs" />
+<view 
+  class="wc__panel"
+  data-view="{{ currView }}"
+  data-main="{{ layout.mainHeight }}"
+  data-max="{{ layout.maxHeight }}"
+  data-min="{{ layout.minHeight }}"
+  change:view="{{ trans_wxs.viewChange }}" view="{{ currView }}"
+  change:offset="{{ trans_wxs.offsetChange }}" offset="{{ offsetChange }}"
+  change:initView="{{ trans_wxs.initViewChange }}" initView="{{ initView }}"
+  change:transView="{{ trans_wxs.transViewChange }}" transView="{{ transView }}"
+  bindtouchstart="{{ trans_wxs.touchStart }}"
+  catchtouchmove="{{ trans_wxs.touchMove }}" 
+  catchtouchend="{{ trans_wxs.touchEnd }}">
+  <swiper 
+    circular 
+    duration="{{ 300 }}" 
+    current="{{ current }}" 
+    class="wc__panel-swiper"
+    data-type="panel"
+    bindtransition="swiperTrans"
+    bindanimationfinish="swiperTransEnd">
+    <swiper-item
+      wx:for="{{ panels }}" 
+      wx:for-item="panel" 
+      wx:for-index="pdx"
+      wx:key="key"
+      skip-hidden-item-layout>
+      <view 
+        class="wc__panel-container {{ current === pdx ? 'wc__panel-container--current' : 'wc__panel-container--incurrent' }}"
+        data-offset="{{ panel.offset }}"
+        >
+        <view
+          wx:if="{{ current === pdx && pointer && pointer.show }}"
+          class="wc__panel-pointer {{ checked.today ? 'wc__panel-pointer--today' : '' }} {{ pointer.animate ? 'wc__panel-pointer--animate' : '' }}"
+          style="top: {{ pointer.y }}; left: {{ pointer.x }};">
+          <view 
+            class="wc__panel-pointer-inner {{ pointer.animate ? 'wc__panel-pointer-inner--animate' : '' }}" 
+            bindanimationend="handlePointerAnimated"></view>
+        </view>
+        <view 
+          class="wc__panel-week wc__panel-week--l-{{ panel.weeks.length }}" 
+          wx:for="{{ panel.weeks }}" 
+          wx:for-item="week" 
+          wx:for-index="wdx"
+          wx:key="key">
+          <view 
+            wx:for="{{ week.days }}" 
+            wx:for-item="day" 
+            wx:for-index="ddx"
+            wx:key="key"
+            class="
+              wc__panel-date
+              wc__panel-date--{{ day.kind }} 
+              {{ day.today ? 'wc__panel-date--today' : '' }}
+              {{ tool_wxs.isChecked(day, checked) ? 'wc__panel-date--checked' : '' }}
+              {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
+            ">
+            <view 
+              class="wc__panel-day"
+              data-wdx="{{ wdx }}"
+              data-ddx="{{ ddx }}"
+              catchtap="selDate">
+              <view class="wc__panel-solar">{{ day.day }}<view 
+                wx:if="{{ day.corner }}"
+                class="wc__panel-corner"
+                style="{{ day.corner.color ? 'color:' + day.corner.color + ';' : '' }}">{{ day.corner.text }}</view></view>
+              <view 
+                class="wc__panel-mark" 
+                style="{{ day.mark.color ? 'color: ' + day.mark.color + ';' : '' }}">{{ day.mark.text }}</view>
+            </view>
+            <view 
+              wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
+              class="wc__panel-schedules">
+              <view 
+                wx:for="{{ tool_wxs.cutSchedules(day.schedules) }}" 
+                wx:for-index="sdx"
+                wx:for-item="schedule"
+                wx:key="key"
+                style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
+                class="wc__panel-schedule">{{ schedule.text }}</view>
+              <view wx:if="{{ day.schedules.length > 3 }}" class="wc__panel-schedule wc__panel-schedule--center">+{{ day.schedules.length - 3 }}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
+</view>

@@ -1,0 +1,14 @@
+{
+	"pages": [
+		"pages/index/index"
+	],
+	"window": {
+		"backgroundTextStyle": "light",
+		"navigationBarBackgroundColor": "#fff",
+		"navigationBarTitleText": "wx calendar",
+		"navigationBarTextStyle": "black"
+	},
+  "darkmode": true,
+  "lazyCodeLoading": "requiredComponents",
+	"sitemapLocation": "sitemap.json"
+}

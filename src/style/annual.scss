@@ -1,0 +1,106 @@
+.wc__annual {
+  width: 100vw;
+  height: 100vh;
+  top: -150vh;
+  left: 0;
+  z-index: 102400;
+  opacity: 0;
+  background: theme(annual-bg);
+  overflow: hidden;
+  contain: layout style;
+  @include if(non-custom) {
+    --wc-annual-bottom-height: 0px;
+    --wc-annual-header-height: calc(var(--wc-menu-bottom) - var(--wc-menu-top) + 30rpx);
+    .wc__annual-header {
+      height: var(--wc-annual-header-height);
+      padding-top: 15rpx;
+      padding-bottom: 15rpx;
+    }
+    .wc__annual-panel-container {
+      height: calc(100% - var(--wc-annual-header-height));
+      top: var(--wc-annual-header-height);
+    }
+  }
+}
+
+.wcc--skyline {
+  .wc__annual {
+    position: absolute;
+  }
+}
+
+.wcc--webview {
+  .wc__annual {
+    position: fixed;
+  }
+}
+
+.wc__annual-header {
+  height: calc(var(--wc-menu-bottom));
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0 30rpx;
+  padding-top: var(--wc-menu-top);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  &-title {
+    font-size: theme(annual-title-size);
+    line-height: 1;
+    font-weight: bold;
+    color: theme(annual-title-color);
+  }
+  &-tips {
+    margin-left: 16rpx;
+  }
+  &-tip {
+    position: relative;
+    padding-left: 26rpx;
+    font-size: theme(annual-title-sub-size);
+    line-height: 1;
+    min-height: theme(annual-title-sub-size);
+    color: theme(annual-title-sub-color);
+    &:first-child {
+      margin-bottom: 6rpx;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      height: 4rpx;
+      width: 14rpx;
+      left: 0;
+      top: 50%;
+      background-color: $wc-primary-1;
+      border-radius: 2rpx;
+      transform: translateY(-50%);
+    }
+    &:first-child::before {
+      background-color: $wc-error;
+    }
+  }
+}
+
+.wc__annual-panel-container {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - var(--wc-menu-bottom));
+  top: var(--wc-menu-bottom);
+  left: 0;
+  right: 0;
+}
+
+.wc__annual-panel {
+  width: 100vw;
+  height: calc(100% - var(--wc-annual-bottom-height));
+  &-canvas {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.wc__annual-panel-swiper {
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,328 @@
+/*
+ * @Description: Description
+ * @Author: lishen
+ * @LastEditTime: 2023-10-27 00:46:31
+ */
+
+var nonNullable = function (value) {
+  return value !== null && value !== undefined;
+};
+
+/**
+ * 更新非当前面板垂直方向偏移
+ * @param instance
+ * @param {'week' | 'month' | 'schedule'} view 视图
+ */
+var refreshIncurrentOffset = function (view, instance) {
+  var panels = instance.selectAllComponents('.wc__panel-container--incurrent');
+  for (var i = 0; i < panels.length; i++) {
+    var panel = panels[i];
+    var offset = view === 'week' ? panel.getDataset().offset : 0;
+    panel.setStyle({
+      transition: 'unset',
+      transform: 'translateY(' + -offset + 'px)'
+    });
+  }
+};
+
+/**
+ * @param {'week' | 'month' | 'schedule'} view 视图
+ * @param {{ min?: number; main?: number; max?: number; }} mark 数据
+ * @param instance
+ * @param {boolean | string} transition
+ */
+var toView = function (view, mark, instance, transition = true) {
+  var calendarHeight = view === 'week' ? mark.min : view === 'month' ? mark.main : mark.max;
+
+  var _transition = transition === true ? 'all .28s ease' : transition || 'unset';
+
+  /** 容器高度 */
+  instance.selectComponent('#calendar').setStyle({
+    transition: _transition,
+    height: calendarHeight + 'px'
+  });
+
+  /** 当前面板 */
+  var panel = instance.selectComponent('.wc__panel-container--current');
+  /** 当前面板垂直方向偏移 */
+  var offset = view === 'week' ? panel.getDataset().offset : 0;
+  /** 面板样式 */
+  panel.setStyle({
+    transition: _transition,
+    transform: 'translateY(' + -offset + 'px)'
+  });
+
+  /** 更新非当前面板垂直方向偏移 */
+  refreshIncurrentOffset(view, instance);
+};
+
+/** 手指触摸面板动作开始 */
+var touchStart = function (e, instance) {
+  var mark = e.mark;
+  var state = instance.getState();
+  state.y = e.changedTouches[0].pageY;
+  state.time = e.timeStamp;
+  state.deg = 0;
+  state.vy = 0;
+  if (mark.view === 'week') state.currentHeight = mark.min;
+  if (mark.view === 'month') state.currentHeight = mark.main;
+  if (mark.view === 'schedule') state.currentHeight = mark.max;
+};
+
+/** 手指触摸面板后移动 */
+var touchMove = function (e, instance) {
+  var mark = e.mark;
+  var state = instance.getState();
+  var deltaY = e.changedTouches[0].pageY - state.y;
+
+  // state.vy = deltaY / (e.timeStamp - e.time); // px/ms
+  // state.time = e.timeStamp;
+
+  /**
+   * 日历容器高度
+   */
+  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY * '0.6')));
+
+  /**
+   * 触摸时的高度不能等于触摸结束后的最终高度，是为了有效触发容器的transitionend事件
+   */
+  height =
+    height == mark.min || height == mark.main || height == mark.max ? (deltaY < 0 ? height - 1 : height + 1) : height;
+
+  /** 容器高度 */
+  instance.selectComponent('#calendar').setStyle({
+    transition: 'unset',
+    height: height + 'px'
+  });
+
+  /** 当前面板 */
+  var panel = instance.selectComponent('.wc__panel-container--current');
+  var offset = panel.getDataset().offset;
+  /** 当前面板垂直方向偏移 */
+  var panelOffset = height >= mark.main ? 0 : (offset * (mark.main - height)) / (mark.main - mark.min);
+
+  /** 面板样式 */
+  panel.setStyle({
+    transition: 'unset',
+    transform: 'translateY(' + -panelOffset + 'px)'
+  });
+
+  /** 计算控制条的角度 */
+  const accmulator = deltaY > 0 ? '0.5' : '-0.5';
+  const accmulation = +accmulator + state.deg;
+  const deg = Math.max(-20, Math.min(accmulation, 20));
+  state.deg = deg;
+
+  /** 底部控制条样式 */
+  instance.selectComponent('#control_1').setStyle({
+    transition: 'unset',
+    transform: 'rotate(' + deg + 'deg)'
+  });
+  instance.selectComponent('#control_2').setStyle({
+    transition: 'unset',
+    transform: 'rotate(' + -deg + 'deg)'
+  });
+
+  /** 计算左上角视图控制的位置 */
+  var translateX = Math.max(0, Math.min(60, ((mark.main - height) * 60) / (mark.main - mark.min)));
+  var monthBarWidth = Math.max(52 - translateX, 8);
+  var weekBarWidth = Math.max(translateX - 8, 8);
+
+  instance.selectComponent('#view_bar').setStyle({
+    transition: 'unset',
+    transform: 'translateX(' + translateX + 'rpx) translateZ(0px)'
+  });
+
+  instance.selectComponent('#view_bar_1').setStyle({
+    transition: 'unset',
+    width: monthBarWidth + 'rpx'
+  });
+
+  instance.selectComponent('#view_bar_2').setStyle({
+    transition: 'unset',
+    width: weekBarWidth + 'rpx'
+  });
+
+  /** 计算日程透明度  */
+  if (height > mark.main) {
+    var opacity = Math.max(0, Math.min(1, (height - mark.main) / (mark.max - mark.main)));
+    var schedules = instance.selectAllComponents('.wc__panel-schedules');
+    for (var i = 0; i < schedules.length; i++) {
+      schedules[i].setStyle({
+        transition: 'unset',
+        opacity: opacity
+      });
+    }
+  }
+};
+
+/** 手指触摸面板动作结束 */
+var touchEnd = function (e, instance) {
+  var mark = e.mark;
+  var state = instance.getState();
+  const deltaY = e.changedTouches[0].pageY - state.y;
+
+  /** 计算容器高度 */
+  var height = Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY));
+  /** 回弹高度 */
+  var unitHeight = mark.panel / 5;
+  /** 月视图到周视图的临界值 */
+  var criticalMin = mark.main - unitHeight;
+  /** 月视图到日程视图的临界值 */
+  var criticalMax = mark.main + unitHeight;
+
+  var toMin = height < criticalMin;
+  var toMax = height > criticalMax;
+
+  toView(toMin ? 'week' : toMax ? 'schedule' : 'month', mark, instance, 'all .3s cubic-bezier(0.61, 1, 0.88, 1)');
+
+  /** 底部控制条样式 */
+  instance.selectComponent('#control_1').setStyle({
+    transition: 'all .3s cubic-bezier(0.61, 1, 0.88, 1)',
+    transform: 'rotate(0deg)'
+  });
+  instance.selectComponent('#control_2').setStyle({
+    transition: 'all .3s cubic-bezier(0.61, 1, 0.88, 1)',
+    transform: 'rotate(0deg)'
+  });
+
+  var translateX = toMin ? 'var(--wc-operator-side)' : 0;
+  var monthBarWidth = toMin ? 0 : 'calc(var(--wc-operator-side) - var(--wc-operator-padding))';
+  var weekBarWidth = toMin ? 'calc(var(--wc-operator-side) - var(--wc-operator-padding))' : 0;
+
+  instance.selectComponent('#view_bar').setStyle({
+    transition: 'all .28s ease',
+    transform: 'translateX(' + translateX + ') translateZ(0px)'
+  });
+
+  instance.selectComponent('#view_bar_1').setStyle({
+    transition: 'all .28s ease',
+    width: monthBarWidth
+  });
+
+  instance.selectComponent('#view_bar_2').setStyle({
+    transition: 'all .28s ease',
+    width: weekBarWidth
+  });
+
+  /** 计算日程透明度  */
+  var opacity = toMax ? 1 : 0;
+  var schedules = instance.selectAllComponents('.wc__panel-container--current .wc__panel-schedules');
+  for (var i = 0; i < schedules.length; i++) {
+    schedules[i].setStyle({
+      transition: 'all .3s ease',
+      opacity: opacity
+    });
+  }
+
+  instance.callMethod('refreshView', { view: toMin ? 1 : toMax ? 4 : 2 });
+};
+
+/**
+ * 更新面板垂直方向偏移
+ * @param {boolean} change 是否更新面板偏移
+ */
+var offsetChange = function (change, _, owner, instance) {
+  var view = instance.getDataset().view;
+  if (view === 'week' && change) {
+    var panels = owner.selectAllComponents('.wc__panel-container');
+    for (var i = 0; i < panels.length; i++) {
+      var panel = panels[i];
+      var offset = panel.getDataset().offset;
+
+      panel.setStyle({
+        transition: 'unset',
+        transform: 'translateY(' + -offset + 'px)'
+      });
+    }
+  }
+};
+
+/** 视图样式类更新 */
+var updateViewCls = function (view, instance) {
+  var minWidth = 'var(--wc-operator-padding)';
+  var maxWidth = 'calc(var(--wc-operator-side) - var(--wc-operator-padding))';
+
+  instance.selectComponent('#view_bar_1').setStyle({
+    width: view === 'week' ? minWidth : maxWidth
+  });
+
+  instance.selectComponent('#view_bar_2').setStyle({
+    width: view === 'week' ? maxWidth : minWidth
+  });
+
+  var translateX = view === 'week' ? 'var(--wc-operator-side)' : 0;
+  instance.selectComponent('#view_bar').setStyle({
+    transform: 'translateX(' + translateX + ') translateZ(0px)'
+  });
+};
+
+/**
+ * 处理视图更新
+ * @param {'week' | 'month' | 'schedule'} view 视图
+ */
+var viewChange = function (view, old, owner) {
+  if (view && view !== old) {
+    const panel = owner.selectComponent('.wc__panel');
+    if (panel.hasClass('wc__panel--week-view')) panel.removeClass('wc__panel--week-view');
+    if (panel.hasClass('wc__panel--month-view')) panel.removeClass('wc__panel--month-view');
+    if (panel.hasClass('wc__panel--schedule-view')) panel.removeClass('wc__panel--schedule-view');
+    panel.addClass('wc__panel--' + view + '-view');
+    updateViewCls(view, owner);
+  }
+};
+
+/** 视图切换 */
+var toggleView = function (e, instance) {
+  var mark = e.mark;
+
+  var _view = mark.view === 'week' ? 'month' : 'week';
+  var toWeek = _view === 'week';
+  var viewState = toWeek ? 1 : 2;
+
+  toView(_view, mark, instance);
+  /** 加这一行是为了跟手性 */
+  updateViewCls(_view, instance);
+  instance.callMethod('refreshView', { view: viewState });
+};
+
+var updateAnuualCls = function (opacity, _, owner) {
+  if (nonNullable(opacity)) {
+    if (opacity) {
+      owner.selectComponent('.wc__header').addClass('wc__header--hidden');
+      owner.selectComponent('.wc__bar').addClass('wc__bar--hidden');
+    } else {
+      owner.selectComponent('.wc__header').removeClass('wc__header--hidden');
+      owner.selectComponent('.wc__bar').removeClass('wc__bar--hidden');
+    }
+  }
+};
+
+var initViewChange = function (view, old, owner, instance) {
+  if (view) {
+    const dataset = instance.getDataset();
+    toView(view, dataset, owner, false);
+  }
+};
+
+var transViewChange = function (view, old, owner, instance) {
+  if (view) {
+    const dataset = instance.getDataset();
+    toView(view, dataset, owner);
+    /** 加这一行是为了跟手性 */
+    updateViewCls(view, instance);
+    instance.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
+  }
+};
+
+module.exports = {
+  touchStart,
+  touchMove,
+  touchEnd,
+  toggleView,
+  viewChange,
+  offsetChange,
+  updateAnuualCls,
+  initViewChange,
+  transViewChange
+};

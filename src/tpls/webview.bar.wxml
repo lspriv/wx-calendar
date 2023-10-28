@@ -1,0 +1,15 @@
+<wxs src="../wxs/transform.wxs" module="trans_wxs" />
+<view 
+  class="wc__bar"
+  bindtouchstart="{{ trans_wxs.touchStart }}"
+  catchtouchmove="{{ trans_wxs.touchMove }}" 
+  catchtouchend="{{ trans_wxs.touchEnd }}">
+  <view class="wc__bar-control">
+    <view class="wc__bar-control-item" >
+      <view class="wc__bar-control-item-bar" id="control_1"></view>
+    </view>
+    <view class="wc__bar-control-item" >
+      <view class="wc__bar-control-item-bar" id="control_2"></view>
+    </view>
+  </view>
+</view>

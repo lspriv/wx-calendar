@@ -1,0 +1,227 @@
+.wc__panel {
+  width: 100%;
+  height: calc(100% - $wc-calendar-sub-height);
+  position: absolute;
+  top: 150rpx;
+  left: 0;
+  z-index: 10;
+  background: transparent;
+  overflow: hidden;
+  contain: layout style;
+  @include if (week-view) {
+    .wc__panel-schedules {
+      opacity: 0;
+    }
+    .wc__panel-date {
+      opacity: 1 !important;
+    }
+  }
+  @include if (month-view) {
+    .wc__panel-schedules {
+      opacity: 0;
+    }
+  }
+  @include if (schedule-view) {
+    .wc__panel-day::after {
+      opacity: 0 !important;
+    }
+    .wc__panel-schedules {
+      opacity: 1;
+    }
+  }
+  &-container {
+    width: 100%;
+    height: 100%;
+    min-height: var(--wc-panel-height);
+    padding: 0 10rpx;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  &-week {
+    width: 100%;
+    position: relative;
+    z-index: 1024;
+    @include column-rect;
+    @include month-week-rows(4);
+    @include month-week-rows(5);
+    @include month-week-rows(6);
+  }
+  &-date {
+    @include column-width;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: opacity .28s ease 0s;
+    overflow: hidden;
+    @include or(last, next) {
+      opacity: .3;
+    }
+    @include if(today) {
+      .wc__panel-solar {
+        color: theme(today-color);
+      }
+    }
+    @include if(checked) {
+      .wc__panel-day {
+        &::after {
+          color: theme(checked-dot-color);
+        }
+      }
+      .wc__panel-solar, .wc__panel-mark {
+        transition-delay: .1s;
+      }
+      .wc__panel-solar {
+        color: theme(checked-color);
+      }
+      .wc__panel-mark {
+        color: theme(checked-mark-color);
+      }
+    }
+
+    @include if(today, checked) {
+      .wc__panel-day {
+        &::after {
+          color: theme(checked-today-color) !important;
+        }
+      }
+      .wc__panel-solar,
+      .wc__panel-mark,
+      .wc__panel-corner {
+        color: theme(checked-today-color) !important;
+      }
+    }
+
+    @include if(scheduled) {
+      .wc__panel-day::after {
+        content: "･";
+        position: absolute;
+        top: -6rpx;
+        left: 50%;
+        transform: translateX(-50%);
+        color: theme(dot-color);
+        opacity: 1;
+        transition: opacity .28s ease;
+        @include animation-fade;
+      }
+    }
+  }
+  &-day {
+    width: 100%;
+    height: 100rpx;
+    min-height: 100rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  &-solar {
+    font-size: theme(date-size);
+    line-height: 1;
+    font-weight: bold;
+    color: theme(date-color);
+    position: relative;
+    @include transition(color);
+  }
+  &-mark {
+    font-size: theme(mark-size);
+    line-height: 1;
+    flex: 0 0 theme(mark-size);
+    color: theme(mark-color);
+    font-weight: bold;
+    margin-top: 4rpx;
+    transition: color .3s ease 0s;
+    position: relative;
+    width: 100%;
+    text-align: center;
+  }
+  &-schedules {
+    width: 100%;
+    padding: 4rpx 2rpx;
+    overflow: hidden;
+    opacity: 0;
+    transform-origin: 50% 0;
+  }
+  &-schedule {
+    font-size: theme(schedule-size);
+    line-height: 1.5;
+    font-weight: bold;
+    margin-bottom: 4rpx;
+    color: theme(schedule-color);
+    background-color: theme(schedule-bg);
+    padding: 0rpx 6rpx;
+    border-radius: 2rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    @include animation-fade;
+    @include if(center) {
+      text-align: center;
+    }
+  }
+  &-corner {
+    position: absolute;
+    top: 0;
+    right: -16rpx;
+    font-size: theme(corner-size);
+    line-height: 1;
+    color: theme(mark-color);
+    font-weight: bold;
+    @include animation-fade;
+  }
+  &-pointer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $wc-calendar-pointer-size;
+    height: $wc-calendar-pointer-size;
+    border-radius: 50%;
+    transform: translate(-50%, 0);
+    z-index: -1;
+    overflow: hidden;
+    @include if (animate) {
+      transition: all .28s ease 0s;
+    }
+    @include if(today) {
+      .wc__panel-pointer-inner {
+        background: theme(checked-today-bg);
+      }
+    }
+    &-inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: inherit;
+      transition: background-color .28s ease;
+      background: theme(checked-bg);
+      @include if(animate) {
+        @include animation-pointer;
+      }
+    }
+  }
+}
+
+.wc__panel-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.wcc--webview {
+  .wc__panel-date--scheduled {
+    --wc-dot-opacity: 1;
+    .wc__panel-day {
+      &::after {
+        opacity: var(--wc-dot-opacity);
+      }
+    }
+  }
+  .wc__panel-schedule {
+    padding: 2rpx 6rpx;
+  }
+}

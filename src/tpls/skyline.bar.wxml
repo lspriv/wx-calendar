@@ -1,0 +1,14 @@
+<vertical-drag-gesture-handler 
+  worklet:ongesture="workletDragGesture"
+  worklet:should-response-on-move="workletDragGesture">
+	<view class="wc__bar">
+		<view class="wc__bar-control">
+			<view class="wc__bar-control-item" >
+				<view class="wc__bar-control-item-bar" id="control_1"></view>
+			</view>
+			<view class="wc__bar-control-item" >
+				<view class="wc__bar-control-item-bar" id="control_2"></view>
+			</view>
+		</view>
+	</view>
+</vertical-drag-gesture-handler>
