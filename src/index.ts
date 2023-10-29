@@ -1,7 +1,7 @@
 /*
  * @Description: wx-calendar组件
  * @Author: lishen
- * @LastEditTime: 2023-10-29 15:36:48
+ * @LastEditTime: 2023-10-29 17:33:45
  */
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
@@ -264,6 +264,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (e.detail.source !== 'touch') return;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
+      console.log('swiperTransEnd', this._swiper_accumulator_, this._swiper_accumulator_ % Layout.layout!.windowWidth);
       if (this._swiper_accumulator_ % Layout.layout!.windowWidth === 0) {
         const offset = this._swiper_accumulator_ / Layout.layout!.windowWidth;
         this._swiper_accumulator_ = 0;
@@ -278,9 +279,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       'worklet';
       const trans = this.$_swiper_trans;
       const accumulation = trans.value + e.detail.dx;
-      if (accumulation % Layout.layout!.windowWidth === 0) {
+      const mod = accumulation % Layout.layout!.windowWidth;
+      const _offset = accumulation / Layout.layout!.windowWidth;
+      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
+      /**
+       * 安卓skyline渲染下滑动一个滑块后并不恰好是windowWidth，是一个近似数
+       * 我的设备有限，测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
+       */
+      if (mod === 0 || Layout.layout!.windowWidth - Math.abs(mod) < Math.abs(offset)) {
         this.$_swiper_trans.value = 0;
-        const offset = accumulation / Layout.layout!.windowWidth;
         if (offset) wx.worklet.runOnJS(this.refreshPanels.bind(this))(offset);
       } else {
         this.$_swiper_trans.value = accumulation;
@@ -290,9 +297,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       'worklet';
       const trans = this.$_annual_trans;
       const accumulation = trans.value + e.detail.dx;
-      if (accumulation % Layout.layout!.windowWidth === 0) {
+      const mod = accumulation % Layout.layout!.windowWidth;
+      const _offset = accumulation / Layout.layout!.windowWidth;
+      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
+      if (mod === 0 || Layout.layout!.windowWidth - Math.abs(mod) < Math.abs(offset)) {
         this.$_annual_trans.value = 0;
-        const offset = accumulation / Layout.layout!.windowWidth;
         if (offset) wx.worklet.runOnJS(this.refreshAnnualPanels.bind(this))(offset);
       } else {
         this.$_annual_trans.value = accumulation;

@@ -1,7 +1,7 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-26 18:50:48
+ * @LastEditTime: 2023-10-29 17:38:23
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
@@ -106,9 +106,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
     const isSkylineRender = isSkyline(this._render_);
     if (show) {
       await instance._panel_.toYear(mon.year);
-
       await severalTicks(2);
-
       const top = await this.calcCalendarTop();
       if (isSkylineRender) this._top_!.value = `-${top}px`;
       else instance.setData({ annualTop: 0, annualDuration: 300 });
@@ -121,7 +119,8 @@ export class AnnualPanelSwitch extends CalendarHandler {
       this._transforming_ = false;
       this.execInteractiveCallbacks();
     } else {
-      instance._panel_.toAnnualMonth(mon);
+      await instance._panel_.toAnnualMonth(mon);
+      await severalTicks(2);
       await instance._printer_.close(mon);
       if (isSkylineRender) this._opacity_!.value = 0;
       else instance.setData({ annualOpacity: 0 });

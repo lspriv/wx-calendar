@@ -6,6 +6,7 @@
 gulpfile.js
 tsconfig.json
 package-lock.json
+.github
 
 logs
 *.log
@@ -18,5 +19,6 @@ docs
 build
 src
 dev
+tmpls
 node_modules
 coverage

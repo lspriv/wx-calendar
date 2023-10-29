@@ -1,15 +1,15 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-23 19:33:24
+ * @LastEditTime: 2023-10-29 17:00:40
  */
 
 var isSkyline = function (renderer) {
   return renderer === 'skyline' || renderer === 'unknown';
 };
 
-var isChecked = function (date, checked) {
-  return date.year === checked.year && date.month === checked.month && date.day === checked.day;
+var isChecked = function (date, checked, pdx, curr) {
+  return pdx === curr && date.year === checked.year && date.month === checked.month && date.day === checked.day;
 };
 
 var cutSchedules = function (schedules) {
