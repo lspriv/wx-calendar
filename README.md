@@ -17,19 +17,28 @@
 
 
 ### 使用
-直接复制dist/wx-calendar到你的项目
+小程序库WeChatLib >= '3.0.0'
 
-页面json配置：
+##### 安装
+```bash
+npm i @lspriv/wx-calendar -S
+```
+
+##### 构建
+微信小程序开发工具菜单栏：工具 --> 构建 npm
+[官方文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
+
+##### 页面json配置：
 ```json
 {
     "usingComponents": {
-        "calendar": "/your-path/wx-calendar/index"
+        "calendar": "@lspriv/wx-calendar"
     }
 }
 ```
 > 
 
-在页面wxml文件中：
+##### 在页面wxml文件中：
 ```html
 <calendar id="calendar" bindload="handleLoad" />
 ```

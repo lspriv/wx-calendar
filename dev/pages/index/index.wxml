@@ -5,6 +5,5 @@
     bindload="handleLoad"
     bindchange="handleChange" 
     bindviewchange="handleViewChange">
-    <button >按钮</button>
   </calendar>
 </view>
