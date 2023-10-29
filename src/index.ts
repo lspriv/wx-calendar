@@ -1,7 +1,7 @@
 /*
  * @Description: wx-calendar组件
  * @Author: lishen
- * @LastEditTime: 2023-10-27 01:49:36
+ * @LastEditTime: 2023-10-29 15:36:48
  */
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
@@ -48,8 +48,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
   options: {
-    pureDataPattern: propPattern(PURE_PROPS),
-    multipleSlots: true
+    pureDataPattern: propPattern(PURE_PROPS)
   },
   properties: {
     darkmode: {
@@ -78,6 +77,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       value: true
     },
     font: {
+      type: String,
+      value: ''
+    },
+    style: {
       type: String,
       value: ''
     },

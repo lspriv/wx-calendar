@@ -1,8 +1,8 @@
 <wxs src="./wxs/tool.wxs" module="tool_wxs" />
 <wxs src="./wxs/transform.wxs" module="trans_wxs" />
 <view 
-  class="wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
-  style="--wc-panel-height: {{ layout.panelHeight }}px;--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottomHeight }}px;font-family: {{ fonts }};">
+  class="ext-class wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
+  style="--wc-panel-height: {{ layout.panelHeight }}px;--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottomHeight }}px;font-family: {{ fonts }};{{ style }}">
 
   <view 
     id="calendar" 

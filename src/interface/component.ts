@@ -1,7 +1,7 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-27 01:49:18
+ * @LastEditTime: 2023-10-29 15:39:31
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -79,8 +79,10 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   marks: FullProperty<ArrayConstructor>;
   /** 视图分月视图，周视图和日程视图 */
   view: FullProperty<StringConstructor>;
-  /** 字体，兜底 system-ui */
+  /** 字体，默认 system-ui */
   font: FullProperty<StringConstructor>;
+  /** 容器样式 */
+  style: FullProperty<StringConstructor>;
   /** 周首日，0 | 1 | 2 | 3 | 4 | 5 | 6 分别对应 日 | 一 | 二 | 三 | 四 | 五 | 六 */
   weekstart: FullProperty<NumberConstructor>;
   /** 点击选择日期时是否震动 */

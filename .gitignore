@@ -9,6 +9,8 @@ yarn-debug.log*
 yarn-error.log*
 
 dist
+types
 node_modules
 coverage
 dev/components/wx-calendar
+dev/app.json

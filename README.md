@@ -106,6 +106,13 @@ npm run build
         <td>0</td>
     </tr>
     <tr>
+        <td>style</td>
+        <td>string</td>
+        <td>样式，可以设置css变量修改主题</td>
+        <td>否</td>
+        <td>''</td>
+    </tr>
+    <tr>
         <td>font</td>
         <td>string</td>
         <td>设置字体</td>
@@ -171,6 +178,66 @@ npm run build
 >     # 更新插件数据，若不指定哪些日期更新，默认全部已加载日期
 
 > 有需要更多方法的可以提issue
+
+### 样式
+可通过传入style属性修改以下css变量调整主题
+```css
+.wcc {
+    /* 浅色主题 */
+    --wc-bg-color-light: #FFF; /* 主背景色 */
+    --wc-title-color-light: #333; /* 左上角日期标题 */
+    --wc-title-sub-color-light: #7A7A7A; /* 左上角日期标题的右侧描述 */
+    --wc-operator-bg-light: #D9ECFF; /* 视图控制背景色 */
+    --wc-operator-checked-bg-light: #409EFF; /* 视图控制按钮背景色 */
+    --wc-operator-color-light: #409EFF; /* 视图控制字体 */
+    --wc-operator-checked-color-light: #FFF; /* 视图控制选中字体 */
+    --wc-week-color-light: #ABABAB; /* 星期 */
+    --wc-date-color-light: #333; /* 日期 */
+    --wc-mark-color-light: #ABABAB; /* 日期下方信息 */
+    --wc-dot-color-light: #ABABAB; /* 日期上方‘･’ */
+    --wc-schedule-color-light: #409EFF; /* 日程默认 */
+    --wc-schedule-bg-light: #EAEEF2; /* 日程默认背景 */
+    --wc-today-color-light: #409EFF; /* 日期（今日） */
+    --wc-solar-color-light: #409EFF; /* 日期下方信息默认（节气，节假日） */
+    --wc-checked-color-light: #333; /* 被选日期 */
+    --wc-checked-mark-color-light: #ABABAB; /* 被选日期下方信息 */
+    --wc-checked-dot-color-light: #ABABAB; /* 被选日期上方‘･’ */
+    --wc-checked-today-color-light: #FFF; /* 被选日期（今日） */
+    --wc-checked-bg-light: #F5F5F5; /* 被选日期背景圆圈 */
+    --wc-checked-today-bg-light: #409EFF; /* 被选日期背景圆圈（今日） */
+    --wc-control-bg-light: #DFDFDF; /* 底部控制条背景 */
+    --wc-annual-bg-light: #FFF; /* 年面板背景 */
+    --wc-annual-title-color-light: #333; /* 年面板左上角标题 */
+    --wc-annual-title-sub-color-light: #7A7A7A; /* 年面板左上角标题右侧信息 */
+
+    /* 深色主题 */
+    --wc-bg-color-dark: #000;
+    --wc-title-color-dark: #E5E5E5;
+    --wc-title-sub-color-dark: #7A7A7A;
+    --wc-operator-bg-dark: #332D2D80;
+    --wc-operator-checked-bg-dark: #409EFF;
+    --wc-operator-color-dark: #409EFF;
+    --wc-operator-checked-color-dark: #FFF;
+    --wc-week-color-dark: #ABABAB;
+    --wc-date-color-dark: #E5E5E5;
+    --wc-mark-color-dark: #5F5F5F;
+    --wc-dot-color-dark: #ABABAB;
+    --wc-schedule-color-dark: #66B1FF;
+    --wc-schedule-bg-dark: #332D2D80;
+    --wc-today-color-dark: #409EFF;
+    --wc-solar-color-dark: #409EFF;
+    --wc-checked-color-dark: #E5E5E5;
+    --wc-checked-mark-color-dark: #5F5F5F;
+    --wc-checked-dot-color-dark: #ABABAB;
+    --wc-checked-today-color-dark: #E5E5E5;
+    --wc-checked-bg-dark: #262626;
+    --wc-checked-today-bg-dark: #409EFF;
+    --wc-control-bg-dark: #262626;
+    --wc-annual-bg-dark: #000;
+    --wc-annual-title-color-dark: #E5E5E5;
+    --wc-annual-title-sub-color-dark: #3F3F3F;
+}
+```
 
 ### 插件
 wx-calendar自带农历插件
