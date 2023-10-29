@@ -1,7 +1,7 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-26 22:43:26
+ * @LastEditTime: 2023-10-29 22:17:01
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -48,7 +48,6 @@ export const flagView = (flag: number) => values(VIEWS)[Math.log2(flag)];
 export const middle = (count: number) => Math.floor((count - 1) / 2);
 
 export const isSkyline = (renderer?: string): renderer is 'skyline' => renderer === 'skyline';
-export const isWebview = (renderer?: string): renderer is 'webview' => renderer === 'webview';
 
 export const circularDiff = (idx: number, curr: number): number => {
   const half = Math.floor(CALENDAR_PANELS / 2);
@@ -56,11 +55,6 @@ export const circularDiff = (idx: number, curr: number): number => {
   if (idx > curr + half) idx = idx - CALENDAR_PANELS;
   return idx - curr;
 };
-
-export const weighted = (idx: number, curr: number): number => Math.abs(circularDiff(idx, curr));
-
-export const weightedSort = (arr: Array<number>, current: number) =>
-  arr.sort((a, b) => weighted(a, current) - weighted(b, current));
 
 export const InitPanels = <T>(prefix: string, mixin: Record<string, any> = {}) =>
   Array.from({ length: CALENDAR_PANELS }, (_, i) => ({ key: `${prefix}_${i}`, ...mixin }) as T);
@@ -91,14 +85,6 @@ export const severalTicks = async (times: number) => {
     times--;
   }
 };
-
-export interface Setter {
-  (data: Record<string, any> | SetterCallback): void;
-}
-
-export interface SetterCallback {
-  (): void;
-}
 
 export const applyAnimated = (
   instance: ComponentInstance,

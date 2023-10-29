@@ -86,7 +86,8 @@ commander
       spinner.succeed('build success');
 
       semantic = semantic === 'pre' ? (preid ? 'release' : 'prerelease') : semantic;
-      const versionCommand = preid ? `npm version pre${semantic} -preid ${preid}` : `npm version ${semantic}`;
+      let versionCommand = preid ? `npm version pre${semantic} -preid ${preid}` : `npm version ${semantic}`;
+      versionCommand += ' -m "build: version %s" --no-git-tag-version';
 
       try {
         execSync(versionCommand, { stdio: 'inherit' });

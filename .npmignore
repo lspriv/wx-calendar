@@ -20,5 +20,6 @@ build
 src
 dev
 tmpls
+scripts
 node_modules
 coverage
