@@ -4,6 +4,7 @@
   "description": "calendar for miniprogram",
   "type": "commonjs",
   "main": "dist/index.js",
+  "miniprogram": "dist",
   "types": "./types/index.d.ts",
   "files": [
     "dist/",
@@ -12,7 +13,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
     "dev": "node ./scripts/dev.js",
-    "pub": "node ./scripts/publish.js",
+    "package": "node ./scripts/publish.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

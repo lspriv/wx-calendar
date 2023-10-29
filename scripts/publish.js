@@ -64,32 +64,35 @@ commander
         });
       }
 
-      if (!preid) {
-        const selections = Preids.map(item => {
-          const s = getArg(item);
-          return { name: s, value: s };
-        });
-        if (semantic !== 'pre') selections.push({ name: 'no', value: undefined });
+      if (!preid && semantic !== 'pre') {
         preid = await select({
           message: 'set prerelease preid',
-          choices: selections
+          choices: Preids.map(item => {
+            const s = getArg(item);
+            return { name: s, value: s };
+          })
         });
+      } else if (semantic === 'pre') {
+        preid = void 0;
       }
+
       spinner.start('building...');
       try {
         execSync('npm run build', { stdio: 'inherit' });
       } catch (error) {
         spinner.fail(error.message);
+        throw error;
       }
       spinner.succeed('build success');
 
-      semantic = semantic === 'pre' ? 'release' : semantic;
+      semantic = semantic === 'pre' ? (preid ? 'release' : 'prerelease') : semantic;
       const versionCommand = preid ? `npm version pre${semantic} -preid ${preid}` : `npm version ${semantic}`;
 
       try {
         execSync(versionCommand, { stdio: 'inherit' });
       } catch (error) {
         console.log('npm version'.white, 'ERR!'.red, error.message.white);
+        throw error;
       }
 
       execSync('npm publis --access public', { stdio: 'inherit' });
