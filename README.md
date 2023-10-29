@@ -170,11 +170,83 @@ npm run build
 >     (dates?: Array<CalendarDay>) => Promise<void>;
 >     # 更新插件数据，若不指定哪些日期更新，默认全部已加载日期
 
-### 说明
+> 有需要更多方法的可以提issue
 
-涉及到`日期标记`无论是标记数组还是单个标记，都是形如以下：
->      marker = { year, month, day, type, mark, color, bgColor }
->      markers = [{ year, month, day, type, mark, color, bgColor }]
+### 插件
+wx-calendar自带农历插件
+
+#### 插件使用
+```javascript
+const { WxCalendar } = require('@lspriv/wx-calendar/interface/calendar');
+const { YourPlugin } = require('anywhere');
+
+// WxCalendar.clearPlugins(); 执行这一行会清除这个页面之前设置的插件，无奈之举
+
+WxCalendar.use(YourPlugin, options); // options 插件选项
+
+// 或 WxCalendar.use([YourPlugin]); 这种适合多个无配置选项的
+
+Component({
+    ...
+})
+```
+
+#### 插件开发
+自定义插件需要实现Plugin接口
+```typescript
+class MyPlugin implements Plugin {
+    /** 需要定义插件的key，必填 */
+    static KEY: 'my-plugin' as const;
+
+    constructor(options, calendarInstance) {
+        // options 你的插件选项
+        // calendarInstance 日历组件实例
+    }
+
+    /** 捕获日期，（周/月面板），可选择实现该方法  */
+    public trackDate(date: CalendarDay): TrackDateResult {
+        // do something...
+        return {
+            // 设置日程数组，可选
+            schedule: [{ text: '', color: '', bgColor: '' }],
+            // 设置角标，可选
+            corner: { text: '', color: '' },
+            // 设置节假日，可选
+            festival: { text: '', color: '' }
+        }
+    }
+
+    /** 捕获年，（年度面板），可选择实现该方法 */
+    public trackYear(year: WxCalendarYear): TrackYearResult {
+        // do something...
+        return {
+            // 设置年份描述信息，可选
+            subinfo: '',
+            // 设置角标，可选
+            marks: new Map([
+                ['2023-10-1', new Set(['rest'])], // 休息日，置灰
+                ['2023-10-7', new Set(['work'])], // 工作日，高亮
+                ['2023-10-9', new Set(['#F56C6C'])] // 自定义颜色下标
+            ])
+        }
+    }
+
+    /** 挂载插件数据，可选择实现该方法 */
+    public pluginData(date: CalendarDay): any {
+        // 返回数据将作为插件数据挂载到日期
+        return {};
+    }
+}
+```
+> 有需要更多接口的可以提issue
+
+#### 插件画饼
+有计划再做两个插件
+>     1. ICS日历订阅插件
+>     2. 日历快照插件，生成周月和年面板的卡片以及分享卡片
+>     3. Locale本地化插件？
+
+### 说明
 
 #### mark说明
 

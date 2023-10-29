@@ -31,9 +31,7 @@
     "@typescript-eslint/parser": "^6.5.0",
     "colors": "^1.4.0",
     "commander": "^11.1.0",
-    "commitizen": "^4.3.0",
     "cross-env": "^7.0.3",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
@@ -58,8 +56,5 @@
     "through2": "^4.0.2",
     "typescript": "^5.2.2",
     "uglify-js": "^3.17.4"
-  },
-  "commitizen": {
-    "path": "./node_modules/cz-conventional-changelog"
   }
 }
