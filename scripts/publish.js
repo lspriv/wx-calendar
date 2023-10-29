@@ -78,7 +78,7 @@ commander
 
       spinner.start('building...');
       try {
-        execSync('npm run build', { stdio: 'inherit' });
+        execSync('npm run build');
       } catch (error) {
         spinner.fail(error.message);
         throw error;
@@ -90,7 +90,7 @@ commander
       versionCommand += ' -m "build: version %s" --no-git-tag-version';
 
       try {
-        execSync(versionCommand, { stdio: 'inherit' });
+        execSync(versionCommand);
       } catch (error) {
         console.log('npm version'.white, 'ERR!'.red, error.message.white);
         throw error;
