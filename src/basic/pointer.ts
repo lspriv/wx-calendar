@@ -1,7 +1,10 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
- * @Author: lishen
- * @LastEditTime: 2023-10-26 19:03:50
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:48:59
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';

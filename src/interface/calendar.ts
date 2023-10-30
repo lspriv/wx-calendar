@@ -1,7 +1,10 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
- * @Author: lishen
- * @LastEditTime: 2023-10-26 23:18:00
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:45:43
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';

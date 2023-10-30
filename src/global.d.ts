@@ -1,7 +1,10 @@
 /*
- * @Description: Description
- * @Author: lishen
- * @LastEditTime: 2023-10-27 14:55:32
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 声明
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:44:36
  */
 declare type SkylineStyleObject = Record<string, string | number>;
 

@@ -1,7 +1,10 @@
 /*
- * @Description: 常量
- * @Author: lishen
- * @LastEditTime: 2023-10-27 14:56:15
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 常量配置
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:47:31
  */
 declare global {
   var $_VERSION: string;

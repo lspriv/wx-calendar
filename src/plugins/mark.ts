@@ -1,7 +1,10 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
- * @Author: lishen
- * @LastEditTime: 2023-10-22 22:22:04
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:44:55
  */
 import { normalDate } from '../interface/calendar';
 

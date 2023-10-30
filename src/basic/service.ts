@@ -1,7 +1,10 @@
 /*
- * @Description: 插件
- * @Author: lishen
- * @LastEditTime: 2023-10-26 23:17:43
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 插件服务
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:49:49
  */
 import { nextTick } from './tools';
 import { notEmptyObject } from '../utils/shared';

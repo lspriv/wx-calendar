@@ -21,14 +21,4 @@ swiper {
   flex-direction: column;
   z-index: 1024;
   overflow: hidden;
-  @include if (hidden) {
-    .wc__panel, .wc__bar {
-      visibility: hidden;
-    }
-  }
-}
-
-.wc__content {
-  position: relative;
-  background-color: theme(bg-color);
 }

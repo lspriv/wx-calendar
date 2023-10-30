@@ -1,7 +1,10 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
- * @Author: lishen
- * @LastEditTime: 2023-10-29 22:12:48
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:45:24
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;

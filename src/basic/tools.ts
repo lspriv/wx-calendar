@@ -1,7 +1,10 @@
 /*
- * @Description: Description
- * @Author: lishen
- * @LastEditTime: 2023-10-29 22:17:01
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 工具方法
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:50:09
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';

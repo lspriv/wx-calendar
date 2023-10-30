@@ -1,7 +1,10 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 计算
- * @Author: lishen
- * @LastEditTime: 2023-09-06 12:51:48
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:45:14
  */
 /**
  * 是否是科学记数法

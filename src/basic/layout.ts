@@ -1,7 +1,10 @@
 /*
- * @Description: 日期处理
- * @Author: lishen
- * @LastEditTime: 2023-10-25 23:58:15
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 布局
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:48:15
  */
 import { View } from './constants';
 

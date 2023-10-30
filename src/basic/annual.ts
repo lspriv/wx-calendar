@@ -1,7 +1,10 @@
 /*
- * @Description: Description
- * @Author: lishen
- * @LastEditTime: 2023-10-29 17:38:23
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 年度面板控制
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:47:17
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';

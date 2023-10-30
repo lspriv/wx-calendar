@@ -1,7 +1,10 @@
 /*
- * @Description: Description
- * @Author: lishen
- * @LastEditTime: 2023-10-26 13:46:52
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 面板拖拽控制
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:47:59
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { applyAnimated, clearAnimated, circularDiff } from './tools';

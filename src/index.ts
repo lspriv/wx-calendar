@@ -1,8 +1,12 @@
 /*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
- * @Author: lishen
- * @LastEditTime: 2023-10-29 17:33:45
+ * @Author: lspriv
+ * @LastEditTime: 2023-10-30 15:33:06
  */
+
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer } from './basic/pointer';

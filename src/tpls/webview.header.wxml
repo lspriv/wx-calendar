@@ -1,3 +1,8 @@
+<!-- 
+  Copyright 2023 lspriv. All Rights Reserved.
+  Distributed under MIT license.
+  See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ -->
 <wxs src="../wxs/transform.wxs" module="trans_wxs" />
 <view class="wc__header">
   <view class="wc__header-title" catchtap="selYear">
