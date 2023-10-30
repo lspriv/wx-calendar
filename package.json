@@ -1,6 +1,6 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "calendar for miniprogram",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -8,7 +8,8 @@
   "types": "./types/index.d.ts",
   "files": [
     "dist/",
-    "types/"
+    "types/",
+    "global.d.ts"
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",

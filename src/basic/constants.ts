@@ -4,11 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:47:31
+ * @LastEditTime: 2023-10-31 02:21:06
  */
-declare global {
-  var $_VERSION: string;
-}
+
+declare const $_VERSION: string;
 
 export const VERSION = $_VERSION;
 

@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
  * 主要是私下快速发预览包用
+ * 也可以发稳定包，但这最好是master分支触发action来控制，已配置workflow
  */
-
+const path = require('path');
 const { execSync } = require('child_process');
 const { Command } = require('commander');
 const { select } = require('@inquirer/prompts');
 const ora = require('ora');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const colors = require('colors');
+require('colors');
 
-const Semantics = ['@major', '@minor', '@patch', '@pre'];
+const Semantics = ['@major', '@minor', '@patch', '@prerelease'];
 const Preids = ['@alpha', '@beta'];
 
 const validSemantic = semantic => {
@@ -64,16 +64,17 @@ commander
         });
       }
 
-      if (!preid && semantic !== 'pre') {
-        preid = await select({
-          message: 'set prerelease preid',
-          choices: Preids.map(item => {
-            const s = getArg(item);
-            return { name: s, value: s };
-          })
-        });
-      } else if (semantic === 'pre') {
+      if (semantic === 'prerelease') {
         preid = void 0;
+      } else if (!preid) {
+        const choices = Preids.map(item => {
+          const s = getArg(item);
+          return { name: s, value: s };
+        });
+        preid = await select({
+          message: 'set prerelease preid?',
+          choices: [...choices, { name: 'no', value: void 0 }]
+        });
       }
 
       spinner.start('building...');
@@ -85,9 +86,8 @@ commander
       }
       spinner.succeed('build success');
 
-      semantic = semantic === 'pre' ? (preid ? 'release' : 'prerelease') : semantic;
       let versionCommand = preid ? `npm version pre${semantic} -preid ${preid}` : `npm version ${semantic}`;
-      versionCommand += ' -m "build: version %s" --no-git-tag-version';
+      versionCommand += ' --no-git-tag-version';
 
       try {
         execSync(versionCommand);
@@ -96,7 +96,20 @@ commander
         throw error;
       }
 
-      execSync('npm publis --access public', { stdio: 'inherit' });
+      execSync('npm publish --access public', { stdio: 'inherit' });
+
+      const version = require(path.join(process.cwd(), '/package.json')).version;
+
+      spinner.start('git pushing...');
+      try {
+        execSync('git add .');
+        execSync(`git commit -m "build(package): version ${version}"`);
+        execSync('git push origin HEAD');
+      } catch (error) {
+        spinner.fail(error.message);
+        throw error;
+      }
+      spinner.succeed('git push success');
     }
   })
   .parse(process.argv);

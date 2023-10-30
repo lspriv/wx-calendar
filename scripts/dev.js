@@ -4,8 +4,7 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 const { Command } = require('commander');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const colors = require('colors');
+require('colors');
 
 const Renderers = ['@skyline', '@webview', '@S', '@W'];
 

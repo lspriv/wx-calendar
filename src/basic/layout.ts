@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 17:17:01
+ * @LastEditTime: 2023-10-31 02:49:39
  */
 import { View } from './constants';
 
@@ -47,8 +47,6 @@ export class Layout {
     const { safeArea, windowWidth, windowHeight, theme } = wx.getSystemInfoSync();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
-    console.log('system', wx.getSystemInfoSync());
-
     const subHeight = Layout.rpxToPx(Layout.CalendarSubHeight, windowWidth);
     const mainHeight = Layout.rpxToPx(Layout.CalendarHeight, windowWidth);
     const panelHeight = mainHeight - subHeight;
@@ -74,8 +72,6 @@ export class Layout {
       windowHeight,
       maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight - subHeight, windowWidth)
     }) as CalendarLayout;
-
-    console.log('layout', Layout.layout);
 
     if (theme === 'dark') Layout.theme = 'dark';
   }

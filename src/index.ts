@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 17:30:39
+ * @LastEditTime: 2023-10-31 03:06:54
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -120,7 +120,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.initializeShared();
     },
     async attached() {
-      console.log('renderer', this.renderer);
       await this.initializeRects();
       this.initializeRender();
     },
@@ -140,7 +139,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        * 未设置view值或view值不合法时，默认View.month（月视图）
        */
       this._view_ = flag || View.month;
-      console.log('view', this._view_);
       /**
        * 初始化calendar处理额外的服务
        */
@@ -269,7 +267,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (e.detail.source !== 'touch') return;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
-      console.log('swiperTransEnd', this._swiper_accumulator_, this._swiper_accumulator_ % Layout.layout!.windowWidth);
       if (this._swiper_accumulator_ % Layout.layout!.windowWidth === 0) {
         const offset = this._swiper_accumulator_ / Layout.layout!.windowWidth;
         this._swiper_accumulator_ = 0;

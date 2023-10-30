@@ -20,7 +20,8 @@
         "node_modules/miniprogram-api-typings/index.d.ts"
     ],
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "global.d.ts"
     ],
     "exclude": [
         "node_modules"

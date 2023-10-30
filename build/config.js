@@ -4,7 +4,7 @@ module.exports.projectName = /** @type {const} */ ('wx-calendar');
 
 module.exports.unPackGlobs = ['!src/style/**'];
 
-module.exports.dependenciesGlobs = ['node_modules/miniprogram-api-typings/index.d.ts'];
+module.exports.dependenciesGlobs = ['node_modules/miniprogram-api-typings/index.d.ts', 'global.d.ts'];
 
 /**
  * 如果小程序开发工具不是默认安装位置，请设置cli路径
