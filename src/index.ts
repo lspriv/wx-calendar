@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-10-31 03:06:54
+ * @LastEditTime: 2023-10-31 03:55:15
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -46,6 +46,8 @@ import type {
 export type * from './interface/component';
 export type * from './interface/calendar';
 export type * from './basic/service';
+
+export { WxCalendar } from './interface/calendar';
 
 const initCurrent = middle(CALENDAR_PANELS);
 
