@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2023-10-30 15:46:02
+ * @LastEditTime: 2023-10-30 17:30:37
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -64,7 +64,7 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** [webview] 周视图下强制更新各面板的垂直偏移量 */
   offsetChange: boolean;
   /** 布局数据 */
-  layout: Nullable<CalendarLayout>;
+  layout: Nullable<Omit<CalendarLayout, 'subHeight' | 'windowWidth' | 'windowHeight'>>;
   /** 选中日期的额外信息 */
   info: string;
   /** 控制选中日期的圆圈⭕️位置和动画 */

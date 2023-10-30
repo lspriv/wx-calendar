@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:48:15
+ * @LastEditTime: 2023-10-30 17:17:01
  */
 import { View } from './constants';
 
@@ -19,7 +19,8 @@ export interface CalendarLayout {
   readonly windowWidth: number;
   readonly windowHeight: number;
   readonly dragMaxHeight: number;
-  readonly safeBottomHeight: number;
+  readonly safeBottom: number;
+  readonly maxScheduleSize: number;
 }
 
 export type Theme = 'light' | 'dark';
@@ -57,12 +58,12 @@ export class Layout {
     const minHeight = panelHeight / 5 + subHeight;
     const dragMaxHeight = panelHeight / 5 + maxHeight;
 
-    const safeBottomHeight = windowHeight - (safeArea?.bottom ?? windowHeight);
+    const safeBottom = windowHeight - (safeArea?.bottom ?? windowHeight);
 
     Layout.layout = Object.freeze({
       menuTop: top,
       menuBottom: bottom,
-      safeBottomHeight: safeBottomHeight > 0 ? safeBottomHeight : Layout.rpxToPx(60, windowWidth),
+      safeBottom: safeBottom > 0 ? safeBottom : Layout.rpxToPx(60, windowWidth),
       subHeight,
       panelHeight,
       mainHeight,
@@ -70,10 +71,26 @@ export class Layout {
       minHeight,
       dragMaxHeight,
       windowWidth,
-      windowHeight
+      windowHeight,
+      maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight - subHeight, windowWidth)
     }) as CalendarLayout;
 
+    console.log('layout', Layout.layout);
+
     if (theme === 'dark') Layout.theme = 'dark';
+  }
+
+  private static calcSchedulesMaxSize(maxPanelHeight: number, windowWidth: number): number {
+    /** 按每个月最大有6行计算最小行高度 */
+    const minUnitHeight = maxPanelHeight / 6;
+    /** 计算日期主体高度 */
+    const dateInnerHeight = Layout.rpxToPx(100, windowWidth);
+    /** 计算日程间距 */
+    const margin = Layout.rpxToPx(4, windowWidth);
+    /** 计算耽搁日程高度 */
+    const scheduleHeight = Layout.rpxToPx(24, windowWidth);
+    /** 计算能容纳的最大日程数量 */
+    return Math.floor((minUnitHeight - dateInnerHeight) / (scheduleHeight + margin));
   }
 
   public static rpxToPx(rpx: number, windowWidth: number) {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wxs工具方法
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:44:19
+ * @LastEditTime: 2023-10-30 17:11:21
  */
 
 var isSkyline = function (renderer) {
@@ -15,13 +15,27 @@ var isChecked = function (date, checked, pdx, curr) {
   return pdx === curr && date.year === checked.year && date.month === checked.month && date.day === checked.day;
 };
 
-var cutSchedules = function (schedules) {
+var cutSchedules = function (schedules, rows, maxSize) {
   if (!schedules || !schedules.length) return [];
-  return schedules.slice(0, 3);
+  return schedules.slice(0, rows === 6 ? maxSize - 1 : maxSize);
+};
+
+var scheduleShowRest = function (schedules, rows, maxSize) {
+  if (!schedules || !schedules.length) return false;
+  var _maxSize = rows === 6 ? maxSize - 1 : maxSize;
+  return schedules.length > _maxSize;
+};
+
+var scheduleRest = function (schedules, rows, maxSize) {
+  if (!schedules || !schedules.length) return 0;
+  var _maxSize = rows === 6 ? maxSize - 1 : maxSize;
+  return schedules.length - _maxSize;
 };
 
 module.exports = {
   isSkyline,
   isChecked,
-  cutSchedules
+  cutSchedules,
+  scheduleShowRest,
+  scheduleRest
 };

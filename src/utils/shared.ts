@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:45:24
+ * @LastEditTime: 2023-10-30 17:27:02
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -40,3 +40,12 @@ export const easeInOutSine = (x: number, end: number = 1, start: number = 0): nu
   const t = end - start;
   return (-(Math.cos(Math.PI * x) - 1) / 2) * t + start;
 };
+
+export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]) =>
+  Object.keys(obj).reduce(
+    (acc, key) => {
+      if (!keys.includes(key as K)) acc[key] = obj[key];
+      return acc;
+    },
+    {} as Pick<T, Exclude<keyof T, K>>
+  );

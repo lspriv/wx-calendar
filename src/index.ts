@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:33:06
+ * @LastEditTime: 2023-10-30 17:30:39
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -29,7 +29,7 @@ import {
   createPointer,
   propPattern
 } from './basic/tools';
-import { promises } from './utils/shared';
+import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
 import type { WxCalendarYear, CalendarMark, WxCalendarDay, CalendarDay } from './interface/calendar';
@@ -172,6 +172,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const fonts = this.data.font ? mergeFonts(this.data.font, FONT) : FONT;
       const initView = flagView(this._view_);
+      const layout = omit(Layout.layout!, ['subHeight', 'windowWidth', 'windowHeight']);
 
       const sets: Partial<CalendarData> = {
         renderer: this.renderer!,
@@ -181,7 +182,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         panels,
         years,
         offsetChange: !!(isWeekView && !isSkylineRender),
-        layout: Layout.layout!,
+        layout,
         annualCurr: isSkylineRender ? null : initCurrent,
         currView: initView,
         initView,

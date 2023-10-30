@@ -66,13 +66,16 @@
                 wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
                 class="wc__panel-schedules">
                 <text 
-                  wx:for="{{ tool_wxs.cutSchedules(day.schedules) }}" 
+                  wx:for="{{ tool_wxs.cutSchedules(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
                   wx:for-index="sdx"
                   wx:for-item="schedule"
                   wx:key="key"
                   style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
                   class="wc__panel-schedule">{{ schedule.text }}</text>
-                <text wx:if="{{ day.schedules.length > 3 }}" class="wc__panel-schedule wc__panel-schedule--center">+{{ day.schedules.length - 3 }}</text>
+                <text 
+                  wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
+                  class="wc__panel-schedule wc__panel-schedule--center"
+                >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</text>
               </view>
             </view>
           </view>
