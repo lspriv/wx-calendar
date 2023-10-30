@@ -253,7 +253,7 @@ wx-calendar自带农历插件
 
 #### 插件使用
 ```javascript
-const { WxCalendar } = require('@lspriv/wx-calendar/interface/calendar');
+const { WxCalendar } = require('@lspriv/wx-calendar');
 const { YourPlugin } = require('anywhere');
 
 // WxCalendar.clearPlugins(); 执行这一行会清除这个页面之前设置的插件，无奈之举
@@ -270,6 +270,8 @@ Component({
 #### 插件开发
 自定义插件需要实现Plugin接口
 ```typescript
+import { Plugin, CalendarDay, WxCalendarYear, TrackDateResult, TrackYearResult } from '@lspriv/wx-calendar';
+
 class MyPlugin implements Plugin {
     /** 需要定义插件的key，必填 */
     static KEY: 'my-plugin' as const;
