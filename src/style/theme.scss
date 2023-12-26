@@ -1,0 +1,137 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 基础样式，主题
+ * @Author: lspriv
+ */
+
+/** css变量前缀 **/
+$wc-theme-prefix: --wc-;
+
+$wc-primary-1: #409EFF; 
+$wc-primary-2: #66B1FF; 
+$wc-primary-3: #8CC5FF;
+$wc-primary-4: #D9ECFF;
+$wc-primary-5: #EAEEF2;
+
+$wc-text-1: #111;
+$wc-text-2: #333;
+$wc-text-3: #7A7A7A;
+$wc-text-4: #ABABAB;
+$wc-text-5: #E5E5E5;
+$wc-text-6: #FFF;
+
+$wc-bg-1: #FFF;
+$wc-bg-2: #F8F8F8;
+$wc-bg-3: #F5F5F5;
+$wc-bg-4: #ECF5FF;
+$wc-bg-5: #DFDFDF;
+
+$wc-error: #F56C6C;
+
+$wc-ratio-width: 750rpx;
+$wc-calendar-height: 800rpx;
+$wc-calendar-header-height: 100rpx;
+$wc-calendar-weeks-height: 50rpx;
+$wc-calendar-bar-height: 50rpx;
+$wc-calendar-sub-height: $wc-calendar-header-height + $wc-calendar-weeks-height + $wc-calendar-bar-height;
+$wc-calendar-panel-height: $wc-calendar-height - $wc-calendar-sub-height;
+$wc-calendar-spare-height: 100rpx;
+$wc-calendar-pointer-size: 100rpx;
+
+$wc-theme-size: (
+	/** header **/
+	title-size: 46rpx, // 左上角日期标题字号
+	title-sub-size: 20rpx, // 左上角日期标题右侧描述信息字号
+	operator-size: 22rpx, // 视图控制按钮字号
+
+	/** week **/
+	week-size: 20rpx, // 星期字号
+
+	/** panel **/
+	date-size: 36rpx, // 日期字体字号
+	mark-size: 20rpx, // 日期下方信息字体字号
+	corner-size: 16rpx, // 日期角标字体字号
+	schedule-size: 16rpx, // 日程字体字号
+
+	/** annual **/
+	annual-title-size: 50rpx, // 年面板左上角年份标题字体字号
+	annual-title-sub-size: 18rpx, // 年面板左上角年份标题右侧信息字体字号
+);
+
+/** 主题色 **/
+$wc-theme-light: ( 
+	bg-color: $wc-bg-1, // 主背景色
+
+	/** header **/
+	title-color: $wc-text-2, // 左上角日期标题字体色
+	title-sub-color: $wc-text-3, // 左上角日期标题右侧描述信息字体色
+	operator-bg: $wc-primary-4, // 视图控制按钮背景色
+	operator-checked-bg: $wc-primary-1, // 视图控制按钮被选择时背景色
+	operator-color: $wc-primary-1, // 视图控制按钮字体色
+	operator-checked-color: $wc-bg-1, // 视图控制按钮被选择时字体色
+
+	/** week **/
+	week-color: $wc-text-4, // 星期字体色
+
+	/** panel **/
+	checked-color: $wc-text-2, // 被选日期字体色
+	checked-mark-color: $wc-text-4, // 被选日期下方信息字体色
+	checked-dot-color: $wc-text-4, // 被选日期上方‘･’的颜色
+	checked-today-color: $wc-text-6, // 被选日期字体色（今日）
+	checked-bg: $wc-bg-3, // 被选择日期背景圆圈色
+	checked-today-bg: $wc-primary-1, // 被选择日期背景圆圈色（今日）
+
+	date-color: $wc-text-2, // 日期字体色
+	mark-color: $wc-text-4, // 日期下方信息字体色
+	dot-color: $wc-text-4, // 日期上方‘･’的颜色
+	schedule-color: $wc-primary-1, // 日程默认字体色
+	schedule-bg: $wc-primary-5, // 日程默认背景色
+	today-color: $wc-primary-1, // 日期字体色（今日）
+	solar-color: $wc-primary-1, // 日期下方信息字体色（节气，节假日）
+
+	/** control bar **/
+	control-bg: $wc-bg-5, // 底部控制条背景色
+
+	/** annual **/
+	annual-bg: $wc-bg-1, // 年面板背景色
+	annual-title-color: $wc-text-2, // 年面板左上角年份标题字体色
+	annual-title-sub-color: $wc-text-3 // 年面板左上角年份标题右侧农历年信息字体色
+);
+
+/** 深色主题 **/
+$wc-theme-dark: ( 
+	bg-color: #000, 
+
+	title-color: $wc-text-5, 
+	title-sub-color: $wc-text-3,
+	operator-bg: rgba($color: #332D2D, $alpha: 0.5),
+	operator-checked-bg: $wc-primary-1,
+	operator-color: $wc-primary-1, 
+	operator-checked-color: $wc-text-6,
+
+	week-color: $wc-text-4, 
+
+	checked-color: $wc-text-5,
+	checked-mark-color: #5F5F5F,
+	checked-dot-color: $wc-text-4,
+	checked-today-color: $wc-text-5,
+	checked-bg: #262626, 
+	checked-today-bg: $wc-primary-1, 
+	
+	date-color: $wc-text-5,
+	mark-color: #5F5F5F,
+	dot-color: $wc-text-4,
+	schedule-color: $wc-primary-2,
+	schedule-bg: rgba($color: #332D2D, $alpha: 0.5),
+	today-color: $wc-primary-1,
+	solar-color: $wc-primary-1,
+
+	control-bg: #262626,
+
+	annual-bg: #000,
+	annual-title-color: $wc-text-5,
+	annual-title-sub-color: #3F3F3F
+);
+

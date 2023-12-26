@@ -1,0 +1,137 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 混入
+ * @Author: lspriv
+ */
+
+@use "sass:map";
+@use "sass:list";
+@use "sass:string";
+@use "sass:selector";
+
+@mixin column-width ($columms: 7) {
+	width: calc(100% / #{$columms});
+}
+
+@mixin column-rect {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+@mixin month-week-rows ($length) {
+	&#{&}--l-#{$length} {
+		height: calc(100% / #{$length});
+	}
+}
+
+@mixin if($states...) {
+	$selector: &;
+	@each $state in $states {
+		$selector: $selector + #{&}--#{$state};
+	}
+	@at-root #{$selector} {
+		@content;
+	}
+}
+
+@mixin or($states...) {
+	$both: string.unquote("");
+	@each $state in $states {
+		$selector: selector.unify(&, #{&}--#{$state});
+		$both: $both + $selector + string.unquote(",");
+	}
+	@at-root #{$both} {
+		@content;
+	}
+}
+
+@mixin animation(
+	$name, 
+	$timing-func: ease, 
+	$duration: .3s, 
+	$delay: 0s, 
+	$count: 1, 
+	$direction: normal, 
+	$fill-mode: none
+) {
+	$-name: #{$name}-#{unique-id()};
+	@keyframes #{$-name} {
+		@content;
+	}
+	animation-name: $-name;
+	animation-duration: $duration;
+	animation-timing-function: $timing-func;
+	animation-delay: $delay;
+	animation-fill-mode: $fill-mode;
+	animation-iteration-count: $count;
+	animation-direction: $direction;
+}
+
+@mixin transition(
+	$transition-property: all,
+	$transition-duration: .28s,
+	$transition-timing-function: ease,
+	$transition-delay: 0s
+) {
+	transition-property: $transition-property;
+	transition-duration: $transition-duration;
+	transition-timing-function: $transition-timing-function;
+	transition-delay: $transition-delay;
+}
+
+@mixin theme-use($theme, $type) {
+	$keys: map.keys($theme);
+	@each $key in $keys {
+		#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+	}
+}
+
+@mixin theme-values($theme, $type: null) {
+	$keys: map.keys($theme);
+	$suffix: string.unquote("");
+	@if $type {
+		$suffix: -#{$type};
+	}
+	@each $key in $keys {
+		#{$wc-theme-prefix}#{$key}#{$suffix}: map.get($theme, $key);
+	}
+}
+
+// @mixin pick-theme($theme, $keys...) {
+// 	@each $key in $keys {
+// 		@if map.has-key($theme, $key) {
+// 			#{$wc-theme-prefix}#{$key}: map.get($theme, $key);
+// 		}
+// 	}
+// }
+
+// @mixin pick-theme-start($theme, $start) {
+// 	$keys: map.keys($theme);
+// 	@each $key in $keys {
+// 		@if start-with($key, $start) {
+// 			#{$wc-theme-prefix}#{$key}: map.get($theme, $key);
+// 		}
+// 	}
+// } 
+
+// @mixin omit-theme($theme, $keys...) {
+// 	$theme-keys: map.keys($theme);
+// 	@each $key in $theme-keys {
+// 		@if not list.index($keys, $key) {
+// 			#{$wc-theme-prefix}#{$key}: map.get($theme, $key);
+// 		}
+// 	}
+// }
+
+// @mixin omit-theme-start($theme, $start) {
+// 	$theme-keys: map.keys($theme);
+// 	@each $key in $theme-keys {
+// 		@if not start-with($key, $start) {
+// 			#{$wc-theme-prefix}#{$key}: map.get($theme, $key);
+// 		}
+// 	}
+// }

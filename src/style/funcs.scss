@@ -1,0 +1,16 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: scss公共方法
+ * @Author: lspriv
+ */
+
+@use "sass:string";
+@function theme ($theme-key) {
+	@return var(#{$wc-theme-prefix}#{$theme-key});
+}
+
+// @function start-with ($str, $substr) {
+// 	@return string.index($str, $substr) == 1;
+// }

@@ -1,0 +1,187 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 头部
+ * @Author: lspriv
+ */
+ 
+.wc__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: $wc-calendar-header-height;
+  padding: 20rpx 40rpx 0;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1024;
+  background: transparent;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all .28s ease;
+  contain: layout style;
+  @include if(hidden) {
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: unset;
+  }
+}
+
+.wc__header-title {
+  position: relative;
+  transition: all .28s ease 0s;
+  opacity: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+
+  color: theme(title-color);
+  font-size: theme(title-size);
+  line-height: 1;
+  font-weight: 500;
+    
+  .wc__header-title-info {
+    font-size: theme(title-sub-size);
+    line-height: 1.5;
+    color: theme(title-sub-color);
+    margin: 0 0 0 6rpx;
+    font-weight: normal;
+  }
+}
+
+.wc__operators {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  transition: all .28s ease 0s;
+  opacity: 1;
+  overflow: hidden;
+  --wc-operator-side: 60rpx;
+  --wc-operator-padding: 8rpx;
+  --wc-operator-inner-side: calc(var(--wc-operator-side) - var(--wc-operator-padding) * 2);
+}
+
+.wc__operator {
+  width: calc(var(--wc-operator-side) * 2);
+  height: var(--wc-operator-side);
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: calc(var(--wc-operator-side) / 2);
+  background-color: theme(operator-bg);
+  overflow: hidden;
+  position: relative;
+  @include if(today) {
+    width: var(--wc-operator-side);
+    justify-content: center;
+    transition: all .28s ease 0s;
+    opacity: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    transform: scale(.3) translateZ(0px);
+    &::before {
+      content: "今";
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: var(--wc-operator-inner-side);
+      height: var(--wc-operator-inner-side);
+      color: theme(operator-checked-color);
+      background: theme(operator-checked-bg);
+      font-size: theme(operator-size);
+      border-radius: 50%;
+      line-height: 1;
+      font-weight: bold;
+    }
+  }
+  @include if(today, show) {
+    opacity: 1;
+    transform: scale(1) translateZ(0px);
+  }
+  @include if(views) {
+    &::before, &::after {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: var(--wc-operator-side);
+      height: var(--wc-operator-side);
+      color: theme(operator-color);
+      font-size: theme(operator-size);
+      line-height: 1;
+      font-weight: bold;
+      position: relative;
+      z-index: 1;
+    }
+    &::before {
+      content: "月";
+    }
+    &::after {
+      content: "周";
+    }
+    .wc__operator-view {
+      width: var(--wc-operator-side);
+      height: var(--wc-operator-inner-side);
+      position: absolute;
+      top: var(--wc-operator-padding);
+      left: var(--wc-operator-side);
+      z-index: 1024;
+      border-radius: calc(var(--wc-operator-inner-side) / 2);
+      overflow: hidden;
+      &-text {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: var(--wc-operator-side);
+        height: var(--wc-operator-inner-side);
+        position: absolute;
+        top: 0;
+        color: theme(operator-checked-color);
+        font-size: theme(operator-size);
+        line-height: 1;
+        font-weight: bold;
+      }
+      &:first-child {
+        transform: translateX(-100%);
+        .wc__operator-view-text {
+          right: 0;
+        }
+      }
+      &:last-child {
+        .wc__operator-view-text {
+          left: 0;
+        }
+      }
+    }
+  }
+}
+
+
+.wx__views-bar {
+  position: absolute;
+  width: var(--wc-operator-inner-side);
+  height: var(--wc-operator-inner-side);
+  top: var(--wc-operator-padding);
+  left: var(--wc-operator-padding);
+  border-radius: 50%;
+  transform: translateX(0) translateZ(0px);
+  background: theme(operator-checked-bg);
+  z-index: 10;
+}
+
+.wcc--webview {
+  .wc__operator--views {
+    .wc__operator-view, .wx__views-bar {
+      transition: all .28s ease;
+    }
+  }
+}

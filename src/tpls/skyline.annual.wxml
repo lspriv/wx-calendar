@@ -1,0 +1,40 @@
+<!-- 
+  Copyright 2023 lspriv. All Rights Reserved.
+  Distributed under MIT license.
+  See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ -->
+<view class="wc__annual">
+  <view class="wc__annual-header">
+    <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
+    <view class="wc__annual-header-tips">
+      <view class="wc__annual-header-tip">{{ years[annualCurr].subinfo }}</view>
+      <view class="wc__annual-header-tip">农历初一</view>
+    </view>
+  </view>
+  <view class="wc__annual-panel-container">
+    <swiper 
+      wx:if="{{ annualCurr !== null }}"
+      circular 
+      duration="{{ 300 }}" 
+      current="{{ annualCurr }}" 
+      class="wc__annual-panel-swiper"
+      scroll-with-animation="{{ false }}"
+      worklet:onscrollend="workletAnnualSwiperTransEnd">
+      <swiper-item
+        wx:for="{{ years }}" 
+        wx:for-item="year" 
+        wx:for-index="ydx"
+        wx:key="key"
+        skip-hidden-item-layout>
+        <view class="wc__annual-panel">
+          <canvas 
+            id="printer_{{ ydx }}" 
+            type="2d" 
+            data-ydx="{{ ydx }}" 
+            class="wc__annual-panel-canvas" 
+            catchtap="selMonth" />
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+</view>

@@ -1,0 +1,29 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 星期
+ * @Author: lspriv
+ */
+
+.wc__week {
+  @include column-rect;
+  height: $wc-calendar-weeks-height;
+  padding: 10rpx 10rpx 0;
+  position: absolute;
+  width: 100%;
+  top: 100rpx;
+  left: 0;
+  z-index: 1024;
+  background: transparent;
+  transition: all .28s ease 0s;
+  opacity: 1;
+  contain: layout style;
+  &-item {
+    text-align: center;
+    font-size: theme(week-size);
+    color: theme(week-color);
+    font-weight: bold;
+    @include column-width;
+  }
+}

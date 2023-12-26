@@ -1,0 +1,21 @@
+{
+	"pages": [
+		"pages/index/index"
+	],
+	"window": {
+		"backgroundTextStyle": "light",
+		"navigationBarBackgroundColor": "#fff",
+		"navigationBarTitleText": "wx calendar",
+		"navigationBarTextStyle": "black"
+	},
+  "darkmode": true,
+  "lazyCodeLoading": "requiredComponents",
+  "renderer": "skyline",
+	"componentFramework": "glass-easel",
+	"rendererOptions": { 
+		"skyline": { 
+			"defaultDisplayBlock": true 
+		} 
+	},
+	"sitemapLocation": "sitemap.json"
+}

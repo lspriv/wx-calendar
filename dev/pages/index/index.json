@@ -1,0 +1,7 @@
+{
+	"usingComponents": {
+		"calendar": "/components/wx-calendar/index"
+	},
+	"disableScroll": true,
+	"navigationStyle": "custom"
+}

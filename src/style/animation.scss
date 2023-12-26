@@ -1,0 +1,30 @@
+/*
+ * Copyright 2023 lspriv. All Rights Reserved.
+ * Distributed under MIT license.
+ * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * @Description: 动画
+ * @Author: lspriv
+ */
+
+@mixin animation-pointer {
+	@include animation(pointer, ease, .28s) {
+		0%,
+		100% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(.5);
+		}
+	}
+}
+
+@mixin animation-fade {
+	@include animation(dotfade, ease, .28s, $fill-mode: both) {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+}

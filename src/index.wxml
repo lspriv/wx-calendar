@@ -1,0 +1,68 @@
+<!-- 
+  Copyright 2023 lspriv. All Rights Reserved.
+  Distributed under MIT license.
+  See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ -->
+<wxs src="./wxs/tool.wxs" module="tool_wxs" />
+<wxs src="./wxs/transform.wxs" module="trans_wxs" />
+<view 
+  class="wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
+  style="--wc-panel-height: {{ layout.panelHeight }}px;--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
+
+  <view 
+    id="calendar" 
+    mark:main="{{ layout.mainHeight }}"
+    mark:max="{{ layout.maxHeight }}"
+    mark:min="{{ layout.minHeight }}"
+    mark:panel="{{ layout.panelHeight }}"
+    mark:dragMax="{{ layout.dragMaxHeight }}"
+    mark:view="{{ currView }}"
+    class="wc"
+    catchtransitionend="calendarTransitionEnd">
+
+    <!-- Calendar Header Start -->
+    <block wx:if="{{ tool_wxs.isSkyline(renderer) }}">
+      <include src="./tpls/skyline.header.wxml"></include>
+    </block>
+    <block wx:else>
+      <include src="./tpls/webview.header.wxml"></include>
+    </block>
+    <!-- Calendar Header Start -->
+
+    <!-- Calendar Week Start -->
+    <view class="wc__week">
+      <view class="wc__week-item" wx:for="{{ weeks }}" wx:key="key">{{ item.label }}</view>
+    </view>
+    <!-- Calendar Week End -->
+
+    <!-- Calendar Panel Start -->
+    <block wx:if="{{ tool_wxs.isSkyline(renderer) }}">
+      <include src="./tpls/skyline.panel.wxml"></include>
+    </block>
+    <block wx:else>
+      <include src="./tpls/webview.panel.wxml"></include>
+    </block>
+    <!-- Calendar Panel End -->
+
+    <!-- Calendar Control Bar Start -->
+    <block wx:if="{{ tool_wxs.isSkyline(renderer) }}">
+      <include src="./tpls/skyline.bar.wxml"></include>
+    </block>
+    <block wx:else>
+      <include src="./tpls/webview.bar.wxml"></include>
+    </block>
+    <!-- Calendar Control Bar End -->
+  </view>
+
+  <!-- Calendar Annual Pannel Start -->
+  <block wx:if="{{ tool_wxs.isSkyline(renderer) }}">
+    <include src="./tpls/skyline.annual.wxml"></include>
+  </block>
+  <block wx:else>
+    <include src="./tpls/webview.annual.wxml"></include>
+  </block>
+  <!-- Calendar Annual Pannel End -->
+  
+</view>
+
+
