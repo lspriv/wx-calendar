@@ -19,7 +19,7 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_TOKEN }}
           release-type: node
-          package-name: @lspriv/wx-calendar
+          package-name: lspriv/wx-calendar
       
       - name: Checkout Repository
         if: ${{ steps.release.outputs.releases_created }}

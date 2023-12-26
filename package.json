@@ -1,6 +1,6 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "description": "calendar for miniprogram",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "build": "cross-env NODE_ENV=production gulp build",
     "dev": "node ./scripts/dev.js",
     "package": "node ./scripts/publish.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=development gulp test && jest"
   },
   "keywords": [
     "calendar",
@@ -50,13 +50,29 @@
     "gulp-size": "^4.0.1",
     "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-uglify": "^3.0.2",
+    "jest": "^23.5.0",
     "miniprogram-api-typings": "^3.12.0",
     "miniprogram-automator": "^0.12.0",
+    "miniprogram-simulate": "^1.6.1",
     "ora": "^5.4.1",
     "prettier": "^3.0.3",
     "sass": "^1.66.1",
     "through2": "^4.0.2",
     "typescript": "^5.2.2",
     "uglify-js": "^3.17.4"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testURL": "https://jest.test",
+    "collectCoverageFrom": [
+      "dist/**/*.js"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "dist"
+    ],
+    "snapshotSerializers": [
+      "miniprogram-simulate/jest-snapshot-plugin"
+    ]
   }
 }

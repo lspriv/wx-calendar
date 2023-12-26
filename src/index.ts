@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-10-31 03:55:15
+ * @LastEditTime: 2023-12-26 17:33:28
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -119,18 +119,18 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     created() {
       Layout.initialize();
       this.initializeView();
-      this.initializeShared();
+      this.initializeDatas();
     },
     async attached() {
       await this.initializeRects();
       this.initializeRender();
     },
     detached() {
-      if (this.data.darkmode) this._printer_.cancelThemeChange();
+      if (this.data.darkmode) this._printer_?.cancelThemeChange();
     }
   },
   methods: {
-    initializeShared() {
+    initializeDatas() {
       this.$_swiper_trans = wx.worklet.shared(0);
       this.$_annual_trans = wx.worklet.shared(0);
       this._dragger_ = new Dragger(this);
@@ -396,11 +396,23 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   observers: {
     date: function (date: string | number) {
       if (this._loaded_) this._panel_.toDate(date);
+      else this._dragger_!.update();
     },
     marks: function (marks: Array<CalendarMark>) {
       const plugin = this._calendar_.getPlugin('_mark_');
       const updates = plugin?.updateMarks(marks);
       if (this._loaded_) this._calendar_.updateDates(updates);
+    },
+    view: function (view: CalendarView) {
+      const _view = viewFlag(view) || View.month;
+      const currView = flagView(_view);
+      if (this._loaded_) {
+        if (isSkyline(this.renderer)) this.toggleView(_view);
+        else this.setData({ transView: currView });
+      } else {
+        this._dragger_!.toView(_view, true);
+        this._view_ = _view;
+      }
     }
   },
   export() {

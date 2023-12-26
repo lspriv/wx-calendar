@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2023-10-31 02:37:19
+ * @LastEditTime: 2023-12-18 11:14:49
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -241,10 +241,10 @@ export class YearPrinter extends CalendarHandler {
         .fields({ node: true, size: true, context: true })
         .exec((res: Array<CanvasElementResult>) => {
           const { node, width, height } = res[0];
-          const ctx = node.getContext('2d');
+          const ctx = node?.getContext('2d');
 
-          node.width = width * dpr;
-          node.height = height * dpr;
+          node && (node.width = width * dpr);
+          node && (node.height = height * dpr);
           ctx?.scale(dpr, dpr);
 
           resolve(createCanvas(node, ctx, width, height));

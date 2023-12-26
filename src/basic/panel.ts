@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:48:43
+ * @LastEditTime: 2023-12-25 23:36:44
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -112,7 +112,6 @@ export class PanelTool extends CalendarHandler {
     const isWeekView = view & View.week;
 
     const sets: RefreshFields = { currView, info: getDateInfo(checked!, isWeekView), checked, current };
-
     this.refreshPanels(sets);
 
     instance.setData(sets);

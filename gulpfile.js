@@ -12,3 +12,4 @@ gulp.task('automator', automator);
 
 exports.build = gulp.series('clean', 'pack');
 exports.dev = gulp.series('clean', 'pack', gulp.parallel('automator', 'watch'));
+exports.test = gulp.series('clean', 'pack');

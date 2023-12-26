@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2023-10-30 17:30:37
+ * @LastEditTime: 2023-12-25 17:55:34
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -102,7 +102,7 @@ interface CalendarInitialize {
    * 初始化必需的共享变量
    * INFO: 在attached生命周期内声明的共享变量在组件实例的worklet函数中拿不到，所以放到created生命周期内初始化
    */
-  initializeShared(): void;
+  initializeDatas(): void;
   /**
    * 初始化视图相关的数据
    */
@@ -156,7 +156,7 @@ interface CalendarEventHandlers {
   /**
    * 切换视图，周/月视图切换
    */
-  toggleView(event: TouchEvent<{}> | View): void;
+  toggleView(event: TouchEvent<{}> | View, animate?: boolean): void;
   /**
    * [WebView] 处理周/月面板的swiper滑块位置变动
    */

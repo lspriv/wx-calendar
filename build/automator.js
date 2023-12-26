@@ -21,8 +21,8 @@ module.exports = () => {
       const systemInfo = await miniProgram.systemInfo();
       console.log(
         automatorLogPrefix(),
-        'SystemInfo',
-        automatorLogInfo('system', systemInfo.system),
+        'System',
+        `${systemInfo.system} `.grey,
         automatorLogInfo('version', systemInfo.version),
         automatorLogInfo('SDKVersion', systemInfo.SDKVersion)
       );

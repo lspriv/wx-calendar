@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:47:17
+ * @LastEditTime: 2023-10-31 23:58:36
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
@@ -109,7 +109,12 @@ export class AnnualPanelSwitch extends CalendarHandler {
     const isSkylineRender = isSkyline(this._render_);
     if (show) {
       await instance._panel_.toYear(mon.year);
-      await severalTicks(2);
+      /**
+       * _panel_.toYear方法中setData后触发视图更新，
+       * 官方文档称setData数据是同步，但是向视图层传递数据是异步，视图层更新节点树用于下次重渲染
+       * 这里要避免上述过程造成的掉帧现象，虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
+       */
+      await severalTicks(10);
       const top = await this.calcCalendarTop();
       if (isSkylineRender) this._top_!.value = `-${top}px`;
       else instance.setData({ annualTop: 0, annualDuration: 300 });
@@ -123,7 +128,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
       this.execInteractiveCallbacks();
     } else {
       await instance._panel_.toAnnualMonth(mon);
-      await severalTicks(2);
+      await severalTicks(10);
       await instance._printer_.close(mon);
       if (isSkylineRender) this._opacity_!.value = 0;
       else instance.setData({ annualOpacity: 0 });

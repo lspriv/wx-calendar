@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板拖拽控制
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:47:59
+ * @LastEditTime: 2023-12-26 00:53:03
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { applyAnimated, clearAnimated, circularDiff } from './tools';
@@ -177,7 +177,7 @@ export class Dragger extends CalendarHandler {
   private setPanelTrans() {
     const instance = this._instance_;
     instance.$_drag_panel_trans!.value.forEach((_, i) => {
-      const trans = this.calcPanelOffset(i, instance.data.checked!);
+      const trans = this.calcPanelOffset(i, instance.data.checked || normalDate(instance.data.date));
       instance.$_drag_panel_trans!.value[i].value = trans;
     });
   }
