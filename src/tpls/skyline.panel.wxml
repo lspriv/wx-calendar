@@ -33,7 +33,7 @@
           </view>
           <view 
             class="wc__panel-week wc__panel-week--l-{{ panel.weeks.length }}" 
-            wx:for="{{ panel.weeks }}" 
+            wx:for="{{ panel.weeks || [] }}" 
             wx:for-item="week" 
             wx:for-index="wdx"
             wx:key="key">

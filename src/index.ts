@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-12-26 17:33:28
+ * @LastEditTime: 2024-01-01 17:37:28
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -332,10 +332,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_drag_calendar_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
-      const accmulator = e.deltaY > 0 ? 0.5 : -0.5;
-      const accmulation = accmulator + this.$_drag_bar_rotate!.value;
-      const deg = Math.max(-20, Math.min(accmulation, 20));
-      this.$_drag_bar_rotate!.value = deg;
+      const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
+      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accmulation, 20));
 
       /** 计算左上角视图控制的位置 */
       const translateX = Math.max(0, Math.min(60, ((mainHeight - usefulHeight) * 60) / (mainHeight - minHeight)));

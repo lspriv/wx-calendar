@@ -8,7 +8,7 @@
 >     · 支持skyline和webview渲染
 >     · 支持插件扩展
 
-> [提bug和需求点这里～](https://github.com/lspriv/wx-calendar/issues/new?assignees=&labels=&template=bug_report.md&title=)
+> [提bug](https://github.com/lspriv/wx-calendar/issues/new?assignees=lspriv&labels=bug&template=bug_report.md&title=)
 
 ### 设计
 
@@ -137,7 +137,7 @@ npm run build
     </tr>
 </table>
 
-> 关于属性 [marks](#)
+> 关于属性 [marks](#mark说明)
 > 
 > Array<{ year: number; month: number; day: number; type: 'schedule' | 'corner' | 'festival'; text: string; color: string; bgColor?: string; }>
 > 其中schedule日程可选bgColor属性，角标和节假日不需要这个属性
