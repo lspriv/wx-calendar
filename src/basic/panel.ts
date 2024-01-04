@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2023-12-25 23:36:44
+ * @LastEditTime: 2024-01-04 16:57:01
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -103,7 +103,7 @@ export class PanelTool extends CalendarHandler {
     await this.update();
   }
 
-  public async refreshView(view: View) {
+  public async refreshView(view: View, fixed?: boolean) {
     const instance = this._instance_;
     const { current, checked } = instance.data;
     instance._view_ = view;
@@ -113,6 +113,8 @@ export class PanelTool extends CalendarHandler {
 
     const sets: RefreshFields = { currView, info: getDateInfo(checked!, isWeekView), checked, current };
     this.refreshPanels(sets);
+
+    if (fixed !== void 0) sets.viewFixed = fixed;
 
     instance.setData(sets);
     await this.update();
@@ -255,24 +257,28 @@ export class PanelTool extends CalendarHandler {
     instance._pointer_.update(void 0, vibrate);
   }
 
-  public async toAnnualMonth(mon: CalendarMonth) {
+  public async toAnnualMonth(mon: CalendarMonth, toMonthView: boolean = true) {
     const instance = this._instance_;
     const { checked, current, panels } = instance.data;
 
     const currPanel = panels[current];
     const isCurrMonth = currPanel.year === mon.year && currPanel.month === mon.month;
-    if (isCurrMonth && instance._view_ & View.month) return;
+    if (isCurrMonth && (instance._view_ & View.month || !toMonthView)) return;
 
     const date = inMonthDate(mon.year, mon.month, checked!.day);
 
     const idx = panels.findIndex(p => p.year === mon.year && p.month === mon.month);
-    const currView = flagView(View.month);
-    const sets: RefreshFields = { current: idx >= 0 ? idx : current, checked: date, currView };
 
-    if (isSkyline(this._render_)) instance._dragger_?.toView(View.month, false);
-    else sets.initView = 'month';
+    const sets: RefreshFields = { current: idx >= 0 ? idx : current, checked: date };
 
-    instance._view_ = View.month;
+    if (toMonthView && !(instance._view_ & View.month)) {
+      const currView = flagView(View.month);
+      sets.currView = currView;
+      if (isSkyline(this._render_)) instance._dragger_?.toView(View.month, false);
+      else sets.initView = 'month';
+      instance._view_ = View.month;
+    }
+
     this.refreshPanels(sets);
     instance._pointer_.update(sets, false, void 0, true);
     instance.setData(sets);

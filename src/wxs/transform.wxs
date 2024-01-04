@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:44:25
+ * @LastEditTime: 2024-01-04 16:40:48
  */
 
 var nonNullable = function (value) {
@@ -63,6 +63,7 @@ var toView = function (view, mark, instance, transition = true) {
 var touchStart = function (e, instance) {
   var mark = e.mark;
   var state = instance.getState();
+  if (mark.fixed) return;
   state.y = e.changedTouches[0].pageY;
   state.time = e.timeStamp;
   state.deg = 0;
@@ -75,6 +76,7 @@ var touchStart = function (e, instance) {
 /** 手指触摸面板后移动 */
 var touchMove = function (e, instance) {
   var mark = e.mark;
+  if (mark.fixed) return;
   var state = instance.getState();
   var deltaY = e.changedTouches[0].pageY - state.y;
 
@@ -162,6 +164,7 @@ var touchMove = function (e, instance) {
 /** 手指触摸面板动作结束 */
 var touchEnd = function (e, instance) {
   var mark = e.mark;
+  if (mark.fixed) return;
   var state = instance.getState();
   const deltaY = e.changedTouches[0].pageY - state.y;
 
@@ -266,11 +269,14 @@ var updateViewCls = function (view, instance) {
  */
 var viewChange = function (view, old, owner) {
   if (view && view !== old) {
-    const panel = owner.selectComponent('.wc__panel');
-    if (panel.hasClass('wc__panel--week-view')) panel.removeClass('wc__panel--week-view');
-    if (panel.hasClass('wc__panel--month-view')) panel.removeClass('wc__panel--month-view');
-    if (panel.hasClass('wc__panel--schedule-view')) panel.removeClass('wc__panel--schedule-view');
-    panel.addClass('wc__panel--' + view + '-view');
+    var panel = owner.selectComponent('.wc');
+    var cls = 'wc--' + view;
+    if (!panel.hasClass(cls)) {
+      if (panel.hasClass('wc--week')) panel.removeClass('wc--week');
+      if (panel.hasClass('wc--month')) panel.removeClass('wc--month');
+      if (panel.hasClass('wc--schedule')) panel.removeClass('wc--schedule');
+      panel.addClass(cls);
+    }
     updateViewCls(view, owner);
   }
 };

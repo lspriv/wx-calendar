@@ -16,31 +16,11 @@
   background: transparent;
   overflow: hidden;
   contain: layout style;
-  @include if (week-view) {
-    .wc__panel-schedules {
-      opacity: 0;
-    }
-    .wc__panel-date {
-      opacity: 1 !important;
-    }
-  }
-  @include if (month-view) {
-    .wc__panel-schedules {
-      opacity: 0;
-    }
-  }
-  @include if (schedule-view) {
-    .wc__panel-day::after {
-      opacity: 0 !important;
-    }
-    .wc__panel-schedules {
-      opacity: 1;
-    }
-  }
+  
   &-container {
     width: 100%;
     height: 100%;
-    min-height: var(--wc-panel-height);
+    min-height: $wc-calendar-panel-height;
     padding: 0 10rpx;
     display: flex;
     flex-direction: column;
@@ -211,6 +191,30 @@
       @include if(animate) {
         @include animation-pointer;
       }
+    }
+  }
+}
+
+.wcc {
+  .wc.wc--week {
+    .wc__panel-schedules {
+      opacity: 0;
+    }
+    .wc__panel-date {
+      opacity: 1 !important;
+    }
+  }
+  .wc.wc--month {
+    .wc__panel-schedules {
+      opacity: 0;
+    }
+  }
+  .wc.wc--schedule {
+    .wc__panel-day::after {
+      opacity: 0 !important;
+    }
+    .wc__panel-schedules {
+      opacity: 1;
     }
   }
 }

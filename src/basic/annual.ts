@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2023-10-31 23:58:36
+ * @LastEditTime: 2024-01-04 17:00:49
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
 import { applyAnimated, clearAnimated, isSkyline, nodeRect, severalTicks } from './tools';
-import { SELECTOR } from './constants';
+import { SELECTOR, View } from './constants';
 import { promises, isFunction } from '../utils/shared';
 
 const { shared, timing, Easing } = wx.worklet;
@@ -127,7 +127,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
       this._transforming_ = false;
       this.execInteractiveCallbacks();
     } else {
-      await instance._panel_.toAnnualMonth(mon);
+      await instance._panel_.toAnnualMonth(mon, !instance.$_view_fixed.value);
       await severalTicks(10);
       await instance._printer_.close(mon);
       if (isSkylineRender) this._opacity_!.value = 0;
