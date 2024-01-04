@@ -11,7 +11,7 @@ const ora = require('ora');
 
 require('colors');
 
-const Semantics = ['@major', '@minor', '@patch', '@prerelease'];
+const Semantics = ['@major', '@minor', '@patch'];
 const Preids = ['@alpha', '@beta'];
 
 const validSemantic = semantic => {
