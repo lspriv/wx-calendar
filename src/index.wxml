@@ -7,7 +7,7 @@
 <wxs src="./wxs/transform.wxs" module="trans_wxs" />
 <view 
   class="wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
-  style="--wc-panel-height: {{ layout.panelHeight }}px;--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
+  style="--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
 
   <view 
     id="calendar" 
@@ -17,7 +17,8 @@
     mark:panel="{{ layout.panelHeight }}"
     mark:dragMax="{{ layout.dragMaxHeight }}"
     mark:view="{{ currView }}"
-    class="wc"
+    mark:fixed="{{ viewFixed }}"
+    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }}"
     catchtransitionend="calendarTransitionEnd">
 
     <!-- Calendar Header Start -->

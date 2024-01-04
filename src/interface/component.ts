@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2023-12-25 17:55:34
+ * @LastEditTime: 2024-01-04 14:41:53
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -61,6 +61,8 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   initView: CalendarView;
   /** [webview] 手动控制视图（过渡效果） */
   transView: Nullable<CalendarView>;
+  /** 是否固定视图 */
+  viewFixed: boolean;
   /** [webview] 周视图下强制更新各面板的垂直偏移量 */
   offsetChange: boolean;
   /** 布局数据 */
@@ -156,7 +158,7 @@ interface CalendarEventHandlers {
   /**
    * 切换视图，周/月视图切换
    */
-  toggleView(event: TouchEvent<{}> | View, animate?: boolean): void;
+  toggleView(event: TouchEvent<{}> | View, fixed?: boolean): void;
   /**
    * [WebView] 处理周/月面板的swiper滑块位置变动
    */
@@ -253,6 +255,8 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   $_swiper_trans: Shared<number>;
   /** 年面板保存连续滑动中累积的偏移量 */
   $_annual_trans: Shared<number>;
+  /** 是否固定视图 */
+  $_view_fixed: Shared<boolean>;
   /** [Skyline] 当前周/月面板所在滑块，worklet函数中使用 */
   $_current?: Shared<number>;
   /** [Skyline] 周/月面板手势拖动状态 */

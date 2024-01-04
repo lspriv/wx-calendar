@@ -76,8 +76,8 @@ npm run build
         <td>view</td>
         <td>string</td>
         <td>初始化视图</td>
-        <td>否</td>
-        <td>month [week | schedule]</td>
+        <td>否，默认月</td>
+        <td>[month|week|schedule][-fixed]</td>
     </tr>
     <tr>
         <td>marks</td>

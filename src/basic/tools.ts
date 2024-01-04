@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2023-12-26 00:25:09
+ * @LastEditTime: 2024-01-04 14:51:07
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -41,7 +41,14 @@ export const createPointer = (opts?: Partial<CalendarPointer>) =>
 
 export type CalendarView = (typeof VIEWS)[keyof typeof VIEWS];
 
-export const viewFlag = (view: CalendarView): View => Math.max(0, 1 << values(VIEWS).indexOf(view));
+export const viewFlag = (view: string, defaultView = VIEWS.MONTH): View => {
+  const inputView = view.match(/^(\w+)(?:-fixed)?$/)?.[1] || defaultView;
+  return Math.max(0, 1 << values(VIEWS).indexOf(inputView as CalendarView));
+};
+
+export const isViewFixed = (view: string): boolean => {
+  return new RegExp(`^(${Object.values(VIEWS).join('|')})-fixed$`).test(view);
+};
 
 export const isView = (view: unknown): view is View =>
   view === View.week || view === View.month || view === View.schedule;
