@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 17:09:28
+ * @LastEditTime: 2024-01-05 17:20:26
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -197,6 +197,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this._pointer_.update(sets);
       this.setData(sets);
       wx.nextTick(() => {
+        if (isSkylineRender) this._dragger_!.bindAnimations();
         this._printer_.initialize();
         this.triggerLoad();
       });
@@ -410,12 +411,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     view: function (view: string) {
       const _view = viewFlag(view);
       const currView = flagView(_view);
+      const isSkylineRender = isSkyline(this.renderer);
       if (this._loaded_) {
         this.$_view_fixed.value = isViewFixed(view);
-        if (isSkyline(this.renderer)) this.toggleView(_view, this.$_view_fixed.value);
+        if (isSkylineRender) this.toggleView(_view, this.$_view_fixed.value);
         else this.setData({ transView: currView, viewFixed: this.$_view_fixed.value });
       } else {
-        this._dragger_!.toView(_view, true);
+        if (isSkylineRender) this._dragger_!.toView(_view, false);
         this._view_ = _view;
       }
     }
