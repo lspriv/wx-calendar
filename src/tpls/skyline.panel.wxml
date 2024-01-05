@@ -7,7 +7,7 @@
 <vertical-drag-gesture-handler 
   worklet:ongesture="workletDragGesture"
   worklet:should-response-on-move="workletDragGesture">
-  <view class="wc__panel wc__panel--{{ currView }}-view">
+  <view class="wc__panel">
     <swiper 
       circular 
       duration="{{ 300 }}" 
@@ -33,7 +33,7 @@
           </view>
           <view 
             class="wc__panel-week wc__panel-week--l-{{ panel.weeks.length }}" 
-            wx:for="{{ panel.weeks }}" 
+            wx:for="{{ panel.weeks || [] }}" 
             wx:for-item="week" 
             wx:for-index="wdx"
             wx:key="key">

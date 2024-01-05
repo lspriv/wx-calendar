@@ -107,6 +107,8 @@
     transform: scale(1) translateZ(0px);
   }
   @include if(views) {
+    transform-origin: 100% 50%;
+    transition: all .28s ease;
     &::before, &::after {
       display: flex;
       flex-direction: row;
@@ -183,5 +185,14 @@
     .wc__operator-view, .wx__views-bar {
       transition: all .28s ease;
     }
+  }
+}
+
+.wc.wc--view-fixed {
+  .wc__operator--views {
+    width: 0 !important;
+    margin-left: 0 !important;
+    transform: scale(0);
+    opacity: 0;
   }
 }

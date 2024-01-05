@@ -8,11 +8,11 @@
 >     · 支持skyline和webview渲染
 >     · 支持插件扩展
 
-> [提bug和需求点这里～](https://github.com/lspriv/wx-calendar/issues/new?assignees=&labels=&template=bug_report.md&title=)
+> [提bug](https://github.com/lspriv/wx-calendar/issues/new?assignees=lspriv&labels=bug&template=bug_report.md&title=)
 
 ### 设计
 
-![demo_img](https://github.com/lspriv/resources/raw/main/wx-calendar.png)
+![demo_img](./.github/resources/wx-calendar.png)
 
 
 
@@ -63,81 +63,71 @@ npm run build
 ```
 
 ### Props 属性
-
+以下所有属性都是可选填属性
 <table>
     <tr>
-        <th>属性名</th>
+        <th>属性</th>
         <th>类型</th>
         <th>说明</th>
-        <th>是否必填</th>
         <th>默认值</th>
     </tr>
     <tr>
         <td>view</td>
         <td>string</td>
-        <td>初始化视图</td>
-        <td>否</td>
-        <td>month [week | schedule]</td>
+        <td>视图</td>
+        <td>month[week|schedule][-fixed]</td>
     </tr>
     <tr>
         <td>marks</td>
         <td>array</td>
         <td>日程、角标和节假日标记</td>
-        <td>否</td>
-        <td>--</td>
+        <td>[]</td>
     </tr>
     <tr>
         <td>vibrate</td>
         <td>boolean</td>
         <td>点选日期是否震动</td>
-        <td>否</td>
         <td>true</td>
     </tr>
     <tr>
         <td>darkmode</td>
         <td>boolean</td>
         <td>深色模式</td>
-        <td>否</td>
         <td>true</td>
     </tr>
     <tr>
         <td>date</td>
-        <td>string | number</td>
-        <td>选择日期</td>
-        <td>否</td>
-        <td>xxxx-xx-xx | timestamp</td>
+        <td>string|number</td>
+        <td>选中日期</td>
+        <td>xxxx-xx-xx|timestamp</td>
     </tr>
     <tr>
         <td>weekstart</td>
-        <td>Number</td>
-        <td>周首日，0 | 1 | 2 | 3 | 4 | 5 | 6</td>
-        <td>否</td>
+        <td>number</td>
+        <td>周首日，0|1|2|3|4|5|6</td>
         <td>0</td>
     </tr>
     <tr>
         <td>style</td>
         <td>string</td>
-        <td>样式，可以设置css变量修改主题</td>
-        <td>否</td>
+        <td>设置主题样式变量</td>
         <td>''</td>
     </tr>
     <tr>
         <td>font</td>
         <td>string</td>
         <td>设置字体</td>
-        <td>否</td>
         <td>''</td>
     </tr>
     <tr>
         <td>customNavBar</td>
         <td>boolean</td>
         <td>组件所在页面是否自定义导航栏</td>
-        <td>否</td>
         <td>true</td>
     </tr>
 </table>
 
-> 关于属性 [marks](#)
+> 关于属性 [marks](#mark说明)
 > 
 > Array<{ year: number; month: number; day: number; type: 'schedule' | 'corner' | 'festival'; text: string; color: string; bgColor?: string; }>
 > 其中schedule日程可选bgColor属性，角标和节假日不需要这个属性

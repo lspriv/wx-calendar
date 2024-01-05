@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2023-12-26 17:33:28
+ * @LastEditTime: 2024-01-05 17:20:26
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -27,7 +27,8 @@ import {
   InitWeeks,
   mergeFonts,
   createPointer,
-  propPattern
+  propPattern,
+  isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
@@ -105,14 +106,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     currView: VIEWS.MONTH,
     initView: VIEWS.MONTH,
     transView: null,
+    viewFixed: false,
     annualCurr: null,
     annualTop: '-150vh',
     annualOpacity: 0,
     annualDuration: 300,
     offsetChange: false,
     layout: null,
-    fonts: FONT,
     pointer: null,
+    fonts: FONT,
     info: ''
   },
   lifetimes: {
@@ -131,16 +133,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   },
   methods: {
     initializeDatas() {
-      this.$_swiper_trans = wx.worklet.shared(0);
-      this.$_annual_trans = wx.worklet.shared(0);
+      const { shared } = wx.worklet;
+      this.$_view_fixed = shared(false);
+      this.$_swiper_trans = shared(0);
+      this.$_annual_trans = shared(0);
       this._dragger_ = new Dragger(this);
     },
     initializeView() {
-      const flag = viewFlag(this.data.view as CalendarView);
       /**
        * 未设置view值或view值不合法时，默认View.month（月视图）
        */
-      this._view_ = flag || View.month;
+      this._view_ = viewFlag(this.data.view as CalendarView);
       /**
        * 初始化calendar处理额外的服务
        */
@@ -172,6 +175,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const fonts = this.data.font ? mergeFonts(this.data.font, FONT) : FONT;
       const initView = flagView(this._view_);
+      this.$_view_fixed.value = isViewFixed(this.data.view);
       const layout = omit(Layout.layout!, ['subHeight', 'windowWidth', 'windowHeight']);
 
       const sets: Partial<CalendarData> = {
@@ -186,12 +190,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         annualCurr: isSkylineRender ? null : initCurrent,
         currView: initView,
         initView,
+        viewFixed: this.$_view_fixed.value,
         info: getDateInfo(checked, isWeekView),
         pointer: createPointer()
       };
       this._pointer_.update(sets);
       this.setData(sets);
       wx.nextTick(() => {
+        if (isSkylineRender) this._dragger_!.bindAnimations();
         this._printer_.initialize();
         this.triggerLoad();
       });
@@ -211,7 +217,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     toToday() {
       this._panel_.toDate(WxCalendar.today);
     },
-    async toggleView(view) {
+    async toggleView(view, fixed) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
       await this._panel_.refreshView(_view);
@@ -232,7 +238,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const checked = normalDate(date);
       const isWeekView = this._view_ & View.week;
       if (date.kind === 'current') {
-        const sets = { info: getDateInfo(checked), checked };
+        const sets = { info: getDateInfo(checked, isWeekView), checked };
         if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
         this._pointer_.update(sets, true);
         this.setData(sets);
@@ -313,7 +319,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     workletDragGesture(e) {
       'worklet';
-      if (e.state === 0) return;
+      if (this.$_view_fixed.value || e.state === 0) return;
       if (e.state === 1) {
         wx.worklet.runOnJS(this.dragGestureStart.bind(this))();
         this.$_drag_state!.value = 1;
@@ -332,10 +338,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_drag_calendar_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
-      const accmulator = e.deltaY > 0 ? 0.5 : -0.5;
-      const accmulation = accmulator + this.$_drag_bar_rotate!.value;
-      const deg = Math.max(-20, Math.min(accmulation, 20));
-      this.$_drag_bar_rotate!.value = deg;
+      const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
+      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accmulation, 20));
 
       /** 计算左上角视图控制的位置 */
       const translateX = Math.max(0, Math.min(60, ((mainHeight - usefulHeight) * 60) / (mainHeight - minHeight)));
@@ -358,6 +362,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
     selYear() {
+      if (this.$_view_fixed.value && this._view_ & View.week) return;
       const { year, month } = this.data.panels[this.data.current];
       const mon = { year, month };
       this._annual_.switch(true, mon);
@@ -403,14 +408,16 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const updates = plugin?.updateMarks(marks);
       if (this._loaded_) this._calendar_.updateDates(updates);
     },
-    view: function (view: CalendarView) {
-      const _view = viewFlag(view) || View.month;
+    view: function (view: string) {
+      const _view = viewFlag(view);
       const currView = flagView(_view);
+      const isSkylineRender = isSkyline(this.renderer);
       if (this._loaded_) {
-        if (isSkyline(this.renderer)) this.toggleView(_view);
-        else this.setData({ transView: currView });
+        this.$_view_fixed.value = isViewFixed(view);
+        if (isSkylineRender) this.toggleView(_view, this.$_view_fixed.value);
+        else this.setData({ transView: currView, viewFixed: this.$_view_fixed.value });
       } else {
-        this._dragger_!.toView(_view, true);
+        if (isSkylineRender) this._dragger_!.toView(_view, false);
         this._view_ = _view;
       }
     }
