@@ -12,7 +12,7 @@
 
 ### 设计
 
-![demo_img](https://github.com/lspriv/resources/raw/main/wx-calendar.png)
+![demo_img](./.github/resources/wx-calendar.png)
 
 
 
