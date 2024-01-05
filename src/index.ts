@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-06 02:31:30
+ * @LastEditTime: 2024-01-06 10:39:20
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -121,7 +121,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     created() {
       Layout.initialize();
       this.initializeView();
-      this.initializeDatas();
+      this.initializeShared();
     },
     async attached() {
       await this.initializeRects();
@@ -132,11 +132,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     }
   },
   methods: {
-    initializeDatas() {
+    initializeShared() {
       const { shared } = wx.worklet;
-      this.$_view_fixed = shared(false);
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
+      this.$_view_fixed = shared(false);
       this._dragger_ = new Dragger(this);
     },
     initializeView() {

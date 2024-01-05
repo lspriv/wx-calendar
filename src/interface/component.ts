@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-06 02:30:57
+ * @LastEditTime: 2024-01-06 10:38:47
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -104,7 +104,7 @@ interface CalendarInitialize {
    * 初始化必需的共享变量
    * INFO: 在attached生命周期内声明的共享变量在组件实例的worklet函数中拿不到，所以放到created生命周期内初始化
    */
-  initializeDatas(): void;
+  initializeShared(): void;
   /**
    * 初始化视图相关的数据
    */
