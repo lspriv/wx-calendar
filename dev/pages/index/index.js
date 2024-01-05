@@ -3,11 +3,8 @@
  * @Author: lishen
  * @Date: 2023-08-31 16:46:44
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-10-27 00:59:33
+ * @LastEditTime: 2024-01-06 02:29:02
  */
-// index.js
-const app = getApp();
-
 Page({
   data: {
     padding: 0,
@@ -25,37 +22,10 @@ Page({
       { year: 2023, month: 10, day: 31, type: 'festival', text: '万圣夜', color: '#409EFF' }
     ]
   },
-
   onLoad() {
     const { bottom } = wx.getMenuButtonBoundingClientRect();
     this.setData({
       padding: bottom
-    });
-  },
-  onTap() {
-    this.setData({
-      markers: [
-        // { year: 2022, month: 1, day: 10, type: 'holiday', mark: '愚人节', color: '#2a97ff', bgColor: '#cce6ff' },
-        { year: 2022, month: 1, day: 11, type: 'corner', mark: '休', color: '#61b057' }
-        // {
-        //   year: 2022,
-        //   month: 1,
-        //   day: 12,
-        //   type: 'schedule',
-        //   mark: '测试一下哈哈哈',
-        //   color: '#2a97ff',
-        //   bgColor: '#cce6ff'
-        // },
-        // {
-        //   year: 2022,
-        //   month: 1,
-        //   day: 12,
-        //   type: 'schedule',
-        //   mark: '测试一下哈哈哈',
-        //   color: '#2a97ff',
-        //   bgColor: '#cce6ff'
-        // }
-      ]
     });
   },
   handleLoad() {
