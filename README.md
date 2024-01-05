@@ -2,13 +2,10 @@
 
 >
 
-这个项目借鉴了`MIUI`系统日历的设计，制作适合微信小程序的日历
-
 >     · 年月周日程视图
 >     · 支持skyline和webview渲染
 >     · 支持插件扩展
 
-> [提bug](https://github.com/lspriv/wx-calendar/issues/new?assignees=lspriv&labels=bug&template=bug_report.md&title=)
 
 ### 设计
 
@@ -74,7 +71,7 @@ npm run build
     <tr>
         <td>view</td>
         <td>string</td>
-        <td>视图</td>
+        <td>视图，加后缀fixed可固定视图</td>
         <td>month[week|schedule][-fixed]</td>
     </tr>
     <tr>
