@@ -159,10 +159,6 @@ npm run build
 >     # 可以是 Date日期类型
 >     # 可以是 type CalendarDay = { year: number; month: number; day: number; }
 
-[**`toYear`**](#toYear) void 年度面板跳转到指定年
->     (year: number) => Promise<void>;
->     # 参数为 年,月
-
 [**`toggleView`**](#toggleView) void 切换视图
 >     (view?: 'month' | 'week' | 'schedule') => void;
 >     # 当view未指定时，会在周月视图之间切换
@@ -172,7 +168,7 @@ npm run build
 >     (key: string) => InstanceType<PluginConstructor>;
 >     # key为插件的KEY属性
  
-[**`updatePluginDates`**](#updatePluginDates) object 更新插件数据
+[**`updateDates`**](#updatePluginDates) object 更新插件数据
 >     (dates?: Array<CalendarDay>) => Promise<void>;
 >     # 更新插件数据，若不指定哪些日期更新，默认全部已加载日期
 

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-04 14:41:53
+ * @LastEditTime: 2024-01-06 02:30:57
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -291,10 +291,6 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
    */
   toDate(date: string | number | Date | CalendarDay): Promise<void>;
   /**
-   * 年面板跳转到指定年
-   */
-  toYear(year: number): Promise<void>;
-  /**
    * 周/月面板切换到视图
    * 若果view未指定，会在周月视图之间切换
    */
@@ -308,7 +304,7 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /**
    * 更新插件日期数据
    */
-  updatePluginDates(dates?: Array<CalendarDay>): Promise<void>;
+  updateDates(dates?: Array<CalendarDay>): Promise<void>;
 }
 
 /**
