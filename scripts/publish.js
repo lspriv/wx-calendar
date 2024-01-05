@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
- * 主要是私下快速发预览包用
- * 也可以发稳定包，但这最好是master分支触发action来控制，已配置workflow
+ * 私下快速发预览包用
  */
 const path = require('path');
 const { execSync } = require('child_process');
