@@ -11,8 +11,8 @@ const ora = require('ora');
 
 require('colors');
 
-const Semantics = ['@major', '@minor', '@patch'];
-const Preids = ['@alpha', '@beta'];
+const Semantics = ['@major', '@minor', '@patch', '@prerelease'];
+const Preids = ['@alpha', '@beta', '@rc'];
 
 const validSemantic = semantic => {
   if (semantic && semantic.startsWith('@') && !Semantics.includes(semantic)) {
@@ -68,7 +68,7 @@ commander
       });
       preid = await select({
         message: 'set prerelease preid?',
-        choices: [...choices, { name: 'no', value: void 0 }]
+        choices
       });
     }
 
@@ -81,13 +81,11 @@ commander
     }
     spinner.succeed('build success');
 
-    semantic = preid ? (semantic === 'prerelease' ? semantic : `pre${semantic}`) : semantic;
-    let versionCommand = `npm version ${semantic}`;
-    preid && (versionCommand += ` -preid ${preid}`);
-    versionCommand += ' --no-git-tag-version';
+    semantic = semantic === 'prerelease' ? semantic : `pre${semantic}`;
+    const command = `npm version ${semantic} -preid ${preid} --no-git-tag-version`;
 
     try {
-      execSync(versionCommand);
+      execSync(command);
     } catch (error) {
       console.log('npm version'.white, 'ERR!'.red, error.message.white);
       throw error;
