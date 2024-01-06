@@ -29,7 +29,7 @@ jobs:
       - name: Print Has Version
         run: echo "$(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }})"
       - name: Print Has Pre
-        run: echo "${{ contains(fromJSON('["alphs", "beta", "rc"]'), steps.local_version.outputs.VERSION) }}"
+        run: echo "${{ contains(steps.local_version.outputs.VERSION, fromJSON('["alphs", "beta", "rc"]')) }}"
       - name: Echo Github
         run: |
           echo "base_ref ${{ github.base_ref }}"
@@ -38,9 +38,8 @@ jobs:
           echo "workspace ${{ github.workspace }}"
       - name: Publish to npm
         run: |
-          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(fromJSON('["alphs", "beta", "rc"]'), steps.local_version.outputs.VERSION) }} ]]; then
+          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(steps.local_version.outputs.VERSION, fromJSON('["alphs", "beta", "rc"]')) }} ]]; then
             echo "yes"
-            exit 1
           else
             echo "no"
           fi
