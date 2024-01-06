@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:43:57
+ * @LastEditTime: 2024-01-06 02:57:50
  */
 import { getAnnualMarkKey, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
@@ -396,6 +396,10 @@ class Lunar {
 
 export class LunarPlugin implements Plugin {
   public static KEY = 'lunar' as const;
+
+  public getLunar(date: CalendarDay): LunarDate {
+    return Lunar.lunar(date.year, date.month, date.day);
+  }
 
   public trackDate(date: CalendarDay): TrackDateResult {
     const lunar = Lunar.lunar(date.year, date.month, date.day);
