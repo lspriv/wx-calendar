@@ -69,10 +69,10 @@ npm run package
 ### 类型说明
 以下出现的类型定义：
 ```typescript
-type CalenderDay = {
-	year: number; // 年
-	month: number; // 月
-	day: number; // 日
+type CalendarDay = {
+  year: number; // 年
+  month: number; // 月
+  day: number; // 日
 };
 ```
 
@@ -187,42 +187,42 @@ type ViewChangeEventDetail = {
 [***`toDate`***](#toDate) 跳转到指定日期
 ```typescript
 {
-	/**
-	 * @param date 跳转日期
-	 * yyyy-mm-dd | timestamp | Date | CalendarDay
-	 */
-  	(date: string | number | Date | CalendarDay): Promise<void>;
+  /**
+   * @param date 跳转日期
+   * yyyy-mm-dd | timestamp | Date | CalendarDay
+   */
+  (date: string | number | Date | CalendarDay): Promise<void>;
 }
 ```
 
 [***`toggleView`***](#toggleView) 切换视图
 ```typescript
 {
-	/** 
-	 * @param [view] 要切换的视图
-	 * 当view未指定时，会在周月视图之间切换
-	 */
-	(view?: 'month' | 'week' | 'schedule'): void;
+  /**
+   * @param [view] 要切换的视图
+   * 当view未指定时，会在周月视图之间切换
+   */
+  (view?: 'month' | 'week' | 'schedule'): void;
 }
 ```
 
 [***`getPlugin`***](#getPlugin) 获取插件实例
 ```typescript
 {
-	/**
-	 * @param key 插件的KEY
-	 */
-	(key: string): InstanceType<PluginConstructor>;
+  /**
+   * @param key 插件的KEY
+   */
+  (key: string): InstanceType<PluginConstructor>;
 }
 ```
  
 [***`updateDates`***](#updatePluginDates) 更新日期数据
 ```typescript
 {
-	/**
-	 * 若不指定哪些日期更新，默认刷新全部
-	 */
-	(dates?: Array<CalendarDay>): Promise<void>;
+  /**
+   * 若不指定哪些日期更新，默认刷新全部
+   */
+  (dates?: Array<CalendarDay>): Promise<void>;
 }
 ```
 > [!TIP]
