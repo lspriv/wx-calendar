@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/lspriv/wx-calendar/compare/v1.1.0...v1.2.0) (2024-01-06)
+
+
+### Features
+
+* lunar插件新增获取农历信息方法 ([11cc4d2](https://github.com/lspriv/wx-calendar/commit/11cc4d2f9c90b2a535c723383ff049792a63cabb))
+
 ## [1.1.0](https://github.com/lspriv/wx-calendar/compare/v1.0.0...v1.1.0) (2024-01-05)
 
 
