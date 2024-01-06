@@ -16,7 +16,7 @@
 
 
 ### 使用
-小程序库WeChatLib >= '3.0.0'
+小程序基础库 `SDKVersion` >= 3.0.0
 
 ##### 安装
 ```bash
@@ -24,7 +24,7 @@ npm i @lspriv/wx-calendar -S
 ```
 
 ##### 构建
-微信小程序开发工具菜单栏：工具 --> 构建 npm
+微信小程序开发工具菜单栏：`工具` --> `构建 npm`
 [官方文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
 
 ##### 页面json配置：
@@ -35,30 +35,45 @@ npm i @lspriv/wx-calendar -S
     }
 }
 ```
-> 
 
 ##### 在页面wxml文件中：
 ```html
 <calendar id="calendar" bindload="handleLoad" />
 ```
-> 
 
-> **`注意`** 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
+> [!IMPORTANT]
+> 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
 启动
-```javascript
+```bash
 npm install
-// 启动，默认skyline配置
+# 启动，默认skyline配置
 npm run dev
-
-// 设置webview
-npm run dev @webview  //或者 npm run dev @W
+# 设置webview
+# npm run dev @webview 或者 npm run dev @W
 ```
 
 打包
-```javascript
+```bash
 npm run build
+```
+
+发包（预览包）
+```bash
+npm run package
+```
+> [!NOTE]
+> 这个发包命令执行了打包、发包和推送仓库三部分，所以不必重复执行打包命令
+
+### 类型说明
+以下出现的类型定义：
+```typescript
+type CalenderDay = {
+	year: number; // 年
+	month: number; // 月
+	day: number; // 日
+};
 ```
 
 ### Props 属性
@@ -126,51 +141,90 @@ npm run build
     </tr>
 </table>
 
-> 关于属性 [marks](#mark说明)
-> 
-> Array<{ year: number; month: number; day: number; type: 'schedule' | 'corner' | 'festival'; text: string; color: string; bgColor?: string; }>
-> 其中schedule日程可选bgColor属性，角标和节假日不需要这个属性
+> [!TIP] 关于属性 `marks`
+> ```typescript
+> type Mark = {
+>   year: number; // 年
+>   month: number; // 月 
+>   day: number; // 日
+>   type: 'schedule' | 'corner' | 'festival'; // 日程｜角标｜节假日
+>   text: string; // 内容
+>   color: string; // 文本色
+>   bgColor?: string; // 背景色，type为schedule时可选
+> }
+> ```
+> 角标内容最好一个字符长度，只对一个字符校正了位置，多出的请自行调整位置
 
 ### Events 事件
 
-[**`bindload`**](#bindload)  日历加载完成
->     e.detail = { checked, view } 
->     # checked 为当前选择日期
->     # view 当前面板视图
+[***`bindload`***](#bindload)  日历加载完成
+```typescript
+type LoadEventDetail = {
+    checked: CalenderDay; // 当前选择日期
+    view: 'week' | 'month' | 'schedule'; // 当前视图
+}
+```
 
+[***`bindchange`***](#bindchange)  日期选中变化
+```typescript
+type ChangeEventDetail = {
+    checked: CalenderDay; // 当前选择日期
+    view: 'week' | 'month' | 'schedule'; // 当前视图
+}
+```
 
-[**`bindchange`**](#bindchange)  日期选择变化
->     e.detail = { checked, view } 
->     # checked 为当前选择日期
->     # view 当前面板视图
-
-[**`bindviewchange`**](#bindviewchange)   面板视图变化
->     e.detail = { checked, view } 
->     # checked 为当前选择日期
->     # view 当前面板视图
+[***`bindviewchange`***](#bindviewchange)   面板视图变化
+```typescript
+type ViewChangeEventDetail = {
+    checked: CalenderDay; // 当前选择日期
+    view: 'week' | 'month' | 'schedule'; // 当前视图
+}
+```
 
 ### Methods 方法
 
-[**`toDate`**](#toDate)  void 跳转到指定日期
->     (date: string | number | Date | CalendarDay) => Promise<void>;
->     # 可以是 yyyy-mm-dd 格式的日期字符串
->     # 可以是 timestamp时间戳
->     # 可以是 Date日期类型
->     # 可以是 type CalendarDay = { year: number; month: number; day: number; }
+[***`toDate`***](#toDate) 跳转到指定日期
+```typescript
+{
+	/**
+	 * @param date 跳转日期
+	 * yyyy-mm-dd | timestamp | Date | CalendarDay
+	 */
+  	(date: string | number | Date | CalendarDay): Promise<void>;
+}
+```
 
-[**`toggleView`**](#toggleView) void 切换视图
->     (view?: 'month' | 'week' | 'schedule') => void;
->     # 当view未指定时，会在周月视图之间切换
+[***`toggleView`***](#toggleView) 切换视图
+```typescript
+{
+	/** 
+	 * @param [view] 要切换的视图
+	 * 当view未指定时，会在周月视图之间切换
+	 */
+	(view?: 'month' | 'week' | 'schedule'): void;
+}
+```
 
-
-[**`getPlugin`**](#getPlugin) void 获取插件实例
->     (key: string) => InstanceType<PluginConstructor>;
->     # key为插件的KEY属性
+[***`getPlugin`***](#getPlugin) 获取插件实例
+```typescript
+{
+	/**
+	 * @param key 插件的KEY
+	 */
+	(key: string): InstanceType<PluginConstructor>;
+}
+```
  
-[**`updateDates`**](#updatePluginDates) object 更新插件数据
->     (dates?: Array<CalendarDay>) => Promise<void>;
->     # 更新插件数据，若不指定哪些日期更新，默认全部已加载日期
-
+[***`updateDates`***](#updatePluginDates) 更新日期数据
+```typescript
+{
+	/**
+	 * 若不指定哪些日期更新，默认刷新全部
+	 */
+	(dates?: Array<CalendarDay>) => Promise<void>;
+}
+```
+> [!TIP]
 > 有需要更多方法的可以提issue
 
 ### 样式
@@ -232,6 +286,10 @@ npm run build
     --wc-annual-title-sub-color-dark: #3F3F3F;
 }
 ```
+修改样式
+```html
+<calendar style="--wc-bg-color-light: #000;" />
+```
 
 ### 插件
 wx-calendar自带农历插件
@@ -241,7 +299,7 @@ wx-calendar自带农历插件
 const { WxCalendar } = require('@lspriv/wx-calendar');
 const { YourPlugin } = require('anywhere');
 
-// WxCalendar.clearPlugins(); 执行这一行会清除这个页面之前设置的插件，无奈之举
+// WxCalendar.clearPlugins(); 执行这一行会清除这个页面之前设置的插件
 
 WxCalendar.use(YourPlugin, options); // options 插件选项
 
@@ -301,27 +359,40 @@ class MyPlugin implements Plugin {
     }
 }
 ```
+> [!TIP]
 > 有需要更多接口的可以提issue
+
+#### 农历插件
+```javascript
+// 你的页面中
+const calendar = this.selectComponent('#calendar');
+const lunarPlugin = calendar.getPlugin('lunar');
+// 获取农历信息
+const lunarDate = lunarPlugin.getLunar({ year: 2023, month: 10, day: 26 });
+```
+农历信息
+```typescript
+type LunarDate = {
+  year: number; // 公历年
+  month: number; // 公历月
+  day: number; // 公历日
+  lunarYear: string; // 农历年
+  lunarMonth: string; // 农历月
+  lunarDay: string; // 农历日
+  solar: string; // 节气
+}
+```
 
 #### 插件说明
 组件使用多个插件，后引入（use）的先执行，并且每个日期角标和节假日只有一个地方可用，所以先执行的插件捕获该日期有返回角标或节假日数据，则不再使用后续插件的角标和节假日数据，日程则是合并所有插件的日程数据
+
 #### 插件画饼
 有计划做的插件
->     1. ICS日历订阅插件
->     2. 日历快照插件，生成周月和年面板的卡片以及分享卡片
->     3. Locale本地化插件？
+- [ ] *ICS日历订阅插件*
+- [ ] *日历快照插件*
+- [ ] *Locale本地化插件*
 
 ### 说明
-
-#### mark说明
-
->     year,month,day 年月日
->     type = [holiday|corner|schedule] 节假日|角标｜日程 
->     text 为标记内容
->     color 为字体颜色
->     bgColor 为背景颜色
-
-> 角标最好一个字符长度，只对一个字符调整了位置，多出的请自行调整位置
 
 #### 农历说明
  
