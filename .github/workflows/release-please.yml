@@ -32,10 +32,10 @@ jobs:
         run: echo "${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }}"
       - name: Echo Github
         run: |
-          echo ${{ github }}"
+          echo ${{ toJSON(github) }}
       - name: Publish to npm
         run: |
-          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
+          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] || [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
             echo "yes"
           else
             echo "no"
