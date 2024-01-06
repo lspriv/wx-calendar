@@ -32,7 +32,8 @@ jobs:
         run: echo "${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }}"
       - name: Echo Github
         run: |
-          echo ${{ toJSON(github) }}
+          echo ${{ github.event.head_commit.message }}
+          echo ${{ contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'from lspriv/develop') }}
       - name: Publish to npm
         run: |
           if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] || [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
