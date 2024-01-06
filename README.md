@@ -25,7 +25,7 @@ npm i @lspriv/wx-calendar -S
 
 ##### 构建
 微信小程序开发工具菜单栏：`工具` --> `构建 npm`
-[官方文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
+[*官方文档*](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
 
 ##### 页面json配置：
 ```json
@@ -141,7 +141,8 @@ type CalenderDay = {
     </tr>
 </table>
 
-> [!TIP] 关于属性 `marks`
+> [!TIP] 
+> 关于属性 `marks`
 > ```typescript
 > type Mark = {
 >   year: number; // 年
@@ -221,7 +222,7 @@ type ViewChangeEventDetail = {
 	/**
 	 * 若不指定哪些日期更新，默认刷新全部
 	 */
-	(dates?: Array<CalendarDay>) => Promise<void>;
+	(dates?: Array<CalendarDay>): Promise<void>;
 }
 ```
 > [!TIP]
