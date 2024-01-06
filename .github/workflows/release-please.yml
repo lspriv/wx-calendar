@@ -3,7 +3,7 @@ name: autorelease
 on:
   push:
     branches:
-      - master
+      - alpha
   workflow_dispatch:
   
 permissions:
@@ -11,29 +11,35 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
+  test-action:
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v4
-        id: release
-        with:
-          token: ${{ secrets.RELEASE_TOKEN }}
-          release-type: node
-      
       - name: Checkout Repository
-        if: ${{ steps.release.outputs.prs_created }}
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
-        if: ${{ steps.release.outputs.prs_created }}
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Publish to npm
-        if: ${{ steps.release.outputs.prs_created }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Get Local Version
+        id: local_version
+        run: echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
+      - name: Print Version
+        run: echo ${{ steps.local_version.outputs.VERSION }}
+      - name: Print Has Version
+        run: echo "$(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }})"
+      - name: Print Has Pre
+        run: echo "${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }}"
+      - name: Echo Github
         run: |
-          npm install
-          npm run build
-          npm publish --access public
+          echo "base_ref ${{ github.base_ref }}"
+          echo "head_ref ${{ github.head_ref }}"
+          echo "ref ${{ github.ref }}"
+          echo "workspace ${{ github.workspace }}"
+      - name: Publish to npm
+        run: |
+          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
+            echo "yes"
+          else
+            echo "no"
+          fi
