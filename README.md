@@ -27,7 +27,8 @@ npm i @lspriv/wx-calendar -S
 微信小程序开发工具菜单栏：`工具` --> `构建 npm`
 [*官方文档*](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
 
-##### 页面json配置：
+##### 引入配置
+在页面或全局配置文件中配置
 ```json
 {
     "usingComponents": {
@@ -36,7 +37,8 @@ npm i @lspriv/wx-calendar -S
 }
 ```
 
-##### 在页面wxml文件中：
+##### 页面使用
+在页面wxml文件中使用
 ```html
 <calendar id="calendar" bindload="handleLoad" />
 ```
@@ -216,7 +218,7 @@ type ViewChangeEventDetail = {
 }
 ```
  
-[***`updateDates`***](#updatePluginDates) 更新日期数据
+[***`updateDates`***](#updateDates) 更新日期数据
 ```typescript
 {
   /**
