@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-05 17:20:26
+ * @LastEditTime: 2024-01-06 10:39:20
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -121,7 +121,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     created() {
       Layout.initialize();
       this.initializeView();
-      this.initializeDatas();
+      this.initializeShared();
     },
     async attached() {
       await this.initializeRects();
@@ -132,11 +132,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     }
   },
   methods: {
-    initializeDatas() {
+    initializeShared() {
       const { shared } = wx.worklet;
-      this.$_view_fixed = shared(false);
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
+      this.$_view_fixed = shared(false);
       this._dragger_ = new Dragger(this);
     },
     initializeView() {
@@ -430,9 +430,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       toDate(date) {
         return instance._panel_.toDate(date);
       },
-      toYear(year) {
-        return instance._panel_.toYear(year);
-      },
       toggleView(view) {
         const flag = view ? viewFlag(view) : instance._view_ & View.week ? View.month : View.week;
         const _view = flag || View.month;
@@ -447,7 +444,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       getPlugin(key) {
         return instance._calendar_.getPlugin(key);
       },
-      updatePluginDates(dates?: Array<CalendarDay>) {
+      updateDates(dates?: Array<CalendarDay>) {
         return instance._calendar_.updateDates(dates);
       }
     } as CalendarExport;

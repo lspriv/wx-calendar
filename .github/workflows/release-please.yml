@@ -21,16 +21,16 @@ jobs:
           release-type: node
       
       - name: Checkout Repository
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.prs_created }}
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.prs_created }}
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Publish to npm
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.prs_created }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
