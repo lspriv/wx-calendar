@@ -38,7 +38,7 @@ jobs:
           echo "workspace ${{ github.workspace }}"
       - name: Publish to npm
         run: |
-          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ contains(fromJSON('["alphs", "beta", "rc"]'), steps.local_version.outputs.VERSION) ]]; then
+          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(fromJSON('["alphs", "beta", "rc"]'), steps.local_version.outputs.VERSION) }} ]]; then
             echo "yes"
             exit 1
           else
