@@ -32,10 +32,7 @@ jobs:
         run: echo "${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }}"
       - name: Echo Github
         run: |
-          echo "base_ref ${{ github.base_ref }}"
-          echo "head_ref ${{ github.head_ref }}"
-          echo "ref ${{ github.ref }}"
-          echo "workspace ${{ github.workspace }}"
+          echo ${{ github }}"
       - name: Publish to npm
         run: |
           if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] && [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
