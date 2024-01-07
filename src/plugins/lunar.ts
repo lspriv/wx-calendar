@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-01-06 02:57:50
+ * @LastEditTime: 2024-01-07 13:09:38
  */
 import { getAnnualMarkKey, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
@@ -401,7 +401,7 @@ export class LunarPlugin implements Plugin {
     return Lunar.lunar(date.year, date.month, date.day);
   }
 
-  public trackDate(date: CalendarDay): TrackDateResult {
+  public PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
     const lunar = Lunar.lunar(date.year, date.month, date.day);
 
     return {
@@ -412,7 +412,7 @@ export class LunarPlugin implements Plugin {
     };
   }
 
-  public trackYear(year: WxCalendarYear): TrackYearResult {
+  public PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
     let lunarYear: string = '';
     const marks: Map<string, Set<WxCalendarYearMark>> = new Map();
     for (let i = 0; i < 12; i++) {
