@@ -13,7 +13,6 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'from lspriv/develop')
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
@@ -35,7 +34,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
       - name: Publish to npm
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created && contains(github.event.head_commit.message, 'from lspriv/develop') }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
