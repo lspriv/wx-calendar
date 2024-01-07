@@ -4,15 +4,18 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 17:00:49
+ * @LastEditTime: 2024-01-07 14:30:53
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
 import { applyAnimated, clearAnimated, isSkyline, nodeRect, severalTicks } from './tools';
-import { SELECTOR, View } from './constants';
+import { SELECTOR } from './constants';
 import { promises, isFunction } from '../utils/shared';
 
 const { shared, timing, Easing } = wx.worklet;
+
+/** skyline下年度面板初始位置 */
+const ANNUAL_TRANSFORM = '-150vh';
 
 export class AnnualPanelSwitch extends CalendarHandler {
   private _top_?: Shared<number | string>;
@@ -37,7 +40,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
   }
 
   private async initializeContainer() {
-    const top = shared('-150vh');
+    const top = shared(ANNUAL_TRANSFORM);
     const opacity = shared(0);
 
     const calendar_trans = shared(0);
@@ -134,8 +137,8 @@ export class AnnualPanelSwitch extends CalendarHandler {
       else instance.setData({ annualOpacity: 0 });
       isSkylineRender && this.showCalendar();
       wx.nextTick(() => {
-        if (isSkylineRender) this._top_!.value = '-150vh';
-        else instance.setData({ annualTop: '-150vh' });
+        if (isSkylineRender) this._top_!.value = ANNUAL_TRANSFORM;
+        else instance.setData({ annualTop: ANNUAL_TRANSFORM });
 
         this._transforming_ = false;
         this.execInteractiveCallbacks();

@@ -1,7 +1,7 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.2.0",
-  "description": "calendar for miniprogram",
+  "version": "1.3.0",
+  "description": "微信小程序日历",
   "type": "commonjs",
   "main": "dist/index.js",
   "miniprogram": "dist",
@@ -19,7 +19,11 @@
   },
   "keywords": [
     "calendar",
-    "miniprogram"
+    "miniprogram",
+    "wechat",
+    "日历",
+    "小程序",
+    "微信"
   ],
   "author": "lspriv",
   "license": "MIT",

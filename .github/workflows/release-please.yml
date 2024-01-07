@@ -13,6 +13,7 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'from lspriv/develop')
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
@@ -21,19 +22,27 @@ jobs:
           release-type: node
       
       - name: Checkout Repository
-        if: ${{ steps.release.outputs.prs_created }}
+        if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
-        if: ${{ steps.release.outputs.prs_created }}
+        if: ${{ steps.release.outputs.release_created }}
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+      - name: Get Local Version
+        id: local_version
+        if: ${{ steps.release.outputs.release_created }}
+        run: echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
       - name: Publish to npm
-        if: ${{ steps.release.outputs.prs_created }}
+        if: ${{ steps.release.outputs.release_created }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm install
-          npm run build
-          npm publish --access public
+          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] || [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} ]]; then
+            echo "the package has published."
+          else
+            npm install
+            npm run build
+            npm publish --access public
+          fi

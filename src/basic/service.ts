@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:49:49
+ * @LastEditTime: 2024-01-07 17:40:55
  */
 import { nextTick } from './tools';
 import { notEmptyObject } from '../utils/shared';
@@ -36,15 +36,42 @@ export type TrackYearResult = {
 };
 
 export interface Plugin {
-  pluginData?(date: CalendarDay): any;
-  trackDate?(date: CalendarDay): Nullable<TrackDateResult>;
-  trackYear?(year: WxCalendarYear): Nullable<TrackYearResult>;
+  /**
+   * PliginService初始化完成
+   * @param component 日历组件实例
+   * @param service PliginService实例
+   */
+  PLUGIN_INITIALIZE?(component: CalendarInstance, service: PluginService<PluginConstructor[]>): void;
+  /**
+   * 插件绑定到日期数据
+   * @param date 待绑定日期
+   */
+  PLUGIN_DATA?(date: CalendarDay): any;
+  /**
+   * 捕获日期
+   * @param date 日期
+   */
+  PLUGIN_TRACK_DATE?(date: CalendarDay): Nullable<TrackDateResult>;
+  /**
+   * 捕获年份
+   * @param year 年
+   */
+  PLUGIN_TRACK_YEAR?(year: WxCalendarYear): Nullable<TrackYearResult>;
 }
 
 export interface PluginConstructor {
-  new (options?: Record<string, any>, component?: CalendarInstance): Plugin;
+  new (options?: Record<string, any>): Plugin;
+  /**
+   * 插件 key
+   */
   KEY: string;
+  /**
+   * 插件版本
+   */
   VERSION?: string;
+  /**
+   * 日历组件版本
+   */
   REQUIER_VERSION?: string;
 }
 
@@ -84,6 +111,12 @@ interface YearResult {
   result: TrackYearResult;
 }
 
+type PluginMark<T> = T & { key: string };
+
+export type PluginEntireMarks = {
+  [P in CalendarMark['type']]: Array<PluginMark<P extends 'schedule' ? CalendarDateSchedule : CalendarDateMark>>;
+};
+
 export type PluginKey<T> = T extends PluginConstructor ? T['KEY'] : never;
 export type PluginKeys<T extends Array<PluginConstructor>> = T extends [
   infer R,
@@ -106,12 +139,22 @@ export class PluginService<T extends Array<PluginConstructor>> {
 
   constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
     this._component_ = component;
-    this._services_ = (services || [])
-      .filter(service => service.construct.KEY)
-      .map(service => ({
-        key: service.construct.KEY,
-        instance: new service.construct(service.options, component)
-      }));
+    this._services_ = (services || []).flatMap(service => {
+      return service.construct.KEY
+        ? {
+            key: service.construct.KEY,
+            instance: new service.construct(service.options)
+          }
+        : [];
+    });
+    this.initialize();
+  }
+
+  private initialize() {
+    for (let i = this._services_.length; i--; ) {
+      const service = this._services_[i];
+      service.instance.PLUGIN_INITIALIZE?.(this._component_, this);
+    }
   }
 
   private walkForDate(date: CalendarDay) {
@@ -119,7 +162,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
 
     for (let i = this._services_.length; i--; ) {
       const service = this._services_[i];
-      const result = service.instance.trackDate?.(date);
+      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
       if (result) {
         if (result.corner && (!record || !record.corner)) record.corner = result.corner;
         if (result.festival && (!record || !record.festival)) record.festival = result.festival;
@@ -127,12 +170,10 @@ export class PluginService<T extends Array<PluginConstructor>> {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
       }
-      if (service.instance.pluginData) {
-        const pluginRes = service.instance.pluginData(date);
-        if (pluginRes) {
-          record.plugin = record.plugin || {};
-          record.plugin[service.key] = pluginRes;
-        }
+      const pluginRes = service.instance.PLUGIN_DATA?.(date);
+      if (pluginRes !== void 0) {
+        record.plugin = record.plugin || {};
+        record.plugin[service.key] = pluginRes;
       }
     }
     return notEmptyObject(record) ? record : null;
@@ -143,7 +184,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
     for (let i = this._services_.length; i--; ) {
       if (record.subinfo && record.marks) break;
       const service = this._services_[i];
-      const result = service.instance.trackYear?.(year);
+      const result = service.instance.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo) record.subinfo = result.subinfo;
         if (result.marks?.size) record.marks = result.marks;
@@ -260,6 +301,28 @@ export class PluginService<T extends Array<PluginConstructor>> {
     }
     await this._component_._annual_.interaction();
     return this.setDates([...map.values()]);
+  }
+
+  /**
+   * 获取完整日期标记
+   * @param date 日期
+   */
+  public getEntireMarks(date: CalendarDay): PluginEntireMarks {
+    const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [] };
+
+    for (let i = this._services_.length; i--; ) {
+      const service = this._services_[i];
+      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+      if (result) {
+        if (result.corner) marks.corner.push({ ...result.corner, key: service.key });
+        if (result.festival) marks.festival.push({ ...result.festival, key: service.key });
+        if (result.schedule?.length) {
+          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key: service.key })));
+        }
+      }
+    }
+
+    return marks;
   }
 
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-06 10:39:20
+ * @LastEditTime: 2024-01-07 17:44:33
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -16,6 +16,7 @@ import { Dragger } from './basic/drag';
 import { AnnualPanelSwitch } from './basic/annual';
 import { YearPrinter } from './basic/printer';
 import { LunarPlugin } from './plugins/lunar';
+import { MARK_PLUGIN_KEY } from './plugins/mark';
 import {
   isView,
   viewFlag,
@@ -49,6 +50,7 @@ export type * from './interface/calendar';
 export type * from './basic/service';
 
 export { WxCalendar } from './interface/calendar';
+export { LUNAR_PLUGIN_KEY } from './plugins/lunar';
 
 const initCurrent = middle(CALENDAR_PANELS);
 
@@ -220,7 +222,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     async toggleView(view, fixed) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
-      await this._panel_.refreshView(_view);
+      await this._panel_.refreshView(_view, fixed);
       this.triggerViewChange(this._view_);
     },
     async calendarTransitionEnd() {
@@ -404,7 +406,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       else this._dragger_!.update();
     },
     marks: function (marks: Array<CalendarMark>) {
-      const plugin = this._calendar_.getPlugin('_mark_');
+      const plugin = this._calendar_.getPlugin(MARK_PLUGIN_KEY);
       const updates = plugin?.updateMarks(marks);
       if (this._loaded_) this._calendar_.updateDates(updates);
     },
@@ -440,6 +442,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
             transView: flagView(_view)
           });
         }
+      },
+      getMarks(date) {
+        return instance._calendar_.getEntireMarks(date);
       },
       getPlugin(key) {
         return instance._calendar_.getPlugin(key);

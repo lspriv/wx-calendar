@@ -13,27 +13,26 @@ require('colors');
 const Semantics = ['@major', '@minor', '@patch', '@prerelease'];
 const Preids = ['@alpha', '@beta', '@rc'];
 
-const validSemantic = semantic => {
-  if (semantic && semantic.startsWith('@') && !Semantics.includes(semantic)) {
+/**
+ * 校验参数
+ * @param {string} arg 参数名
+ * @param {string[]} range 有效值
+ * @returns {(value: string) => void}
+ */
+const validArgument = (arg, range) => value => {
+  if (value && value.startsWith('@') && !range.includes(value)) {
     throw new TypeError(
       'calendar publish'.white +
         ' ERR!'.red +
-        ' invalid semantic argument'.white +
-        `\nstandard arguments: ${Semantics.join(' ')}`.grey
+        ` invalid ${arg} argument`.white +
+        `\nstandard arguments: ${range.join(' ')}`.grey
     );
   }
 };
 
-const validPreid = preid => {
-  if (preid && preid.startsWith('@') && !Preids.includes(preid)) {
-    throw new TypeError(
-      'calendar publish'.white +
-        ' ERR!'.red +
-        ' invalid preid argument'.white +
-        `\nstandard arguments: ${Preids.join(' ')}`.grey
-    );
-  }
-};
+const validSemantic = validArgument('semantic', Semantics);
+
+const validPreid = validArgument('preid', Preids);
 
 const getArg = arg => (arg ? arg.replace(/^@(.*)/, '$1') : null);
 
@@ -67,7 +66,7 @@ commander
       });
       preid = await select({
         message: 'set prerelease preid?',
-        choices
+        choices: [...choices, { name: 'no', value: null }]
       });
     }
 
@@ -80,8 +79,15 @@ commander
     }
     spinner.succeed('build success');
 
-    semantic = semantic === 'prerelease' ? semantic : `pre${semantic}`;
-    const command = `npm version ${semantic} -preid ${preid} --no-git-tag-version`;
+    semantic = preid
+      ? semantic === 'prerelease'
+        ? semantic
+        : `pre${semantic}`
+      : semantic === 'prerelease'
+      ? 'patch'
+      : semantic;
+    const preidArg = preid ? ` -preid ${preid}` : '';
+    const command = `npm version ${semantic}${preidArg} --no-git-tag-version`;
 
     try {
       execSync(command);
@@ -90,7 +96,7 @@ commander
       throw error;
     }
 
-    execSync('npm publish --access public', { stdio: 'inherit' });
+    preid && execSync('npm publish --access public', { stdio: 'inherit' });
 
     const version = require(path.join(process.cwd(), '/package.json')).version;
 

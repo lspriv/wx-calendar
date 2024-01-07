@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 17:10:14
+ * @LastEditTime: 2024-01-07 17:43:36
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MarkPlugin } from '../plugins/mark';
 
-import type { PluginConstructor, PluginUse, PluginKeys, PulginMap } from '../basic/service';
+import type { PluginConstructor, PluginUse, PluginKeys, PulginMap, PluginEntireMarks } from '../basic/service';
 import type { CalendarInstance } from './component';
 import type { Voidable } from '../utils/shared';
 
@@ -421,6 +421,10 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WxCalendarFullYear;
     this._service_.catchYear(y);
     return y;
+  }
+
+  public getEntireMarks(date: CalendarDay): PluginEntireMarks {
+    return this._service_.getEntireMarks(date);
   }
 
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
