@@ -66,7 +66,7 @@ commander
       });
       preid = await select({
         message: 'set prerelease preid?',
-        choices
+        choices: [...choices, { name: 'no', value: null }]
       });
     }
 
@@ -79,8 +79,15 @@ commander
     }
     spinner.succeed('build success');
 
-    semantic = semantic === 'prerelease' ? semantic : `pre${semantic}`;
-    const command = `npm version ${semantic} -preid ${preid} --no-git-tag-version`;
+    semantic = preid
+      ? semantic === 'prerelease'
+        ? semantic
+        : `pre${semantic}`
+      : semantic === 'prerelease'
+      ? 'patch'
+      : semantic;
+    const preidArg = preid ? ` -preid ${preid}` : '';
+    const command = `npm version ${semantic}${preidArg} --no-git-tag-version`;
 
     try {
       execSync(command);
@@ -89,7 +96,7 @@ commander
       throw error;
     }
 
-    execSync('npm publish --access public', { stdio: 'inherit' });
+    preid && execSync('npm publish --access public', { stdio: 'inherit' });
 
     const version = require(path.join(process.cwd(), '/package.json')).version;
 
