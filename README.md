@@ -47,6 +47,8 @@ npm i @lspriv/wx-calendar -S
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
+alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag
+
 启动
 ```bash
 npm install
@@ -319,47 +321,54 @@ Component({
 import { Plugin, CalendarDay, WxCalendarYear, TrackDateResult, TrackYearResult } from '@lspriv/wx-calendar';
 
 class MyPlugin implements Plugin {
-    /** 需要定义插件的key，必填 */
-    static KEY: 'my-plugin' as const;
+  /** 需要定义插件的key，必填 */
+  static KEY = 'my-plugin' as const;
 
-    constructor(options, calendarInstance) {
-        // options 你的插件选项
-        // calendarInstance 日历组件实例
-    }
+  constructor(options) {
+    // options 引入时的插件选项
+  }
 
-    /** 捕获日期，（周/月面板），可选择实现该方法  */
-    public trackDate(date: CalendarDay): TrackDateResult {
-        // do something...
-        return {
-            // 设置日程数组，可选
-            schedule: [{ text: '', color: '', bgColor: '' }],
-            // 设置角标，可选
-            corner: { text: '', color: '' },
-            // 设置节假日，可选
-            festival: { text: '', color: '' }
-        }
-    }
+  /**
+   * PliginService初始化完成，可选择实现该方法
+   * @param {CalendarInstance} component 日历组件实例
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_INITIALIZE(component, service) {}
 
-    /** 捕获年，（年度面板），可选择实现该方法 */
-    public trackYear(year: WxCalendarYear): TrackYearResult {
-        // do something...
-        return {
-            // 设置年份描述信息，可选
-            subinfo: '',
-            // 设置角标，可选
-            marks: new Map([
-                ['2023-10-1', new Set(['rest'])], // 休息日，置灰
-                ['2023-10-7', new Set(['work'])], // 工作日，高亮
-                ['2023-10-9', new Set(['#F56C6C'])] // 自定义颜色下标
-            ])
-        }
+  /**
+   * 捕获日期，可选择实现该方法
+   * @param date 日期
+   */
+  PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
+    // do something...
+    return {
+      schedule: [{ text: '', color: '', bgColor: '' }], // 设置日程数组，可选
+      corner: { text: '', color: '' }, // 设置角标，可选
+      festival: { text: '', color: '' } // 设置节假日，可选
+    };
+  };
+  
+  /**
+   * 捕获年份，可选择实现该方法
+   * @param year 年
+   */
+  PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
+    // do something...
+    return {
+      subinfo: '', // 设置年份描述信息，可选
+      marks: new Map([
+        ['2023-10-1', new Set(['rest'])], // 休息日，置灰
+        ['2023-10-7', new Set(['work'])], // 工作日，正常
+        ['2023-10-9', new Set(['#F56C6C'])] // 自定义颜色下标
+      ])
     }
+  };
 
-    /** 挂载插件数据，可选择实现该方法 */
-    public pluginData(date: CalendarDay): any {
-        // 返回数据将作为插件数据挂载到日期
-        return {};
-    }
+  /**
+   * 插件绑定到日期数据，可选择实现该方法
+   * @param date 待绑定日期
+   */
+  PLUGIN_DATA(date: CalendarDay): any {};
 }
 ```
 > [!TIP]
@@ -367,9 +376,10 @@ class MyPlugin implements Plugin {
 
 #### 农历插件
 ```javascript
+const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar');
 // 你的页面中
 const calendar = this.selectComponent('#calendar');
-const lunarPlugin = calendar.getPlugin('lunar');
+const lunarPlugin = calendar.getPlugin(LUNAR_PLUGIN_KEY);
 // 获取农历信息
 const lunarDate = lunarPlugin.getLunar({ year: 2023, month: 10, day: 26 });
 ```

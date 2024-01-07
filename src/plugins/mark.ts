@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:44:55
+ * @LastEditTime: 2024-01-07 14:16:49
  */
 import { normalDate } from '../interface/calendar';
 
@@ -60,7 +60,7 @@ export class MarkPlugin implements Plugin {
     return [...updates, ...deletes];
   }
 
-  public trackDate(date: CalendarDay): Nullable<TrackDateResult> {
+  public PLUGIN_TRACK_DATE(date: CalendarDay): Nullable<TrackDateResult> {
     if (!this._marks_) return null;
 
     const key = `${date.year}_${date.month}_${date.day}`;
@@ -84,3 +84,5 @@ export class MarkPlugin implements Plugin {
     return null;
   }
 }
+
+export const MARK_PLUGIN_KEY = MarkPlugin.KEY;

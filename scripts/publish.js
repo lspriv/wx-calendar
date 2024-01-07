@@ -13,27 +13,26 @@ require('colors');
 const Semantics = ['@major', '@minor', '@patch', '@prerelease'];
 const Preids = ['@alpha', '@beta', '@rc'];
 
-const validSemantic = semantic => {
-  if (semantic && semantic.startsWith('@') && !Semantics.includes(semantic)) {
+/**
+ * 校验参数
+ * @param {string} arg 参数名
+ * @param {string[]} range 有效值
+ * @returns {(value: string) => void}
+ */
+const validArgument = (arg, range) => value => {
+  if (value && value.startsWith('@') && !range.includes(value)) {
     throw new TypeError(
       'calendar publish'.white +
         ' ERR!'.red +
-        ' invalid semantic argument'.white +
-        `\nstandard arguments: ${Semantics.join(' ')}`.grey
+        ` invalid ${arg} argument`.white +
+        `\nstandard arguments: ${range.join(' ')}`.grey
     );
   }
 };
 
-const validPreid = preid => {
-  if (preid && preid.startsWith('@') && !Preids.includes(preid)) {
-    throw new TypeError(
-      'calendar publish'.white +
-        ' ERR!'.red +
-        ' invalid preid argument'.white +
-        `\nstandard arguments: ${Preids.join(' ')}`.grey
-    );
-  }
-};
+const validSemantic = validArgument('semantic', Semantics);
+
+const validPreid = validArgument('preid', Preids);
 
 const getArg = arg => (arg ? arg.replace(/^@(.*)/, '$1') : null);
 
