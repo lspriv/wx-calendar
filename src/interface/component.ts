@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-06 10:38:47
+ * @LastEditTime: 2024-01-07 17:44:24
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -18,7 +18,7 @@ import type { CalendarLayout } from '../basic/layout';
 import type { Nullable, Voidable } from '../utils/shared';
 import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
-import type { PluginConstructor, PluginKeys, PulginMap } from 'src/basic/service';
+import type { PluginConstructor, PluginEntireMarks, PluginKeys, PulginMap } from 'src/basic/service';
 
 export interface CalendarPanel extends WxCalendarMonth {
   /** 面板垂直偏移量 */
@@ -295,6 +295,10 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
    * 若果view未指定，会在周月视图之间切换
    */
   toggleView(view?: CalendarView): void;
+  /**
+   * 获取日期标记
+   */
+  getMarks(date: CalendarDay): PluginEntireMarks;
   /**
    * 获取插件
    */

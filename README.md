@@ -47,7 +47,7 @@ npm i @lspriv/wx-calendar -S
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
-alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag
+alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
 
 启动
 ```bash
@@ -207,6 +207,16 @@ type ViewChangeEventDetail = {
    * 当view未指定时，会在周月视图之间切换
    */
   (view?: 'month' | 'week' | 'schedule'): void;
+}
+```
+
+[***`getMarks`***](#getMarks) 获取完整的日期标记
+```typescript
+{
+  /**
+   * @param date 获取日期
+   */
+  (date: CalendarDay): PluginEntireMarks;
 }
 ```
 

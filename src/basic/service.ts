@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 13:33:43
+ * @LastEditTime: 2024-01-07 17:40:55
  */
 import { nextTick } from './tools';
 import { notEmptyObject } from '../utils/shared';
@@ -110,6 +110,12 @@ interface YearResult {
   year: number;
   result: TrackYearResult;
 }
+
+type PluginMark<T> = T & { key: string };
+
+export type PluginEntireMarks = {
+  [P in CalendarMark['type']]: Array<PluginMark<P extends 'schedule' ? CalendarDateSchedule : CalendarDateMark>>;
+};
 
 export type PluginKey<T> = T extends PluginConstructor ? T['KEY'] : never;
 export type PluginKeys<T extends Array<PluginConstructor>> = T extends [
@@ -295,6 +301,28 @@ export class PluginService<T extends Array<PluginConstructor>> {
     }
     await this._component_._annual_.interaction();
     return this.setDates([...map.values()]);
+  }
+
+  /**
+   * 获取完整日期标记
+   * @param date 日期
+   */
+  public getEntireMarks(date: CalendarDay): PluginEntireMarks {
+    const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [] };
+
+    for (let i = this._services_.length; i--; ) {
+      const service = this._services_[i];
+      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+      if (result) {
+        if (result.corner) marks.corner.push({ ...result.corner, key: service.key });
+        if (result.festival) marks.festival.push({ ...result.festival, key: service.key });
+        if (result.schedule?.length) {
+          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key: service.key })));
+        }
+      }
+    }
+
+    return marks;
   }
 
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
