@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0](https://github.com/lspriv/wx-calendar/compare/v1.2.0...v1.3.0) (2024-01-07)
+
+
+### Features
+
+* 插件新增PLUGIN_INITIALIZE方法 ([65d0b16](https://github.com/lspriv/wx-calendar/commit/65d0b163f823a850e1884d35dbc0245296644800))
+* 新增导出农历插件的PLUGIN_KEY ([bbabd58](https://github.com/lspriv/wx-calendar/commit/bbabd58e3c07beb128ba24fe7a9cb6f18ade0ae3))
+* 新增组件导出方法getMarks,获取完整的日期标记 ([d89b375](https://github.com/lspriv/wx-calendar/commit/d89b3759b0f4022c35bcb8e1d240a8e0266aad13))
+
+
+### Bug Fixes
+
+* **skyline:** 解决viewFixed遗漏 ([b498c78](https://github.com/lspriv/wx-calendar/commit/b498c783d25d6217e3df8f5fe459005ff5b517a4))
+* **skyline:** 调整年度面板初始位置变量 ([fdf8361](https://github.com/lspriv/wx-calendar/commit/fdf8361847660112c63324284e4679429a346ea2))
+
 ## [1.2.0](https://github.com/lspriv/wx-calendar/compare/v1.1.0...v1.2.0) (2024-01-06)
 
 
