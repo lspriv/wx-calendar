@@ -210,6 +210,16 @@ type ViewChangeEventDetail = {
 }
 ```
 
+[***`getMarks`***](#getMarks) 获取完整的日期标记
+```typescript
+{
+  /**
+   * @param date 获取日期
+   */
+  (date: CalendarDay): PluginEntireMarks;
+}
+```
+
 [***`getPlugin`***](#getPlugin) 获取插件实例
 ```typescript
 {

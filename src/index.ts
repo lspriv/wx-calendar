@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 16:14:20
+ * @LastEditTime: 2024-01-07 17:44:33
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -442,6 +442,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
             transView: flagView(_view)
           });
         }
+      },
+      getMarks(date) {
+        return instance._calendar_.getEntireMarks(date);
       },
       getPlugin(key) {
         return instance._calendar_.getPlugin(key);
