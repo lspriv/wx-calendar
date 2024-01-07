@@ -336,7 +336,7 @@ class MyPlugin implements Plugin {
   PLUGIN_INITIALIZE(component, service) {}
 
   /**
-   * 捕获日期
+   * 捕获日期，可选择实现该方法
    * @param date 日期
    */
   PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
@@ -349,7 +349,7 @@ class MyPlugin implements Plugin {
   };
   
   /**
-   * 捕获年份
+   * 捕获年份，可选择实现该方法
    * @param year 年
    */
   PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
