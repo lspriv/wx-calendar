@@ -47,6 +47,8 @@ npm i @lspriv/wx-calendar -S
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
+alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题
+
 启动
 ```bash
 npm install
@@ -374,9 +376,10 @@ class MyPlugin implements Plugin {
 
 #### 农历插件
 ```javascript
+const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar');
 // 你的页面中
 const calendar = this.selectComponent('#calendar');
-const lunarPlugin = calendar.getPlugin('lunar');
+const lunarPlugin = calendar.getPlugin(LUNAR_PLUGIN_KEY);
 // 获取农历信息
 const lunarDate = lunarPlugin.getLunar({ year: 2023, month: 10, day: 26 });
 ```

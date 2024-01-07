@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 13:10:39
+ * @LastEditTime: 2024-01-07 14:16:49
  */
 import { normalDate } from '../interface/calendar';
 
@@ -84,3 +84,5 @@ export class MarkPlugin implements Plugin {
     return null;
   }
 }
+
+export const MARK_PLUGIN_KEY = MarkPlugin.KEY;
