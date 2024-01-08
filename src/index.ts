@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 17:44:33
+ * @LastEditTime: 2024-01-08 15:51:52
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -42,7 +42,8 @@ import type {
   CalendarMethod,
   CalendarCustomProp,
   CalendarPanel,
-  CalendarExport
+  CalendarExport,
+  CalendarEventDetail
 } from './interface/component';
 
 export type * from './interface/component';
@@ -122,8 +123,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   lifetimes: {
     created() {
       Layout.initialize();
-      this.initializeView();
       this.initializeShared();
+      this.initializeView();
     },
     async attached() {
       await this.initializeRects();
@@ -139,7 +140,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
       this.$_view_fixed = shared(false);
-      this._dragger_ = new Dragger(this);
     },
     initializeView() {
       /**
@@ -147,7 +147,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        */
       this._view_ = viewFlag(this.data.view as CalendarView);
       /**
-       * 初始化calendar处理额外的服务
+       * 实例化拖拽控制器
+       */
+      this._dragger_ = new Dragger(this);
+      /**
+       * 实例化WxCalendar处理数据和插件
        */
       this._calendar_ = new WxCalendar(this, [LunarPlugin]);
     },
@@ -377,19 +381,25 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     triggerLoad() {
       this._loaded_ = true;
-      const checked = this.data.checked;
+      const checked = this.data.checked!;
       const view = this.data.currView;
-      this.triggerEvent('load', { checked, view });
+      const detail: CalendarEventDetail = { checked, view };
+      this._calendar_.dispatchPluginEventHandlers('load', detail);
+      this.triggerEvent('load', detail);
     },
     triggerDateChange(date) {
       date = date || (this.data.checked! as WxCalendarDay);
       const view = this.data.currView;
-      this.triggerEvent('change', { checked: date, view });
+      const detail: CalendarEventDetail = { checked: date, view };
+      this._calendar_.dispatchPluginEventHandlers('change', detail);
+      this.triggerEvent('change', detail);
     },
     triggerViewChange(view) {
       const _view = flagView(view || this._view_);
-      const checked = this.data.checked;
-      this.triggerEvent('viewchange', { checked, view: _view });
+      const checked = this.data.checked!;
+      const detail: CalendarEventDetail = { checked, view: _view };
+      this._calendar_.dispatchPluginEventHandlers('viewChange', detail);
+      this.triggerEvent('viewchange', detail);
     }
   },
   pageLifetimes: {

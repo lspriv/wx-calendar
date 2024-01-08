@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-07 17:44:24
+ * @LastEditTime: 2024-01-08 12:52:14
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import type { CalendarPointer, CalendarView } from '../basic/tools';
@@ -187,6 +187,11 @@ interface CalendarEventHandlers {
    * [WebView] 处理日历面板过渡结束
    */
   calendarTransitionEnd(): void;
+}
+
+export interface CalendarEventDetail {
+  checked: CalendarDay;
+  view: CalendarView;
 }
 
 interface CalendarTrigger {

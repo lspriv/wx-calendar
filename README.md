@@ -340,10 +340,12 @@ class MyPlugin implements Plugin {
 
   /**
    * PliginService初始化完成，可选择实现该方法
-   * @param {CalendarInstance} component 日历组件实例
    * @param {PluginService<PluginConstructor[]>} service PliginService实例
    */
-  PLUGIN_INITIALIZE(component, service) {}
+  PLUGIN_INITIALIZE(service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 
   /**
    * 捕获日期，可选择实现该方法
@@ -379,6 +381,36 @@ class MyPlugin implements Plugin {
    * @param date 待绑定日期
    */
   PLUGIN_DATA(date: CalendarDay): any {};
+
+  /**
+   * 注册日历加载完成事件处理方法，可选择实现该方法
+   * @param {CalendarEventDetail} detail 事件数据
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_ON_LOAD(detail, service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+
+  /**
+   * 注册日期变化事件处理方法，可选择实现该方法
+   * @param {CalendarEventDetail} detail 事件数据
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_ON_CHANGE(detail, service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+  
+  /**
+   * 注册视图变化事件处理方法，可选择实现该方法
+   * @param {CalendarEventDetail} detail 事件数据
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_ON_VIEW_CHANGE(detail, service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 }
 ```
 > [!TIP]

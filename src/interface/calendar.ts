@@ -4,15 +4,22 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 17:43:36
+ * @LastEditTime: 2024-01-08 15:48:54
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MarkPlugin } from '../plugins/mark';
 
-import type { PluginConstructor, PluginUse, PluginKeys, PulginMap, PluginEntireMarks } from '../basic/service';
-import type { CalendarInstance } from './component';
+import type {
+  PluginConstructor,
+  PluginUse,
+  PluginKeys,
+  PulginMap,
+  PluginEntireMarks,
+  PluginEventNames
+} from '../basic/service';
+import type { CalendarEventDetail, CalendarInstance } from './component';
 import type { Voidable } from '../utils/shared';
 
 export interface CalendarDay {
@@ -433,6 +440,10 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
 
   public updateDates(dates?: Array<CalendarDay>) {
     return this._service_.updateDates(dates);
+  }
+
+  public dispatchPluginEventHandlers<E extends PluginEventNames>(event: E, detail: CalendarEventDetail): void {
+    this._service_.dispatchEventHandler(event, detail);
   }
 
   public static use(service: PluginConstructor, options?: Record<string, any>): void;

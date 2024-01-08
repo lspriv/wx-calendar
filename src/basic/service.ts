@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 17:40:55
+ * @LastEditTime: 2024-01-08 15:49:36
  */
 import { nextTick } from './tools';
-import { notEmptyObject } from '../utils/shared';
+import { camelToSnake, notEmptyObject } from '../utils/shared';
 import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
-import type { Nullable, Voidable } from '../utils/shared';
-import type { CalendarData, CalendarInstance } from '../interface/component';
+import type { LowerCamelCase, Nullable, SnakeCase, Voidable } from '../utils/shared';
+import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
   WxCalendarMonth,
@@ -35,13 +35,33 @@ export type TrackYearResult = {
   marks?: WxCalendarYearMarks;
 };
 
-export interface Plugin {
+interface PluginEventHandlers {
   /**
-   * PliginService初始化完成
-   * @param component 日历组件实例
+   * 日历组件onLoad事件触发
+   * @param detail 事件详情数据
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE?(component: CalendarInstance, service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_ON_LOAD?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+  /**
+   * 日期变化触发
+   * @param detail 事件详情数据
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_CHANGE?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+  /**
+   * 视图变化触发
+   * @param detail 事件详情数据
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_VIEW_CHANGE?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+}
+
+export interface Plugin extends PluginEventHandlers {
+  /**
+   * PliginService初始化完成
+   * @param service PliginService实例
+   */
+  PLUGIN_INITIALIZE?(service: PluginService<PluginConstructor[]>): void;
   /**
    * 插件绑定到日期数据
    * @param date 待绑定日期
@@ -133,12 +153,20 @@ export type PulginMap<T extends Array<PluginConstructor>> = {
   [P in Union<T> as PluginKey<P>]: PluginInstance<P>;
 };
 
+type PluginEventName<T> = T extends `PLUGIN_ON_${infer R}` ? R : never;
+
+export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandlers>>;
+
+type PluginEventHandlerName<T extends PluginEventNames> = `PLUGIN_ON_${Uppercase<SnakeCase<T>>}`;
 export class PluginService<T extends Array<PluginConstructor>> {
-  private _component_: CalendarInstance;
+  /** 日历组件实例 */
+  public component: CalendarInstance;
+
+  /** 插件队列 */
   private _services_: Array<RegistPlugin> = [];
 
   constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
-    this._component_ = component;
+    this.component = component;
     this._services_ = (services || []).flatMap(service => {
       return service.construct.KEY
         ? {
@@ -153,7 +181,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
   private initialize() {
     for (let i = this._services_.length; i--; ) {
       const service = this._services_[i];
-      service.instance.PLUGIN_INITIALIZE?.(this._component_, this);
+      service.instance.PLUGIN_INITIALIZE?.(this);
     }
   }
 
@@ -206,7 +234,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
       }
       return records;
     });
-    await this._component_._annual_.interaction();
+    await this.component._annual_.interaction();
     this.setMonth({ year: month.year, month: month.month, days: records });
   }
 
@@ -217,7 +245,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
 
   private setMonth(month: MonthResult) {
     nextTick(() => {
-      const panels = this._component_.data.panels;
+      const panels = this.component.data.panels;
       const sets: Partial<CalendarData> = {};
       for (let k = panels.length; k--; ) {
         const panel = panels[k];
@@ -234,29 +262,29 @@ export class PluginService<T extends Array<PluginConstructor>> {
           }
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   private setYear(year: YearResult) {
     nextTick(() => {
-      const years = this._component_.data.years;
+      const years = this.component.data.years;
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
         if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
         if (year.result.marks) {
-          this._component_._years_[ydx].marks = year.result.marks;
-          this._component_._printer_.update([ydx]);
+          this.component._years_[ydx].marks = year.result.marks;
+          this.component._printer_.update([ydx]);
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   private setDates(dates: Array<DateResult>) {
     return nextTick(() => {
-      const panels = this._component_.data.panels;
+      const panels = this.component.data.panels;
       const sets: Partial<CalendarData> = {};
       for (let i = dates.length; i--; ) {
         const { year, month, day, record } = dates[i];
@@ -282,12 +310,12 @@ export class PluginService<T extends Array<PluginConstructor>> {
           }
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   public async updateDates(dates?: Array<CalendarDay>) {
-    const panels = this._component_.data.panels;
+    const panels = this.component.data.panels;
     dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
 
     const map = new Map<string, DateResult>();
@@ -299,7 +327,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
       const result = this.walkForDate(date);
       if (result) map.set(key, { year: date.year, month: date.month, day: date.day, record: result });
     }
-    await this._component_._annual_.interaction();
+    await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
   }
 
@@ -323,6 +351,25 @@ export class PluginService<T extends Array<PluginConstructor>> {
     }
 
     return marks;
+  }
+
+  /**
+   * 响应事件
+   * @param event 事件名
+   * @param detail 事件详情数据
+   */
+  public dispatchEventHandler<K extends PluginEventNames>(event: K, detail: CalendarEventDetail): void {
+    const handler: PluginEventHandlerName<K> = `PLUGIN_ON_${
+      camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
+    }`;
+    try {
+      for (let i = this._services_.length; i--; ) {
+        const service = this._services_[i];
+        service.instance[handler]?.call(service, detail, this.component, this);
+      }
+    } catch (e) {
+      return;
+    }
   }
 
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
