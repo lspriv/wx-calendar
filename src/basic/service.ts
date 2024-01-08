@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:18:34
+ * @LastEditTime: 2024-01-08 16:37:20
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -35,7 +35,7 @@ export type TrackYearResult = {
   marks?: WxCalendarYearMarks;
 };
 
-interface PluginEventHandlers {
+interface PluginEventHandle {
   /**
    * 日历组件onLoad事件触发
    * @param detail 事件详情数据
@@ -56,7 +56,7 @@ interface PluginEventHandlers {
   PLUGIN_ON_VIEW_CHANGE?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
 }
 
-export interface Plugin extends PluginEventHandlers {
+export interface Plugin extends PluginEventHandle {
   /**
    * PliginService初始化完成
    * @param service PliginService实例
@@ -155,9 +155,10 @@ export type PulginMap<T extends Array<PluginConstructor>> = {
 
 type PluginEventName<T> = T extends `PLUGIN_ON_${infer R}` ? R : never;
 
-export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandlers>>;
+export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandle>>;
 
 type PluginEventHandlerName<T extends PluginEventNames> = `PLUGIN_ON_${Uppercase<SnakeCase<T>>}`;
+
 export class PluginService<T extends Array<PluginConstructor>> {
   /** 日历组件实例 */
   public component: CalendarInstance;
