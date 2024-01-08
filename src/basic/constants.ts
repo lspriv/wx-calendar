@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2023-12-26 00:13:09
+ * @LastEditTime: 2024-01-08 18:15:39
  */
 
 declare const $_VERSION: string;
@@ -16,7 +16,7 @@ export const CALENDAR_PANELS = 3;
 
 export const PURE_PROPS = ['date', 'view', 'weekstart', 'vibrate', 'font'] as const;
 
-export const FONT = 'system-ui';
+export const FONT = 'ui-sans-serif';
 // '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif';
 
 export const WEEKS = '日一二三四五六';

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:37:20
+ * @LastEditTime: 2024-01-08 17:59:12
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -95,6 +95,10 @@ export interface PluginConstructor {
   REQUIER_VERSION?: string;
 }
 
+interface TraverseCallback {
+  (instance: Plugin, key: string): void;
+}
+
 type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
 
 export interface PluginUse<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
@@ -164,11 +168,11 @@ export class PluginService<T extends Array<PluginConstructor>> {
   public component: CalendarInstance;
 
   /** 插件队列 */
-  private _services_: Array<RegistPlugin> = [];
+  private _plugins_: Array<RegistPlugin> = [];
 
   constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
     this.component = component;
-    this._services_ = (services || []).flatMap(service => {
+    this._plugins_ = (services || []).flatMap(service => {
       return service.construct.KEY
         ? {
             key: service.construct.KEY,
@@ -180,18 +184,17 @@ export class PluginService<T extends Array<PluginConstructor>> {
   }
 
   private initialize() {
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      service.instance.PLUGIN_INITIALIZE?.(this);
-    }
+    this.traversePlugins(plugin => {
+      plugin.PLUGIN_INITIALIZE?.(this);
+    });
   }
 
   private walkForDate(date: CalendarDay) {
     const record: TrackDateResult = {};
 
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+    this.traversePlugins((plugin, key) => {
+      /** 处理日期标记 */
+      const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
         if (result.corner && (!record || !record.corner)) record.corner = result.corner;
         if (result.festival && (!record || !record.festival)) record.festival = result.festival;
@@ -199,26 +202,27 @@ export class PluginService<T extends Array<PluginConstructor>> {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
       }
-      const pluginRes = service.instance.PLUGIN_DATA?.(date);
+      /** 处理插件数据 */
+      const pluginRes = plugin.PLUGIN_DATA?.(date);
       if (pluginRes !== void 0) {
         record.plugin = record.plugin || {};
-        record.plugin[service.key] = pluginRes;
+        record.plugin[key] = pluginRes;
       }
-    }
+    });
+
     return notEmptyObject(record) ? record : null;
   }
 
   private walkForYear(year: WxCalendarYear) {
     const record: TrackYearResult = {};
-    for (let i = this._services_.length; i--; ) {
-      if (record.subinfo && record.marks) break;
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_YEAR?.(year);
+    this.traversePlugins(plugin => {
+      if (record.subinfo && record.marks) return;
+      const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo) record.subinfo = result.subinfo;
         if (result.marks?.size) record.marks = result.marks;
       }
-    }
+    });
     return notEmptyObject(record) ? record : null;
   }
 
@@ -339,17 +343,16 @@ export class PluginService<T extends Array<PluginConstructor>> {
   public getEntireMarks(date: CalendarDay): PluginEntireMarks {
     const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [] };
 
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+    this.traversePlugins((plugin, key) => {
+      const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
-        if (result.corner) marks.corner.push({ ...result.corner, key: service.key });
-        if (result.festival) marks.festival.push({ ...result.festival, key: service.key });
+        if (result.corner) marks.corner.push({ ...result.corner, key });
+        if (result.festival) marks.festival.push({ ...result.festival, key });
         if (result.schedule?.length) {
-          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key: service.key })));
+          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key })));
         }
       }
-    }
+    });
 
     return marks;
   }
@@ -364,17 +367,31 @@ export class PluginService<T extends Array<PluginConstructor>> {
       camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
     }`;
     try {
-      for (let i = this._services_.length; i--; ) {
-        const service = this._services_[i];
-        service.instance[handler]?.call(service, detail, this.component, this);
-      }
+      this.traversePlugins(plugin => {
+        plugin[handler]?.call(plugin, detail, this.component, this);
+      });
     } catch (e) {
       return;
     }
   }
 
+  /**
+   * 获取插件
+   * @param key 插件 key
+   */
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
-    const service = this._services_.find(s => s.key === key);
+    const service = this._plugins_.find(s => s.key === key);
     return service?.instance as Voidable<PulginMap<T>[K]>;
+  }
+
+  /**
+   * 遍历插件
+   * @param callback 执行
+   */
+  private traversePlugins(callback: TraverseCallback): void {
+    for (let i = this._plugins_.length; i--; ) {
+      const plugin = this._plugins_[i];
+      callback(plugin.instance, plugin.key);
+    }
   }
 }

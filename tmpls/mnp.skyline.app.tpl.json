@@ -3,10 +3,7 @@
 		"pages/index/index"
 	],
 	"window": {
-		"backgroundTextStyle": "light",
-		"navigationBarBackgroundColor": "#fff",
-		"navigationBarTitleText": "wx calendar",
-		"navigationBarTextStyle": "black"
+		"backgroundTextStyle": "light"
 	},
   "darkmode": true,
   "lazyCodeLoading": "requiredComponents",
