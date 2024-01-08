@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 15:49:36
+ * @LastEditTime: 2024-01-08 16:18:34
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -358,7 +358,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
    * @param event 事件名
    * @param detail 事件详情数据
    */
-  public dispatchEventHandler<K extends PluginEventNames>(event: K, detail: CalendarEventDetail): void {
+  public dispatchEventHandle<K extends PluginEventNames>(event: K, detail: CalendarEventDetail): void {
     const handler: PluginEventHandlerName<K> = `PLUGIN_ON_${
       camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
     }`;

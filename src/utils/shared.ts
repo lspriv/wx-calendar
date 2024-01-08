@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 15:40:32
+ * @LastEditTime: 2024-01-08 16:25:35
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -36,6 +36,7 @@ export type LowerCamelCase<T extends string, K = Lowercase<T>> = K extends `${in
   ? `${R}${Capitalize<LowerCamelCase<P, P>>}`
   : K;
 
+/** 小驼峰（lowerCamelCase）转下划线（snake_case） */
 export type SnakeCase<T extends string> = T extends `${infer R}${infer P}`
   ? R extends Lowercase<R>
     ? `${R}${SnakeCase<P>}`

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 15:51:52
+ * @LastEditTime: 2024-01-08 16:22:31
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -384,21 +384,21 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const checked = this.data.checked!;
       const view = this.data.currView;
       const detail: CalendarEventDetail = { checked, view };
-      this._calendar_.dispatchPluginEventHandlers('load', detail);
+      this._calendar_.service.dispatchEventHandle('load', detail);
       this.triggerEvent('load', detail);
     },
     triggerDateChange(date) {
       date = date || (this.data.checked! as WxCalendarDay);
       const view = this.data.currView;
       const detail: CalendarEventDetail = { checked: date, view };
-      this._calendar_.dispatchPluginEventHandlers('change', detail);
+      this._calendar_.service.dispatchEventHandle('change', detail);
       this.triggerEvent('change', detail);
     },
     triggerViewChange(view) {
       const _view = flagView(view || this._view_);
       const checked = this.data.checked!;
       const detail: CalendarEventDetail = { checked, view: _view };
-      this._calendar_.dispatchPluginEventHandlers('viewChange', detail);
+      this._calendar_.service.dispatchEventHandle('viewChange', detail);
       this.triggerEvent('viewchange', detail);
     }
   },
@@ -416,9 +416,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       else this._dragger_!.update();
     },
     marks: function (marks: Array<CalendarMark>) {
-      const plugin = this._calendar_.getPlugin(MARK_PLUGIN_KEY);
+      const plugin = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
       const updates = plugin?.updateMarks(marks);
-      if (this._loaded_) this._calendar_.updateDates(updates);
+      if (this._loaded_) this._calendar_.service.updateDates(updates);
     },
     view: function (view: string) {
       const _view = viewFlag(view);
@@ -454,13 +454,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         }
       },
       getMarks(date) {
-        return instance._calendar_.getEntireMarks(date);
+        return instance._calendar_.service.getEntireMarks(date);
       },
       getPlugin(key) {
-        return instance._calendar_.getPlugin(key);
+        return instance._calendar_.service.getPlugin(key);
       },
       updateDates(dates?: Array<CalendarDay>) {
-        return instance._calendar_.updateDates(dates);
+        return instance._calendar_.service.updateDates(dates);
       }
     } as CalendarExport;
   }

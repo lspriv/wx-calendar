@@ -4,23 +4,15 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 15:48:54
+ * @LastEditTime: 2024-01-08 16:22:55
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MarkPlugin } from '../plugins/mark';
 
-import type {
-  PluginConstructor,
-  PluginUse,
-  PluginKeys,
-  PulginMap,
-  PluginEntireMarks,
-  PluginEventNames
-} from '../basic/service';
-import type { CalendarEventDetail, CalendarInstance } from './component';
-import type { Voidable } from '../utils/shared';
+import type { PluginConstructor, PluginUse } from '../basic/service';
+import type { CalendarInstance } from './component';
 
 export interface CalendarDay {
   year: number;
@@ -391,16 +383,17 @@ export type WxCalendarPlugins<T extends WxCalendar<any>> = T extends WxCalendar<
 export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
   /** 今天 */
   public static today = normalDate(new Date());
-
+  /** 预设插件 */
   private static _PLUGINS_: Array<PluginUse> = [];
-  private _service_: PluginService<T>;
+  /** 插件服务 */
+  public service: PluginService<T>;
 
   constructor(component: CalendarInstance, services: T | Array<PluginUse<T>>) {
     const _services = [...services, ...WxCalendar._PLUGINS_, MarkPlugin].map(service => {
       if ((service as PluginUse<any>).construct) return service as PluginUse<T>;
       return { construct: service } as PluginUse<T>;
     });
-    this._service_ = new PluginService(component, _services);
+    this.service = new PluginService(component, _services);
   }
 
   public createMonth(mon: CalendarMonth, weekstart: number = 0) {
@@ -417,7 +410,7 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
       weeks: createMonthWeeks({ year, month }, days),
       count: currDaysCount
     } as WxCalendarMonth;
-    this._service_.catchMonth(m);
+    this.service.catchMonth(m);
     return m;
   }
 
@@ -426,24 +419,8 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
       createYearMonth({ year, month: i + 1 }, weekstart)
     );
     const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WxCalendarFullYear;
-    this._service_.catchYear(y);
+    this.service.catchYear(y);
     return y;
-  }
-
-  public getEntireMarks(date: CalendarDay): PluginEntireMarks {
-    return this._service_.getEntireMarks(date);
-  }
-
-  public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
-    return this._service_.getPlugin(key);
-  }
-
-  public updateDates(dates?: Array<CalendarDay>) {
-    return this._service_.updateDates(dates);
-  }
-
-  public dispatchPluginEventHandlers<E extends PluginEventNames>(event: E, detail: CalendarEventDetail): void {
-    this._service_.dispatchEventHandler(event, detail);
   }
 
   public static use(service: PluginConstructor, options?: Record<string, any>): void;
