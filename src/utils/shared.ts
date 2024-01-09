@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:25:35
+ * @LastEditTime: 2024-01-09 19:08:56
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -24,12 +24,12 @@ export const nonNullable = <T>(val: T): val is NonNullable<T> => val !== void 0 
 export const isVoid = (val: unknown): val is undefined => val === void 0;
 
 /** 元组 join */
-export type Join<T extends ReadonlyArray<string>, S = ',', U = ''> = T extends readonly [
-  infer R,
-  ...infer P extends ReadonlyArray<string>
-]
-  ? `${U & string}${R & string}${Join<P, S, S>}`
-  : '';
+// export type Join<T extends ReadonlyArray<string>, S = ',', U = ''> = T extends readonly [
+//   infer R,
+//   ...infer P extends ReadonlyArray<string>
+// ]
+//   ? `${U & string}${R & string}${Join<P, S, S>}`
+//   : '';
 
 /** 下划线（snake_case）转小驼峰（lowerCamelCase） */
 export type LowerCamelCase<T extends string, K = Lowercase<T>> = K extends `${infer R}_${infer P}`

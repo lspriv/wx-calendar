@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 01:51:15
+ * @LastEditTime: 2024-01-09 19:45:07
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
-import { values } from '../utils/shared';
+import { camelToSnake, values } from '../utils/shared';
 
-import type { Voidable, Join } from '../utils/shared';
+import type { Voidable } from '../utils/shared';
 import type { CalendarWeek } from '../interface/component';
 
 export interface CalendarPointer {
@@ -32,9 +32,6 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
 interface PropRegExp<T> extends RegExp {
   readonly __content__: T;
 }
-
-export const propPattern = <T extends ReadonlyArray<string>>(words: T) =>
-  new RegExp(`^(${words.join('|')})$`) as PropRegExp<`^(${Join<T, '|'>})$`>;
 
 export const createPointer = (opts?: Partial<CalendarPointer>) =>
   ({ x: 0, y: 0, show: true, animate: true, transition: true, ...opts }) as CalendarPointer;

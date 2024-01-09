@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:22:31
+ * @LastEditTime: 2024-01-09 19:07:43
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -28,7 +28,6 @@ import {
   InitWeeks,
   mergeFonts,
   createPointer,
-  propPattern,
   isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -58,7 +57,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
   options: {
-    pureDataPattern: propPattern(PURE_PROPS)
+    pureDataPattern: PURE_PROPS
   },
   properties: {
     darkmode: {
