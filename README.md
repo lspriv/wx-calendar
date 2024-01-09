@@ -2,6 +2,14 @@
 
 >
 
+<!-- https://shields.io/ -->
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lspriv/wx-calendar/release-please.yml?branch=master)
+![NPM Version](https://img.shields.io/npm/v/@lspriv/wx-calendar)
+![NPM Downloads](https://img.shields.io/npm/dw/@lspriv/wx-calendar)
+![Static Badge](https://img.shields.io/badge/coverage-later-a9a9a9)
+![GitHub License](https://img.shields.io/github/license/lspriv/wx-calendar)
+
+
 微信小程序日历
 
 >     · 年月周日程视图
@@ -49,7 +57,7 @@ npm i @lspriv/wx-calendar -S
 ### 二次开发
 alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
 
-启动
+**启动**
 ```bash
 npm install
 # 启动，默认skyline配置
@@ -58,17 +66,21 @@ npm run dev
 # npm run dev @webview 或者 npm run dev @W
 ```
 
-打包
+**打包**
 ```bash
 npm run build
 ```
 
-发包（预览包）
+**发包（预览包）**
 ```bash
 npm run package
 ```
 > [!NOTE]
 > 这个发包命令执行了打包、发包和推送仓库三部分，所以不必重复执行打包命令
+
+**测试**
+
+测试尚未写完，等我抽空就写 :rofl:
 
 ### 类型说明
 以下出现的类型定义：
@@ -446,19 +458,6 @@ type LunarDate = {
 - [ ] *ICS日历订阅插件*
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*
-
-### 说明
-
-#### 农历说明
- 
->     实用于公历 1901 年至 2100 年之间的 200 年 
->     参考了eleworld.com上的算法，并修正了5处节气错误
-> 
->     * 2014年3月5日 惊蛰
->     * 2051年3月21日 春分
->     * 2083年2月4日 立春
->     * 2084年3月20日 春分
->     * 2094年6月6日 芒种
 
 ### 关于
 
