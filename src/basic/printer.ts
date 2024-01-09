@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2023-12-18 11:14:49
+ * @LastEditTime: 2024-01-09 14:05:20
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
-import { nodeRect, isSkyline } from './tools';
+import { nodeRect } from './tools';
 
 import type { CalendarDay, CalendarMonth, WxCalendarYMonth, WxCalendarFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
@@ -255,7 +255,7 @@ export class YearPrinter extends CalendarHandler {
   private async initializeRender() {
     this._dpr_ = wx.getSystemInfoSync().pixelRatio;
 
-    if (!isSkyline(this._render_)) {
+    if (!this.skyline) {
       this._canvas_ = await promises(
         Array.from({ length: CALENDAR_PANELS }, (_, i) => {
           return this.initializeCanvas(`${SELECTOR.ANNUAL_CANVAS}${i}`, this._dpr_);
@@ -702,6 +702,12 @@ export class YearPrinter extends CalendarHandler {
     this.render(canvas, year);
   }
 
+  /**
+   * 打开年度面板
+   * @param mon 指定月份
+   * @param top 日历顶端在页面的位置
+   * @param callback 动画开始之前的操作
+   */
   public async open(mon: CalendarMonth, top: number, callback?: () => void) {
     this._calendar_top_ = top;
     const current = this._instance_.data.annualCurr!;
@@ -712,6 +718,7 @@ export class YearPrinter extends CalendarHandler {
 
     const state = canvas.state;
 
+    /** 重置状态和帧 */
     canvas.state = PrinterState.maximize;
     canvas.frame = 0;
 
@@ -720,15 +727,14 @@ export class YearPrinter extends CalendarHandler {
       this.render(canvas, year);
     }
 
-    return new Promise<void>(resolve => {
-      canvas.canvas?.requestAnimationFrame(async () => {
-        callback?.();
-        await this.requestAnimation(canvas, year);
-        canvas.state = PrinterState.minimize;
-        this.checkInitializeRender([current]);
-        resolve();
-      });
-    });
+    /** 执行动画前置操作 */
+    callback?.();
+
+    /** 执行动画 */
+    await this.requestAnimation(canvas, year);
+    canvas.state = PrinterState.minimize;
+    /** 检查并渲染其他面板 */
+    this.checkInitializeRender([current]);
   }
 
   public async close(mon: CalendarMonth) {
@@ -738,16 +744,13 @@ export class YearPrinter extends CalendarHandler {
 
     const year = this._instance_._panel_.getFullYear(current);
 
+    /** 重置状态和帧 */
     canvas.state = PrinterState.minimize;
     canvas.frame = 0;
 
-    return new Promise<void>(resolve => {
-      canvas.canvas?.requestAnimationFrame(async () => {
-        await this.requestAnimation(canvas, year, mon.month);
-        canvas.state = PrinterState.maximize;
-        resolve();
-      });
-    });
+    /** 执行动画 */
+    await this.requestAnimation(canvas, year, mon.month);
+    canvas.state = PrinterState.maximize;
   }
 
   public async getTapMonth(ydx: number, x: number, y: number): Promise<CalendarMonth> {

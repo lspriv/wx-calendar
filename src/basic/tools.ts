@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 14:51:07
+ * @LastEditTime: 2024-01-09 01:51:15
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -33,7 +33,7 @@ interface PropRegExp<T> extends RegExp {
   readonly __content__: T;
 }
 
-export const propPattern = <T extends ReadonlyArray<string>>(words: T): PropRegExp<`^(${Join<T, '|'>})$`> =>
+export const propPattern = <T extends ReadonlyArray<string>>(words: T) =>
   new RegExp(`^(${words.join('|')})$`) as PropRegExp<`^(${Join<T, '|'>})$`>;
 
 export const createPointer = (opts?: Partial<CalendarPointer>) =>

@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 17:59:12
+ * @LastEditTime: 2024-01-08 23:34:56
  */
 import { nextTick } from './tools';
-import { camelToSnake, notEmptyObject } from '../utils/shared';
+import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
 import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
 import type { LowerCamelCase, Nullable, SnakeCase, Voidable } from '../utils/shared';
@@ -204,7 +204,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
       }
       /** 处理插件数据 */
       const pluginRes = plugin.PLUGIN_DATA?.(date);
-      if (pluginRes !== void 0) {
+      if (!isVoid(pluginRes)) {
         record.plugin = record.plugin || {};
         record.plugin[key] = pluginRes;
       }
