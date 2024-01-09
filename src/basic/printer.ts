@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 14:05:20
+ * @LastEditTime: 2024-01-09 14:18:27
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -703,7 +703,7 @@ export class YearPrinter extends CalendarHandler {
   }
 
   /**
-   * 打开年度面板
+   * 年度面板打开动画
    * @param mon 指定月份
    * @param top 日历顶端在页面的位置
    * @param callback 动画开始之前的操作
@@ -737,6 +737,10 @@ export class YearPrinter extends CalendarHandler {
     this.checkInitializeRender([current]);
   }
 
+  /**
+   * 年度面板关闭动画
+   * @param mon 指定月份
+   */
   public async close(mon: CalendarMonth) {
     const current = this._instance_.data.annualCurr!;
     const canvas = this._canvas_[current];
