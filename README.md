@@ -4,9 +4,9 @@
 
 <!-- https://shields.io/ -->
 ![NPM Version](https://img.shields.io/npm/v/@lspriv/wx-calendar)
-![NPM Downloads](https://img.shields.io/npm/dw/@lspriv/wx-calendar)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lspriv/wx-calendar/release-please.yml?branch=master)
 ![Static Badge](https://img.shields.io/badge/coverage-later-a9a9a9)
+![NPM Downloads](https://img.shields.io/npm/dw/@lspriv/wx-calendar)
 ![GitHub License](https://img.shields.io/github/license/lspriv/wx-calendar)
 
 
