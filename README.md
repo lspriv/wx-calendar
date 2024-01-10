@@ -394,30 +394,30 @@ class MyPlugin implements Plugin {
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
-   * @param {CalendarEventDetail} detail 事件数据
    * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
    */
-  PLUGIN_ON_LOAD(detail, service) {
+  PLUGIN_ON_LOAD(service, detail) {
     // 获取日历组件实例
     const component = service.component;
   }
 
   /**
    * 注册日期变化事件处理方法，可选择实现该方法
-   * @param {CalendarEventDetail} detail 事件数据
    * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
    */
-  PLUGIN_ON_CHANGE(detail, service) {
+  PLUGIN_ON_CHANGE(service, detail) {
     // 获取日历组件实例
     const component = service.component;
   }
   
   /**
    * 注册视图变化事件处理方法，可选择实现该方法
-   * @param {CalendarEventDetail} detail 事件数据
    * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
    */
-  PLUGIN_ON_VIEW_CHANGE(detail, service) {
+  PLUGIN_ON_VIEW_CHANGE(service, detail) {
     // 获取日历组件实例
     const component = service.component;
   }

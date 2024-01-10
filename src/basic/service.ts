@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 23:34:56
+ * @LastEditTime: 2024-01-10 12:27:35
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
@@ -38,22 +38,22 @@ export type TrackYearResult = {
 interface PluginEventHandle {
   /**
    * 日历组件onLoad事件触发
-   * @param detail 事件详情数据
    * @param service PliginService实例
+   * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_ON_LOAD?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
   /**
    * 日期变化触发
-   * @param detail 事件详情数据
    * @param service PliginService实例
+   * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_ON_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
   /**
    * 视图变化触发
-   * @param detail 事件详情数据
    * @param service PliginService实例
+   * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEW_CHANGE?(detail: CalendarEventDetail, service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_ON_VIEW_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
 }
 
 export interface Plugin extends PluginEventHandle {
@@ -96,7 +96,7 @@ export interface PluginConstructor {
 }
 
 interface TraverseCallback {
-  (instance: Plugin, key: string): void;
+  (plugin: Plugin, key: string): void;
 }
 
 type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
@@ -362,13 +362,13 @@ export class PluginService<T extends Array<PluginConstructor>> {
    * @param event 事件名
    * @param detail 事件详情数据
    */
-  public dispatchEventHandle<K extends PluginEventNames>(event: K, detail: CalendarEventDetail): void {
+  public dispatchEventHandle<K extends PluginEventNames>(event: K, detail?: any): void {
     const handler: PluginEventHandlerName<K> = `PLUGIN_ON_${
       camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
     }`;
     try {
       this.traversePlugins(plugin => {
-        plugin[handler]?.call(plugin, detail, this.component, this);
+        plugin[handler]?.call(plugin, this, detail);
       });
     } catch (e) {
       return;
