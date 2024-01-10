@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 16:40:48
+ * @LastEditTime: 2024-01-10 17:36:27
  */
 
 var nonNullable = function (value) {
@@ -59,15 +59,24 @@ var toView = function (view, mark, instance, transition = true) {
   refreshIncurrentOffset(view, instance);
 };
 
+var TOUCH_CHECK_PASS = 1 << 0;
+var TOUCH_CHECK_FAIL = 1 << 1;
+
 /** 手指触摸面板动作开始 */
 var touchStart = function (e, instance) {
   var mark = e.mark;
   var state = instance.getState();
   if (mark.fixed) return;
+  /** 起始位置 */
   state.y = e.changedTouches[0].pageY;
-  state.time = e.timeStamp;
+  /** 日历底部 bar 的转角 */
   state.deg = 0;
-  state.vy = 0;
+  /** 记录上一次动作数据 */
+  state.lastTime = e.timeStamp;
+  state.lastX = e.changedTouches[0].pageX;
+  state.lastY = state.y;
+  /** 入角检查入角 */
+  state.check = 0;
   if (mark.view === 'week') state.currentHeight = mark.min;
   if (mark.view === 'month') state.currentHeight = mark.main;
   if (mark.view === 'schedule') state.currentHeight = mark.max;
@@ -78,6 +87,20 @@ var touchMove = function (e, instance) {
   var mark = e.mark;
   if (mark.fixed) return;
   var state = instance.getState();
+  if (state.check & TOUCH_CHECK_FAIL) return;
+
+  /** 入角小于 45 度，无效动作 */
+  if (!state.check) {
+    const dx = Math.abs(e.changedTouches[0].pageX - state.lastX);
+    const dy = Math.abs(e.changedTouches[0].pageY - state.lastY);
+    if (dx > dy /** / Math.tan(45) */) {
+      state.check = TOUCH_CHECK_FAIL;
+      return;
+    } else {
+      state.check = TOUCH_CHECK_PASS;
+    }
+  }
+
   var deltaY = e.changedTouches[0].pageY - state.y;
 
   // state.vy = deltaY / (e.timeStamp - e.time); // px/ms
@@ -86,7 +109,7 @@ var touchMove = function (e, instance) {
   /**
    * 日历容器高度
    */
-  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY * '0.6')));
+  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY)));
 
   /**
    * 触摸时的高度不能等于触摸结束后的最终高度，是为了有效触发容器的transitionend事件
@@ -166,6 +189,7 @@ var touchEnd = function (e, instance) {
   var mark = e.mark;
   if (mark.fixed) return;
   var state = instance.getState();
+  if (!state.check || state.check & TOUCH_CHECK_FAIL) return;
   const deltaY = e.changedTouches[0].pageY - state.y;
 
   /** 计算容器高度 */

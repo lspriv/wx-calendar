@@ -56,7 +56,7 @@ npm i @lspriv/wx-calendar -S
 ### 二次开发
 alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
 
-**启动**
+#### 启动
 ```bash
 npm install
 # 启动，默认skyline配置
@@ -65,19 +65,19 @@ npm run dev
 # npm run dev @webview 或者 npm run dev @W
 ```
 
-**打包**
+#### 打包
 ```bash
 npm run build
 ```
 
-**发包（预览包）**
+#### 发包（预览包）
 ```bash
 npm run package
 ```
 > [!NOTE]
 > 这个发包命令执行了打包、发包和推送仓库三部分，所以不必重复执行打包命令
 
-**测试**
+#### 测试
 
 测试尚未写完，等我抽空就写 :rofl:
 
