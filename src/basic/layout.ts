@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2023-12-26 16:44:28
+ * @LastEditTime: 2024-01-09 01:32:11
  */
 import { View } from './constants';
 
@@ -83,7 +83,7 @@ export class Layout {
     const dateInnerHeight = Layout.rpxToPx(100, windowWidth);
     /** 计算日程间距 */
     const margin = Layout.rpxToPx(4, windowWidth);
-    /** 计算耽搁日程高度 */
+    /** 计算单个日程高度 */
     const scheduleHeight = Layout.rpxToPx(24, windowWidth);
     /** 计算能容纳的最大日程数量 */
     return Math.floor((minUnitHeight - dateInnerHeight) / (scheduleHeight + margin));

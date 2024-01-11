@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 17:44:33
+ * @LastEditTime: 2024-01-09 19:07:43
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -28,7 +28,6 @@ import {
   InitWeeks,
   mergeFonts,
   createPointer,
-  propPattern,
   isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -42,7 +41,8 @@ import type {
   CalendarMethod,
   CalendarCustomProp,
   CalendarPanel,
-  CalendarExport
+  CalendarExport,
+  CalendarEventDetail
 } from './interface/component';
 
 export type * from './interface/component';
@@ -57,7 +57,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
   options: {
-    pureDataPattern: propPattern(PURE_PROPS)
+    pureDataPattern: PURE_PROPS
   },
   properties: {
     darkmode: {
@@ -122,8 +122,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   lifetimes: {
     created() {
       Layout.initialize();
-      this.initializeView();
       this.initializeShared();
+      this.initializeView();
     },
     async attached() {
       await this.initializeRects();
@@ -139,7 +139,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
       this.$_view_fixed = shared(false);
-      this._dragger_ = new Dragger(this);
     },
     initializeView() {
       /**
@@ -147,7 +146,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        */
       this._view_ = viewFlag(this.data.view as CalendarView);
       /**
-       * 初始化calendar处理额外的服务
+       * 实例化拖拽控制器
+       */
+      this._dragger_ = new Dragger(this);
+      /**
+       * 实例化WxCalendar处理数据和插件
        */
       this._calendar_ = new WxCalendar(this, [LunarPlugin]);
     },
@@ -377,19 +380,25 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     triggerLoad() {
       this._loaded_ = true;
-      const checked = this.data.checked;
+      const checked = this.data.checked!;
       const view = this.data.currView;
-      this.triggerEvent('load', { checked, view });
+      const detail: CalendarEventDetail = { checked, view };
+      this._calendar_.service.dispatchEventHandle('load', detail);
+      this.triggerEvent('load', detail);
     },
     triggerDateChange(date) {
       date = date || (this.data.checked! as WxCalendarDay);
       const view = this.data.currView;
-      this.triggerEvent('change', { checked: date, view });
+      const detail: CalendarEventDetail = { checked: date, view };
+      this._calendar_.service.dispatchEventHandle('change', detail);
+      this.triggerEvent('change', detail);
     },
     triggerViewChange(view) {
       const _view = flagView(view || this._view_);
-      const checked = this.data.checked;
-      this.triggerEvent('viewchange', { checked, view: _view });
+      const checked = this.data.checked!;
+      const detail: CalendarEventDetail = { checked, view: _view };
+      this._calendar_.service.dispatchEventHandle('viewChange', detail);
+      this.triggerEvent('viewchange', detail);
     }
   },
   pageLifetimes: {
@@ -406,9 +415,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       else this._dragger_!.update();
     },
     marks: function (marks: Array<CalendarMark>) {
-      const plugin = this._calendar_.getPlugin(MARK_PLUGIN_KEY);
+      const plugin = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
       const updates = plugin?.updateMarks(marks);
-      if (this._loaded_) this._calendar_.updateDates(updates);
+      if (this._loaded_) this._calendar_.service.updateDates(updates);
     },
     view: function (view: string) {
       const _view = viewFlag(view);
@@ -444,13 +453,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         }
       },
       getMarks(date) {
-        return instance._calendar_.getEntireMarks(date);
+        return instance._calendar_.service.getEntireMarks(date);
       },
       getPlugin(key) {
-        return instance._calendar_.getPlugin(key);
+        return instance._calendar_.service.getPlugin(key);
       },
       updateDates(dates?: Array<CalendarDay>) {
-        return instance._calendar_.updateDates(dates);
+        return instance._calendar_.service.updateDates(dates);
       }
     } as CalendarExport;
   }

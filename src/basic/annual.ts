@@ -4,11 +4,11 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 14:30:53
+ * @LastEditTime: 2024-01-09 14:04:47
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
-import { applyAnimated, clearAnimated, isSkyline, nodeRect, severalTicks } from './tools';
+import { applyAnimated, clearAnimated, nextTick, nodeRect, severalTicks } from './tools';
 import { SELECTOR } from './constants';
 import { promises, isFunction } from '../utils/shared';
 
@@ -31,15 +31,18 @@ export class AnnualPanelSwitch extends CalendarHandler {
 
   constructor(instance: CalendarInstance) {
     super(instance);
-    if (isSkyline(instance.renderer)) this.initialize();
+    if (this.skyline) this.initialize();
   }
 
   private initialize() {
     this._style_ids_ = new Map();
-    this.initializeContainer();
+    this.bindAnimations();
   }
 
-  private async initializeContainer() {
+  /**
+   * 绑定动画（年度面板，日历主体，日历头，日历拖拽bar）
+   */
+  private async bindAnimations() {
     const top = shared(ANNUAL_TRANSFORM);
     const opacity = shared(0);
 
@@ -88,62 +91,102 @@ export class AnnualPanelSwitch extends CalendarHandler {
     this._style_ids_!.set(SELECTOR.BAR, bid);
   }
 
+  /**
+   * 日历头和drag bar的显示动画
+   */
   private showCalendar() {
     const options = { duration: 280, easing: Easing.out(Easing.sin) };
     this._calendar_trans_!.value = timing(0, options);
     this._calendar_alpha_!.value = timing(1, options);
   }
 
+  /**
+   * 日历头和drag bar的隐藏动画
+   */
   private hiddenCalendar() {
     this._calendar_trans_!.value = 200;
     this._calendar_alpha_!.value = 0;
   }
 
+  /**
+   * 计算日历顶端在页面中的位置
+   */
   private async calcCalendarTop() {
     const query = nodeRect(this._instance_);
     const rect = await query(SELECTOR.CALENDAR);
     return rect[0].top;
   }
 
+  /**
+   * 年度面板开关
+   * @param show 开/关 true/false
+   * @param mon  指定月份
+   */
   public async switch(show: boolean, mon: CalendarMonth) {
     const instance = this._instance_;
     if (this._transforming_) return;
+    /** 设置动画状态为正在进行 */
     this._transforming_ = true;
-    const isSkylineRender = isSkyline(this._render_);
+
+    /** 是否 skyline 渲染 */
+    const isSkyline = this.skyline;
+
     if (show) {
+      /** 跳转到指定年份 */
       await instance._panel_.toYear(mon.year);
       /**
-       * _panel_.toYear方法中setData后触发视图更新，
-       * 官方文档称setData数据是同步，但是向视图层传递数据是异步，视图层更新节点树用于下次重渲染
-       * 这里要避免上述过程造成的掉帧现象，虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
+       * _panel_.toYear方法中setData后触发视图更新
+       * 虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
        */
       await severalTicks(10);
+      /**
+       * 获取日历顶端在页面的位置
+       * 用来处理年度面板动画垂直方向的初始偏移量
+       */
       const top = await this.calcCalendarTop();
-      if (isSkylineRender) this._top_!.value = `-${top}px`;
+      if (isSkyline) this._top_!.value = `-${top}px`;
       else instance.setData({ annualTop: 0, annualDuration: 300 });
 
+      /** 执行年度面板打开动画 */
       await instance._printer_.open(mon, top, () => {
-        if (isSkylineRender) this._opacity_!.value = 1;
+        /** 动画开始前将面板透明度设置可见 */
+        if (isSkyline) this._opacity_!.value = 1;
         else instance.setData({ annualOpacity: 1 });
       });
-      isSkylineRender && this.hiddenCalendar();
-      this._transforming_ = false;
-      this.execInteractiveCallbacks();
-    } else {
-      await instance._panel_.toAnnualMonth(mon, !instance.$_view_fixed.value);
-      await severalTicks(10);
-      await instance._printer_.close(mon);
-      if (isSkylineRender) this._opacity_!.value = 0;
-      else instance.setData({ annualOpacity: 0 });
-      isSkylineRender && this.showCalendar();
-      wx.nextTick(() => {
-        if (isSkylineRender) this._top_!.value = ANNUAL_TRANSFORM;
-        else instance.setData({ annualTop: ANNUAL_TRANSFORM });
 
-        this._transforming_ = false;
-        this.execInteractiveCallbacks();
-      });
+      /**
+       * skyline下执行日历头部和拖拽bar的隐藏动画
+       * webview由annualOpacity控制，无需操作
+       */
+      isSkyline && this.hiddenCalendar();
+    } else {
+      /** 日历跳转到指定月 */
+      await instance._panel_.toAnnualMonth(mon, !instance.$_view_fixed.value);
+      /** 等待视图更新 */
+      await severalTicks(10);
+      /** 执行年度面板关闭动画 */
+      await instance._printer_.close(mon);
+      /** 设置年度面板为隐藏 */
+      if (isSkyline) this._opacity_!.value = 0;
+      else instance.setData({ annualOpacity: 0 });
+      /**
+       * skyline下执行日历头和 bar 的隐藏动画
+       * webview由annualOpacity控制，无需操作
+       */
+      isSkyline && this.showCalendar();
+
+      await nextTick();
+
+      /** 年度面板垂直方向归位，移出屏幕外 */
+      if (isSkyline) this._top_!.value = ANNUAL_TRANSFORM;
+      else instance.setData({ annualTop: ANNUAL_TRANSFORM });
     }
+
+    /** 设置动画状态为结束 */
+    this._transforming_ = false;
+
+    /** 执行动画结束后的等待操作 */
+    this.execInteractiveCallbacks();
   }
 
   /**
@@ -167,6 +210,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
     this._calendar_alpha_ = void 0;
   }
 
+  /** 执行动画结束后的等待操作 */
   private execInteractiveCallbacks() {
     while (this._interactive_callbacks_.length) {
       const callback = this._interactive_callbacks_.shift();
@@ -174,6 +218,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
     }
   }
 
+  /** 等待动画交互 */
   public interaction() {
     if (!this._transforming_) return Promise.resolve();
     return new Promise<void>(resolve => {
