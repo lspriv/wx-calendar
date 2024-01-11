@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/lspriv/wx-calendar/compare/v1.3.0...v1.4.0) (2024-01-11)
+
+
+### Features
+
+* **webview:** 拖拽新增入角控制 ([a755c69](https://github.com/lspriv/wx-calendar/commit/a755c69f82b049cdacd6af5d5a491e9111a7412d))
+* 插件新增PLUGIN_ON_LOAD,PLUGIN_ON_CHANGE和PLUGIN_ON_VIEW_CHANGE三个事件处理接口 ([9551967](https://github.com/lspriv/wx-calendar/commit/95519676a20469bff0a3593caead0f7add6dbaaf))
+
+
+### Bug Fixes
+
+* **webview:** 调整拖拽动画 ([6e898f0](https://github.com/lspriv/wx-calendar/commit/6e898f0f8f096fcf12647b146c72fdbb9f6ec5ef))
+
 ## [1.3.0](https://github.com/lspriv/wx-calendar/compare/v1.2.0...v1.3.0) (2024-01-07)
 
 
