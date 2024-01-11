@@ -309,6 +309,18 @@ type ViewChangeEventDetail = {
     --wc-annual-bg-dark: #000;
     --wc-annual-title-color-dark: #E5E5E5;
     --wc-annual-title-sub-color-dark: #3F3F3F;
+
+    /** 字号 */
+    --wc-title-size: 46rpx, /** 左上角日期标题字号 */ 
+	  --wc-title-sub-size: 20rpx, /** 左上角日期标题右侧描述信息字号 */ 
+	  --wc-operator-size: 22rpx, /** 视图控制按钮字号 */ 
+	  --wc-week-size: 20rpx, /** 星期字号 */ 
+    --wc-date-size: 36rpx, /** 日期字体字号 */ 
+    --wc-mark-size: 20rpx, /** 日期下方信息字体字号 */ 
+    --wc-corner-size: 16rpx, /** 日期角标字体字号 */ 
+    --wc-schedule-size: 16rpx, /** 日程字体字号 */ 
+    --wc-annual-title-size: 50rpx, /** 年面板左上角年份标题字体字号 */ 
+    --wc-annual-title-sub-size: 18rpx, /** 年面板左上角年份标题右侧信息字体字号 */ 
 }
 ```
 修改样式
