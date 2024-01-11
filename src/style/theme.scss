@@ -62,15 +62,15 @@ $wc-theme-size: (
 
 /** 主题色 **/
 $wc-theme-light: ( 
-	bg-color: $wc-bg-1, // 主背景色
+	bg: $wc-bg-1, // 主背景色
 
 	/** header **/
 	title-color: $wc-text-2, // 左上角日期标题字体色
 	title-sub-color: $wc-text-3, // 左上角日期标题右侧描述信息字体色
-	operator-bg: $wc-primary-4, // 视图控制按钮背景色
-	operator-checked-bg: $wc-primary-1, // 视图控制按钮被选择时背景色
-	operator-color: $wc-primary-1, // 视图控制按钮字体色
-	operator-checked-color: $wc-bg-1, // 视图控制按钮被选择时字体色
+	opt-bg: $wc-primary-4, // 视图控制按钮背景色
+	opt-checked-bg: $wc-primary-1, // 视图控制按钮被选择时背景色
+	opt-color: $wc-primary-1, // 视图控制按钮字体色
+	opt-checked-color: $wc-bg-1, // 视图控制按钮被选择时字体色
 
 	/** week **/
 	week-color: $wc-text-4, // 星期字体色
@@ -102,14 +102,14 @@ $wc-theme-light: (
 
 /** 深色主题 **/
 $wc-theme-dark: ( 
-	bg-color: #000, 
+	bg: #000, 
 
 	title-color: $wc-text-5, 
 	title-sub-color: $wc-text-3,
-	operator-bg: rgba($color: #332D2D, $alpha: 0.5),
-	operator-checked-bg: $wc-primary-1,
-	operator-color: $wc-primary-1, 
-	operator-checked-color: $wc-text-6,
+	opt-bg: rgba($color: #332D2D, $alpha: 0.5),
+	opt-checked-bg: $wc-primary-1,
+	opt-color: $wc-primary-1, 
+	opt-checked-color: $wc-text-6,
 
 	week-color: $wc-text-4, 
 

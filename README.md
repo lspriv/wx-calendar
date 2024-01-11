@@ -2,6 +2,13 @@
 
 >
 
+<!-- https://shields.io/ -->
+![NPM Version](https://img.shields.io/npm/v/@lspriv/wx-calendar)
+![NPM Downloads](https://img.shields.io/npm/dw/@lspriv/wx-calendar)
+![Static Badge](https://img.shields.io/badge/coverage-later-a9a9a9)
+![GitHub License](https://img.shields.io/github/license/lspriv/wx-calendar)
+
+
 微信小程序日历
 
 >     · 年月周日程视图
@@ -49,7 +56,7 @@ npm i @lspriv/wx-calendar -S
 ### 二次开发
 alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
 
-启动
+#### 启动
 ```bash
 npm install
 # 启动，默认skyline配置
@@ -58,17 +65,21 @@ npm run dev
 # npm run dev @webview 或者 npm run dev @W
 ```
 
-打包
+#### 打包
 ```bash
 npm run build
 ```
 
-发包（预览包）
+#### 发包（预览包）
 ```bash
 npm run package
 ```
 > [!NOTE]
 > 这个发包命令执行了打包、发包和推送仓库三部分，所以不必重复执行打包命令
+
+#### 测试
+
+测试尚未写完，等我抽空就写 :rofl:
 
 ### 类型说明
 以下出现的类型定义：
@@ -239,21 +250,20 @@ type ViewChangeEventDetail = {
   (dates?: Array<CalendarDay>): Promise<void>;
 }
 ```
-> [!TIP]
-> 有需要更多方法的可以提issue
+
 
 ### 样式
-可通过传入style属性修改以下css变量调整主题
+组件开启了样式隔离，仅可以调整字体大小和色号，可通过传入style属性修改以下css变量调整主题
 ```css
 .wcc {
     /* 浅色主题 */
-    --wc-bg-color-light: #FFF; /* 主背景色 */
+    --wc-bg-light: #FFF; /* 主背景色 */
     --wc-title-color-light: #333; /* 左上角日期标题 */
     --wc-title-sub-color-light: #7A7A7A; /* 左上角日期标题的右侧描述 */
-    --wc-operator-bg-light: #D9ECFF; /* 视图控制背景色 */
-    --wc-operator-checked-bg-light: #409EFF; /* 视图控制按钮背景色 */
-    --wc-operator-color-light: #409EFF; /* 视图控制字体 */
-    --wc-operator-checked-color-light: #FFF; /* 视图控制选中字体 */
+    --wc-opt-bg-light: #D9ECFF; /* 视图控制背景色 */
+    --wc-opt-checked-bg-light: #409EFF; /* 视图控制按钮背景色 */
+    --wc-opt-color-light: #409EFF; /* 视图控制字体 */
+    --wc-opt-checked-color-light: #FFF; /* 视图控制选中字体 */
     --wc-week-color-light: #ABABAB; /* 星期 */
     --wc-date-color-light: #333; /* 日期 */
     --wc-mark-color-light: #ABABAB; /* 日期下方信息 */
@@ -273,14 +283,14 @@ type ViewChangeEventDetail = {
     --wc-annual-title-color-light: #333; /* 年面板左上角标题 */
     --wc-annual-title-sub-color-light: #7A7A7A; /* 年面板左上角标题右侧信息 */
 
-    /* 深色主题 */
-    --wc-bg-color-dark: #000;
+    /* 深色主题，以下和浅色主题一一对应 */
+    --wc-bg-dark: #000;
     --wc-title-color-dark: #E5E5E5;
     --wc-title-sub-color-dark: #7A7A7A;
-    --wc-operator-bg-dark: #332D2D80;
-    --wc-operator-checked-bg-dark: #409EFF;
-    --wc-operator-color-dark: #409EFF;
-    --wc-operator-checked-color-dark: #FFF;
+    --wc-opt-bg-dark: #332D2D80;
+    --wc-opt-checked-bg-dark: #409EFF;
+    --wc-opt-color-dark: #409EFF;
+    --wc-opt-checked-color-dark: #FFF;
     --wc-week-color-dark: #ABABAB;
     --wc-date-color-dark: #E5E5E5;
     --wc-mark-color-dark: #5F5F5F;
@@ -299,11 +309,23 @@ type ViewChangeEventDetail = {
     --wc-annual-bg-dark: #000;
     --wc-annual-title-color-dark: #E5E5E5;
     --wc-annual-title-sub-color-dark: #3F3F3F;
+
+    /** 字号 */
+    --wc-title-size: 46rpx, /** 左上角日期标题字号 */ 
+	  --wc-title-sub-size: 20rpx, /** 左上角日期标题右侧描述信息字号 */ 
+	  --wc-operator-size: 22rpx, /** 视图控制按钮字号 */ 
+	  --wc-week-size: 20rpx, /** 星期字号 */ 
+    --wc-date-size: 36rpx, /** 日期字体字号 */ 
+    --wc-mark-size: 20rpx, /** 日期下方信息字体字号 */ 
+    --wc-corner-size: 16rpx, /** 日期角标字体字号 */ 
+    --wc-schedule-size: 16rpx, /** 日程字体字号 */ 
+    --wc-annual-title-size: 50rpx, /** 年面板左上角年份标题字体字号 */ 
+    --wc-annual-title-sub-size: 18rpx, /** 年面板左上角年份标题右侧信息字体字号 */ 
 }
 ```
 修改样式
 ```html
-<calendar style="--wc-bg-color-light: #000;" />
+<calendar style="--wc-bg-light: #000;" />
 ```
 
 ### 插件
@@ -340,10 +362,12 @@ class MyPlugin implements Plugin {
 
   /**
    * PliginService初始化完成，可选择实现该方法
-   * @param {CalendarInstance} component 日历组件实例
    * @param {PluginService<PluginConstructor[]>} service PliginService实例
    */
-  PLUGIN_INITIALIZE(component, service) {}
+  PLUGIN_INITIALIZE(service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 
   /**
    * 捕获日期，可选择实现该方法
@@ -379,10 +403,39 @@ class MyPlugin implements Plugin {
    * @param date 待绑定日期
    */
   PLUGIN_DATA(date: CalendarDay): any {};
+
+  /**
+   * 注册日历加载完成事件处理方法，可选择实现该方法
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
+   */
+  PLUGIN_ON_LOAD(service, detail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+
+  /**
+   * 注册日期变化事件处理方法，可选择实现该方法
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
+   */
+  PLUGIN_ON_CHANGE(service, detail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+  
+  /**
+   * 注册视图变化事件处理方法，可选择实现该方法
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param {CalendarEventDetail} detail 事件数据
+   */
+  PLUGIN_ON_VIEW_CHANGE(service, detail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 }
 ```
-> [!TIP]
-> 有需要更多接口的可以提issue
+
 
 #### 农历插件
 ```javascript
@@ -414,19 +467,6 @@ type LunarDate = {
 - [ ] *ICS日历订阅插件*
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*
-
-### 说明
-
-#### 农历说明
- 
->     实用于公历 1901 年至 2100 年之间的 200 年 
->     参考了eleworld.com上的算法，并修正了5处节气错误
-> 
->     * 2014年3月5日 惊蛰
->     * 2051年3月21日 春分
->     * 2083年2月4日 立春
->     * 2084年3月20日 春分
->     * 2094年6月6日 芒种
 
 ### 关于
 

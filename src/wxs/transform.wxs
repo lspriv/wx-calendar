@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 16:40:48
+ * @LastEditTime: 2024-01-11 22:52:14
  */
 
 var nonNullable = function (value) {
@@ -59,15 +59,24 @@ var toView = function (view, mark, instance, transition = true) {
   refreshIncurrentOffset(view, instance);
 };
 
+var TOUCH_CHECK_PASS = 1 << 0;
+var TOUCH_CHECK_FAIL = 1 << 1;
+
 /** 手指触摸面板动作开始 */
 var touchStart = function (e, instance) {
   var mark = e.mark;
   var state = instance.getState();
   if (mark.fixed) return;
+  /** 起始位置 */
   state.y = e.changedTouches[0].pageY;
-  state.time = e.timeStamp;
+  /** 日历底部 bar 的转角 */
   state.deg = 0;
-  state.vy = 0;
+  /** 记录上一次动作数据 */
+  state.lastTime = e.timeStamp;
+  state.lastX = e.changedTouches[0].pageX;
+  state.lastY = state.y;
+  /** 入角检查入角 */
+  state.check = 0;
   if (mark.view === 'week') state.currentHeight = mark.min;
   if (mark.view === 'month') state.currentHeight = mark.main;
   if (mark.view === 'schedule') state.currentHeight = mark.max;
@@ -78,15 +87,30 @@ var touchMove = function (e, instance) {
   var mark = e.mark;
   if (mark.fixed) return;
   var state = instance.getState();
+  if (state.check & TOUCH_CHECK_FAIL) return;
+
+  /** 入角小于 45 度，无效动作 */
+  if (!state.check) {
+    const dx = Math.abs(e.changedTouches[0].pageX - state.lastX);
+    const dy = Math.abs(e.changedTouches[0].pageY - state.lastY);
+    if (dx > dy /** / Math.tan(45) */) {
+      state.check = TOUCH_CHECK_FAIL;
+      return;
+    } else {
+      state.check = TOUCH_CHECK_PASS;
+    }
+  }
+
   var deltaY = e.changedTouches[0].pageY - state.y;
 
-  // state.vy = deltaY / (e.timeStamp - e.time); // px/ms
-  // state.time = e.timeStamp;
+  state.vy = (e.changedTouches[0].pageY - state.lastY) / (e.timeStamp - state.time);
+  state.lastY = e.changedTouches[0].pageY;
+  state.time = e.timeStamp;
 
   /**
    * 日历容器高度
    */
-  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY * '0.6')));
+  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + (deltaY * 3) / 5)));
 
   /**
    * 触摸时的高度不能等于触摸结束后的最终高度，是为了有效触发容器的transitionend事件
@@ -166,21 +190,32 @@ var touchEnd = function (e, instance) {
   var mark = e.mark;
   if (mark.fixed) return;
   var state = instance.getState();
+  if (!state.check || state.check & TOUCH_CHECK_FAIL) return;
   const deltaY = e.changedTouches[0].pageY - state.y;
 
   /** 计算容器高度 */
   var height = Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY));
-  /** 回弹高度 */
+  /** 临界高度 */
   var unitHeight = mark.panel / 5;
-  /** 月视图到周视图的临界值 */
-  var criticalMin = mark.main - unitHeight;
-  /** 月视图到日程视图的临界值 */
-  var criticalMax = mark.main + unitHeight;
 
-  var toMin = height < criticalMin;
-  var toMax = height > criticalMax;
+  var view;
+  if (mark.view === 'week') {
+    view = deltaY > unitHeight ? 'month' : 'week';
+  } else if (mark.view === 'schedule') {
+    view = deltaY > -unitHeight ? 'schedule' : 'month';
+  } else {
+    view = deltaY < -unitHeight ? 'week' : deltaY > unitHeight ? 'schedule' : 'month';
+  }
 
-  toView(toMin ? 'week' : toMax ? 'schedule' : 'month', mark, instance, 'all .3s cubic-bezier(0.61, 1, 0.88, 1)');
+  const toMin = view === 'week';
+  const toMax = view === 'schedule';
+
+  const finalHeight = toMin ? mark.min : toMax ? mark.max : mark.main;
+  const ms = Math.min(300, Math.abs((finalHeight - height) / state.vy));
+
+  const transition = ms < 200 ? 'cubic-bezier(0.34, 1.56, 0.64, 1)' : 'cubic-bezier(0.61, 1, 0.88, 1)';
+
+  toView(view, mark, instance, 'all .3s ' + transition);
 
   /** 底部控制条样式 */
   instance.selectComponent('#control_1').setStyle({
@@ -197,17 +232,17 @@ var touchEnd = function (e, instance) {
   var weekBarWidth = toMin ? 'calc(var(--wc-operator-side) - var(--wc-operator-padding))' : 0;
 
   instance.selectComponent('#view_bar').setStyle({
-    transition: 'all .28s ease',
+    transition: 'all .3s ease',
     transform: 'translateX(' + translateX + ') translateZ(0px)'
   });
 
   instance.selectComponent('#view_bar_1').setStyle({
-    transition: 'all .28s ease',
+    transition: 'all .3s ease',
     width: monthBarWidth
   });
 
   instance.selectComponent('#view_bar_2').setStyle({
-    transition: 'all .28s ease',
+    transition: 'all .3s ease',
     width: weekBarWidth
   });
 
@@ -290,7 +325,6 @@ var toggleView = function (e, instance) {
   var viewState = toWeek ? 1 : 2;
 
   toView(_view, mark, instance);
-  /** 加这一行是为了跟手性 */
   updateViewCls(_view, instance);
   instance.callMethod('refreshView', { view: viewState });
 };
@@ -318,7 +352,6 @@ var transViewChange = function (view, old, owner, instance) {
   if (view) {
     const dataset = instance.getDataset();
     toView(view, dataset, owner);
-    /** 加这一行是为了跟手性 */
     updateViewCls(view, instance);
     instance.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
   }

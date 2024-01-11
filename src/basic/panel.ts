@@ -4,13 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-04 16:57:01
+ * @LastEditTime: 2024-01-09 14:04:59
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, View } from './constants';
-import { circularDiff, isSkyline, flagView, nextTick, middle } from './tools';
+import { circularDiff, flagView, nextTick, middle } from './tools';
 import { mul, div } from '../utils/calc';
+import { nonNullable } from '../utils/shared';
 import {
   getMonthDays,
   normalDate,
@@ -23,8 +24,7 @@ import {
   getDateInfo
 } from '../interface/calendar';
 
-import { nonNullable, type PartRequired } from '../utils/shared';
-
+import type { PartRequired } from '../utils/shared';
 import type { CalendarData, CalendarPanel } from '../interface/component';
 import type { CalendarDay, CalendarMonth, WxCalendarFullYear } from '../interface/calendar';
 
@@ -58,7 +58,7 @@ export class PanelTool extends CalendarHandler {
   private refreshPanels(sets: RefreshFields) {
     const { current, checked } = sets;
     const isWeekView = this._instance_._view_ & View.week;
-    const offsetChange = !isSkyline(this._render_) && !!isWeekView;
+    const offsetChange = !this.skyline && !!isWeekView;
     const panels: Array<CalendarPanel> = [];
     for (let i = 0; i < CALENDAR_PANELS; i++) {
       const panel = this._instance_.data.panels[i];
@@ -114,7 +114,7 @@ export class PanelTool extends CalendarHandler {
     const sets: RefreshFields = { currView, info: getDateInfo(checked!, isWeekView), checked, current };
     this.refreshPanels(sets);
 
-    if (fixed !== void 0) sets.viewFixed = fixed;
+    if (nonNullable(fixed)) sets.viewFixed = fixed;
 
     instance.setData(sets);
     await this.update();
@@ -136,7 +136,7 @@ export class PanelTool extends CalendarHandler {
 
     const _exclude = isExcludes ? excludes : [];
 
-    const offsetChange = !isSkyline(this._render_) && !!(instance._view_ & View.week);
+    const offsetChange = !this.skyline && !!(instance._view_ & View.week);
 
     for (let i = 0; i < CALENDAR_PANELS; i++) {
       if (_exclude.includes(i)) continue;
@@ -250,7 +250,7 @@ export class PanelTool extends CalendarHandler {
     const offset = this.calcWeekOffset(checked);
     sets[`panels[${current}]`] = this.createPanel(checked, current, offset);
     instance._pointer_.update(sets, false, instance.data.checked!, true);
-    if (!isSkyline(this._render_)) sets.offsetChange = true;
+    if (!this.skyline) sets.offsetChange = true;
     instance.setData(sets);
     await nextTick();
     await this.update();
@@ -274,7 +274,7 @@ export class PanelTool extends CalendarHandler {
     if (toMonthView && !(instance._view_ & View.month)) {
       const currView = flagView(View.month);
       sets.currView = currView;
-      if (isSkyline(this._render_)) instance._dragger_?.toView(View.month, false);
+      if (this.skyline) instance._dragger_?.toView(View.month, false);
       else sets.initView = 'month';
       instance._view_ = View.month;
     }
@@ -295,7 +295,7 @@ export class PanelTool extends CalendarHandler {
 
     const idx = instance.data.years.findIndex(y => y.year === year);
     const offset = year - annual.year;
-    return this.refreshAnnualPanels(offset, idx >= 0 ? idx : current, !isSkyline(this._render_));
+    return this.refreshAnnualPanels(offset, idx >= 0 ? idx : current, !this.skyline);
   }
 
   public getFullYear(idx: number): WxCalendarFullYear {
@@ -304,11 +304,11 @@ export class PanelTool extends CalendarHandler {
 
   public async update() {
     await nextTick();
-    if (isSkyline(this._render_)) this._instance_._dragger_!.update();
+    if (this.skyline) this._instance_._dragger_!.update();
   }
 
   private calcWeekOffset(date: CalendarDay) {
-    if (isSkyline(this._render_)) return 0;
+    if (this.skyline) return 0;
     return PanelTool.calcPanelOffset(date, this._instance_.data.weekstart);
   }
 

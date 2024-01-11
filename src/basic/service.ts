@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 17:40:55
+ * @LastEditTime: 2024-01-10 12:27:35
  */
 import { nextTick } from './tools';
-import { notEmptyObject } from '../utils/shared';
+import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
 import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
-import type { Nullable, Voidable } from '../utils/shared';
-import type { CalendarData, CalendarInstance } from '../interface/component';
+import type { LowerCamelCase, Nullable, SnakeCase, Voidable } from '../utils/shared';
+import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
   WxCalendarMonth,
@@ -35,13 +35,33 @@ export type TrackYearResult = {
   marks?: WxCalendarYearMarks;
 };
 
-export interface Plugin {
+interface PluginEventHandle {
+  /**
+   * 日历组件onLoad事件触发
+   * @param service PliginService实例
+   * @param detail 事件详情数据
+   */
+  PLUGIN_ON_LOAD?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  /**
+   * 日期变化触发
+   * @param service PliginService实例
+   * @param detail 事件详情数据
+   */
+  PLUGIN_ON_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  /**
+   * 视图变化触发
+   * @param service PliginService实例
+   * @param detail 事件详情数据
+   */
+  PLUGIN_ON_VIEW_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+}
+
+export interface Plugin extends PluginEventHandle {
   /**
    * PliginService初始化完成
-   * @param component 日历组件实例
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE?(component: CalendarInstance, service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_INITIALIZE?(service: PluginService<PluginConstructor[]>): void;
   /**
    * 插件绑定到日期数据
    * @param date 待绑定日期
@@ -73,6 +93,10 @@ export interface PluginConstructor {
    * 日历组件版本
    */
   REQUIER_VERSION?: string;
+}
+
+interface TraverseCallback {
+  (plugin: Plugin, key: string): void;
 }
 
 type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
@@ -133,13 +157,22 @@ export type PulginMap<T extends Array<PluginConstructor>> = {
   [P in Union<T> as PluginKey<P>]: PluginInstance<P>;
 };
 
+type PluginEventName<T> = T extends `PLUGIN_ON_${infer R}` ? R : never;
+
+export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandle>>;
+
+type PluginEventHandlerName<T extends PluginEventNames> = `PLUGIN_ON_${Uppercase<SnakeCase<T>>}`;
+
 export class PluginService<T extends Array<PluginConstructor>> {
-  private _component_: CalendarInstance;
-  private _services_: Array<RegistPlugin> = [];
+  /** 日历组件实例 */
+  public component: CalendarInstance;
+
+  /** 插件队列 */
+  private _plugins_: Array<RegistPlugin> = [];
 
   constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
-    this._component_ = component;
-    this._services_ = (services || []).flatMap(service => {
+    this.component = component;
+    this._plugins_ = (services || []).flatMap(service => {
       return service.construct.KEY
         ? {
             key: service.construct.KEY,
@@ -151,18 +184,17 @@ export class PluginService<T extends Array<PluginConstructor>> {
   }
 
   private initialize() {
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      service.instance.PLUGIN_INITIALIZE?.(this._component_, this);
-    }
+    this.traversePlugins(plugin => {
+      plugin.PLUGIN_INITIALIZE?.(this);
+    });
   }
 
   private walkForDate(date: CalendarDay) {
     const record: TrackDateResult = {};
 
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+    this.traversePlugins((plugin, key) => {
+      /** 处理日期标记 */
+      const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
         if (result.corner && (!record || !record.corner)) record.corner = result.corner;
         if (result.festival && (!record || !record.festival)) record.festival = result.festival;
@@ -170,26 +202,27 @@ export class PluginService<T extends Array<PluginConstructor>> {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
       }
-      const pluginRes = service.instance.PLUGIN_DATA?.(date);
-      if (pluginRes !== void 0) {
+      /** 处理插件数据 */
+      const pluginRes = plugin.PLUGIN_DATA?.(date);
+      if (!isVoid(pluginRes)) {
         record.plugin = record.plugin || {};
-        record.plugin[service.key] = pluginRes;
+        record.plugin[key] = pluginRes;
       }
-    }
+    });
+
     return notEmptyObject(record) ? record : null;
   }
 
   private walkForYear(year: WxCalendarYear) {
     const record: TrackYearResult = {};
-    for (let i = this._services_.length; i--; ) {
-      if (record.subinfo && record.marks) break;
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_YEAR?.(year);
+    this.traversePlugins(plugin => {
+      if (record.subinfo && record.marks) return;
+      const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo) record.subinfo = result.subinfo;
         if (result.marks?.size) record.marks = result.marks;
       }
-    }
+    });
     return notEmptyObject(record) ? record : null;
   }
 
@@ -206,7 +239,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
       }
       return records;
     });
-    await this._component_._annual_.interaction();
+    await this.component._annual_.interaction();
     this.setMonth({ year: month.year, month: month.month, days: records });
   }
 
@@ -217,7 +250,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
 
   private setMonth(month: MonthResult) {
     nextTick(() => {
-      const panels = this._component_.data.panels;
+      const panels = this.component.data.panels;
       const sets: Partial<CalendarData> = {};
       for (let k = panels.length; k--; ) {
         const panel = panels[k];
@@ -234,29 +267,29 @@ export class PluginService<T extends Array<PluginConstructor>> {
           }
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   private setYear(year: YearResult) {
     nextTick(() => {
-      const years = this._component_.data.years;
+      const years = this.component.data.years;
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
         if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
         if (year.result.marks) {
-          this._component_._years_[ydx].marks = year.result.marks;
-          this._component_._printer_.update([ydx]);
+          this.component._years_[ydx].marks = year.result.marks;
+          this.component._printer_.update([ydx]);
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   private setDates(dates: Array<DateResult>) {
     return nextTick(() => {
-      const panels = this._component_.data.panels;
+      const panels = this.component.data.panels;
       const sets: Partial<CalendarData> = {};
       for (let i = dates.length; i--; ) {
         const { year, month, day, record } = dates[i];
@@ -282,12 +315,12 @@ export class PluginService<T extends Array<PluginConstructor>> {
           }
         }
       }
-      notEmptyObject(sets) && this._component_.setData(sets);
+      notEmptyObject(sets) && this.component.setData(sets);
     });
   }
 
   public async updateDates(dates?: Array<CalendarDay>) {
-    const panels = this._component_.data.panels;
+    const panels = this.component.data.panels;
     dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
 
     const map = new Map<string, DateResult>();
@@ -299,7 +332,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
       const result = this.walkForDate(date);
       if (result) map.set(key, { year: date.year, month: date.month, day: date.day, record: result });
     }
-    await this._component_._annual_.interaction();
+    await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
   }
 
@@ -310,23 +343,55 @@ export class PluginService<T extends Array<PluginConstructor>> {
   public getEntireMarks(date: CalendarDay): PluginEntireMarks {
     const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [] };
 
-    for (let i = this._services_.length; i--; ) {
-      const service = this._services_[i];
-      const result = service.instance.PLUGIN_TRACK_DATE?.(date);
+    this.traversePlugins((plugin, key) => {
+      const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
-        if (result.corner) marks.corner.push({ ...result.corner, key: service.key });
-        if (result.festival) marks.festival.push({ ...result.festival, key: service.key });
+        if (result.corner) marks.corner.push({ ...result.corner, key });
+        if (result.festival) marks.festival.push({ ...result.festival, key });
         if (result.schedule?.length) {
-          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key: service.key })));
+          marks.schedule.push(...result.schedule.map(schedule => ({ ...schedule, key })));
         }
       }
-    }
+    });
 
     return marks;
   }
 
+  /**
+   * 响应事件
+   * @param event 事件名
+   * @param detail 事件详情数据
+   */
+  public dispatchEventHandle<K extends PluginEventNames>(event: K, detail?: any): void {
+    const handler: PluginEventHandlerName<K> = `PLUGIN_ON_${
+      camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
+    }`;
+    try {
+      this.traversePlugins(plugin => {
+        plugin[handler]?.call(plugin, this, detail);
+      });
+    } catch (e) {
+      return;
+    }
+  }
+
+  /**
+   * 获取插件
+   * @param key 插件 key
+   */
   public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
-    const service = this._services_.find(s => s.key === key);
+    const service = this._plugins_.find(s => s.key === key);
     return service?.instance as Voidable<PulginMap<T>[K]>;
+  }
+
+  /**
+   * 遍历插件
+   * @param callback 执行
+   */
+  private traversePlugins(callback: TraverseCallback): void {
+    for (let i = this._plugins_.length; i--; ) {
+      const plugin = this._plugins_[i];
+      callback(plugin.instance, plugin.key);
+    }
   }
 }

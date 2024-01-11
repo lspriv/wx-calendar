@@ -75,7 +75,7 @@
   align-items: center;
   justify-content: space-between;
   border-radius: calc(var(--wc-operator-side) / 2);
-  background-color: theme(operator-bg);
+  background-color: theme(opt-bg);
   overflow: hidden;
   position: relative;
   @include if(today) {
@@ -94,8 +94,8 @@
       justify-content: center;
       width: var(--wc-operator-inner-side);
       height: var(--wc-operator-inner-side);
-      color: theme(operator-checked-color);
-      background: theme(operator-checked-bg);
+      color: theme(opt-checked-color);
+      background: theme(opt-checked-bg);
       font-size: theme(operator-size);
       border-radius: 50%;
       line-height: 1;
@@ -116,7 +116,7 @@
       justify-content: center;
       width: var(--wc-operator-side);
       height: var(--wc-operator-side);
-      color: theme(operator-color);
+      color: theme(opt-color);
       font-size: theme(operator-size);
       line-height: 1;
       font-weight: bold;
@@ -147,7 +147,7 @@
         height: var(--wc-operator-inner-side);
         position: absolute;
         top: 0;
-        color: theme(operator-checked-color);
+        color: theme(opt-checked-color);
         font-size: theme(operator-size);
         line-height: 1;
         font-weight: bold;
@@ -176,7 +176,7 @@
   left: var(--wc-operator-padding);
   border-radius: 50%;
   transform: translateX(0) translateZ(0px);
-  background: theme(operator-checked-bg);
+  background: theme(opt-checked-bg);
   z-index: 10;
 }
 
