@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:22:55
+ * @LastEditTime: 2024-01-12 12:34:52
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';
@@ -433,7 +433,11 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     }
   }
 
-  public static clearPlugins() {
-    this._PLUGINS_ = [];
+  /**
+   * 清除插件
+   * @param filter 过滤器
+   */
+  public static clearPlugins(filter?: (plugin: PluginUse) => boolean) {
+    this._PLUGINS_ = filter ? this._PLUGINS_.filter(plugin => !filter(plugin)) : [];
   }
 }
