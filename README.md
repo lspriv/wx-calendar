@@ -433,6 +433,15 @@ class MyPlugin implements Plugin {
     // 获取日历组件实例
     const component = service.component;
   }
+
+  /**
+   * 注册日历组件实例销毁事件处理方法，可选择实现该方法
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_ON_DETACHED(service) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 }
 ```
 

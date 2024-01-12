@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-10 12:27:35
+ * @LastEditTime: 2024-01-12 11:27:18
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
@@ -54,6 +54,11 @@ interface PluginEventHandle {
    * @param detail 事件详情数据
    */
   PLUGIN_ON_VIEW_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  /**
+   * 视图变化触发
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_DETACHED?(service: PluginService<PluginConstructor[]>): void;
 }
 
 export interface Plugin extends PluginEventHandle {
