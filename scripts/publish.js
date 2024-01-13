@@ -91,12 +91,11 @@ commander
 
     try {
       execSync(command);
+      preid && execSync('npm publish --access public', { stdio: 'inherit' });
     } catch (error) {
-      console.log('npm version'.white, 'ERR!'.red, error.message.white);
+      execSync('git checkout -- package.json');
       throw error;
     }
-
-    preid && execSync('npm publish --access public', { stdio: 'inherit' });
 
     const version = require(path.join(process.cwd(), '/package.json')).version;
 
