@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-13 19:15:46
+ * @LastEditTime: 2024-01-13 19:33:02
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -286,8 +286,8 @@ export type CalendarInstance = WechatMiniprogram.Component.Instance<
   CalendarCustomProp
 >;
 
-type DefaultPluginKeyExtend<T extends Array<PluginConstructor>> = PluginKeys<T> | PluginKeys<DEFAULT_PLUGINS>;
-type DefaultPluginMapExtend<T extends Array<PluginConstructor>> = PulginMap<T> & PulginMap<DEFAULT_PLUGINS>;
+export type DefaultPluginKeyExtend<T extends Array<PluginConstructor>> = PluginKeys<T> | PluginKeys<DEFAULT_PLUGINS>;
+export type DefaultPluginMapExtend<T extends Array<PluginConstructor>> = PulginMap<T> & PulginMap<DEFAULT_PLUGINS>;
 
 export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /** 版本号 */
@@ -308,10 +308,7 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /**
    * 获取插件
    */
-  getPlugin<
-    T extends Array<PluginConstructor> = DEFAULT_PLUGINS,
-    K extends DefaultPluginKeyExtend<T> = DefaultPluginKeyExtend<T>
-  >(
+  getPlugin<T extends Array<PluginConstructor> = [], K extends DefaultPluginKeyExtend<T> = DefaultPluginKeyExtend<T>>(
     key: K
   ): Voidable<DefaultPluginMapExtend<T>[K]>;
   /**

@@ -338,7 +338,7 @@ wx-calendar自带农历插件
 const { WxCalendar } = require('@lspriv/wx-calendar');
 const { YourPlugin } = require('anywhere');
 
-// WxCalendar.clearPlugins(); 清理预设插件
+// WxCalendar.clearPlugin(); 清理预设插件
 
 WxCalendar.use(YourPlugin, options); // options 插件选项
 
