@@ -159,10 +159,12 @@ type CalendarDay = {
 > [!TIP] 
 > 关于属性 `marks`
 > ```typescript
+> // 标记里的日期，要么输入年月日year｜month｜day，要么输入日期 date
 > type Mark = {
->   year: number; // 年
->   month: number; // 月 
->   day: number; // 日
+>   year?: number; // 年
+>   month?: number; // 月 
+>   day?: number; // 日
+>   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | Date
 >   type: 'schedule' | 'corner' | 'festival'; // 日程｜角标｜节假日
 >   text: string; // 内容
 >   color: string; // 文本色
@@ -311,16 +313,16 @@ type ViewChangeEventDetail = {
     --wc-annual-title-sub-color-dark: #3F3F3F;
 
     /** 字号 */
-    --wc-title-size: 46rpx, /** 左上角日期标题字号 */ 
-	  --wc-title-sub-size: 20rpx, /** 左上角日期标题右侧描述信息字号 */ 
-	  --wc-operator-size: 22rpx, /** 视图控制按钮字号 */ 
-	  --wc-week-size: 20rpx, /** 星期字号 */ 
-    --wc-date-size: 36rpx, /** 日期字体字号 */ 
-    --wc-mark-size: 20rpx, /** 日期下方信息字体字号 */ 
-    --wc-corner-size: 16rpx, /** 日期角标字体字号 */ 
-    --wc-schedule-size: 16rpx, /** 日程字体字号 */ 
-    --wc-annual-title-size: 50rpx, /** 年面板左上角年份标题字体字号 */ 
-    --wc-annual-title-sub-size: 18rpx, /** 年面板左上角年份标题右侧信息字体字号 */ 
+    --wc-title-size: 46rpx; /** 左上角日期标题字号 */ 
+    --wc-title-sub-size: 20rpx; /** 左上角日期标题右侧描述信息字号 */ 
+    --wc-operator-size: 22rpx; /** 视图控制按钮字号 */ 
+    --wc-week-size: 20rpx; /** 星期字号 */ 
+    --wc-date-size: 36rpx; /** 日期字体字号 */ 
+    --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */ 
+    --wc-corner-size: 16rpx; /** 日期角标字体字号 */ 
+    --wc-schedule-size: 16rpx; /** 日程字体字号 */ 
+    --wc-annual-title-size: 50rpx; /** 年面板左上角年份标题字体字号 */ 
+    --wc-annual-title-sub-size: 18rpx; /** 年面板左上角年份标题右侧信息字体字号 */ 
 }
 ```
 修改样式
@@ -336,7 +338,7 @@ wx-calendar自带农历插件
 const { WxCalendar } = require('@lspriv/wx-calendar');
 const { YourPlugin } = require('anywhere');
 
-// WxCalendar.clearPlugins(); 执行这一行会清除这个页面之前设置的插件
+// WxCalendar.clearPlugin(); 清理预设插件
 
 WxCalendar.use(YourPlugin, options); // options 插件选项
 
@@ -430,6 +432,15 @@ class MyPlugin implements Plugin {
    * @param {CalendarEventDetail} detail 事件数据
    */
   PLUGIN_ON_VIEW_CHANGE(service, detail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+
+  /**
+   * 注册日历组件实例销毁事件处理方法，可选择实现该方法
+   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   */
+  PLUGIN_ON_DETACHED(service) {
     // 获取日历组件实例
     const component = service.component;
   }

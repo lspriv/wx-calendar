@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板拖拽控制
  * @Author: lspriv
- * @LastEditTime: 2024-01-05 17:18:00
+ * @LastEditTime: 2024-01-13 18:37:04
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { applyAnimated, clearAnimated, circularDiff } from './tools';
@@ -12,7 +12,7 @@ import { SELECTOR, View, CALENDAR_PANELS } from './constants';
 import { Layout } from './layout';
 import { PanelTool } from './panel';
 import { offsetDate, normalDate } from '../interface/calendar';
-import { promises, easeInOutSine } from '../utils/shared';
+import { promises, easingOpt } from '../utils/shared';
 
 import type { CalendarDay } from '../interface/calendar';
 
@@ -22,6 +22,10 @@ const { shared, timing, sequence, Easing, delay, runOnJS } = wx.worklet;
 const VIEW_BAR_WIDTH = 60;
 /** 视图控制单元内边距，单位rpx */
 const VIEW_BAR_PADDING = 8;
+/** 拖拽结束后的动画时长 */
+const DRAG_OUT_DURATION = 280;
+/** 弹性系数 */
+const ELASTIC_COE = 220;
 
 /**
  * skyline渲染下的面板拖拽控制器
@@ -238,81 +242,77 @@ export class Dragger extends CalendarHandler {
     const instance = this._instance_;
     const { minHeight, maxHeight, mainHeight, panelHeight } = Layout.layout!;
 
-    const maxBounce = panelHeight / 5;
-    const criticalMin = mainHeight - maxBounce;
-    const criticalMax = mainHeight + maxBounce;
-
     const calendarHeight = instance.$_drag_calendar_height!.value;
-    const animOpts = { duration: 280, easing: Easing.out(Easing.sin) };
+    const maxBounce = panelHeight / 5;
+
+    const view = shared(0) as unknown as Shared<View>;
+
+    if (instance._view_ & View.week) {
+      const dy = calendarHeight - minHeight;
+      view.value = velocity > 0 ? View.month : dy < maxBounce ? View.week : View.month;
+    } else if (instance._view_ & View.schedule) {
+      const dy = calendarHeight - maxBounce;
+      view.value = dy > -maxBounce ? (velocity < 0 ? View.month : View.schedule) : View.month;
+    } else {
+      const dy = calendarHeight - mainHeight;
+      if (!velocity) {
+        view.value = dy < -maxBounce ? View.week : dy > maxBounce ? View.schedule : View.month;
+      } else {
+        if (dy > 0) {
+          view.value = velocity > 0 ? View.schedule : View.month;
+        } else {
+          view.value = velocity < 0 ? View.week : View.month;
+        }
+      }
+    }
+
+    const toMin = view.value & View.week;
+    const toMax = view.value & View.schedule;
+
+    const finalHeight = toMin ? minHeight : toMax ? maxHeight : mainHeight;
+
+    const animOpt = easingOpt(DRAG_OUT_DURATION);
 
     return new Promise<View>(resolve => {
-      const view = shared(0) as unknown as Shared<View>;
-
       const callback = () => {
         'worklet';
         runOnJS(resolve)(view.value);
       };
 
-      if (!velocity || calendarHeight <= minHeight) {
-        const toMinPanel = calendarHeight < criticalMin;
-        const toMaxPanel = calendarHeight > criticalMax;
-        const usefulHeight = toMinPanel ? minHeight : toMaxPanel ? maxHeight : mainHeight;
-        instance.$_drag_calendar_height!.value = timing(usefulHeight, animOpts);
-        instance.$_drag_bar_rotate!.value = timing(0, animOpts, callback);
-        view.value = toMinPanel ? View.week : toMaxPanel ? View.schedule : View.month;
+      if (!velocity) {
+        instance.$_drag_calendar_height!.value = timing(finalHeight, animOpt);
+        instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
       } else {
-        const bounceOpts = { duration: 200, easing: Easing.inOut(Easing.sin) };
-        const velocityAbs = Math.min(Math.abs(velocity), Layout.MaxVelocity);
-        const criticalDiff = velocityAbs - Layout.CriticalVelocity;
-        const maxCriticalDiff = Layout.MaxVelocity - Layout.CriticalVelocity;
-        const critical = criticalDiff > 0;
-        if (calendarHeight < mainHeight) {
-          if (velocity > 0) {
-            const bounce = Math.floor(
-              critical
-                ? easeInOutSine(criticalDiff / maxCriticalDiff, maxBounce)
-                : easeInOutSine(velocityAbs / Layout.CriticalVelocity, maxBounce)
-            );
-            const height = critical ? maxHeight : mainHeight;
-            view.value = critical ? View.schedule : View.month;
-            instance.$_drag_calendar_height!.value = sequence(
-              timing(height + bounce, animOpts, callback),
-              timing(height, bounceOpts)
-            );
-          } else {
-            const bounce = Math.floor(easeInOutSine(velocityAbs / Layout.MaxVelocity, maxBounce));
-            view.value = View.week;
-            instance.$_drag_calendar_height!.value = sequence(
-              timing(minHeight - bounce, animOpts, callback),
-              timing(minHeight, bounceOpts)
-            );
-          }
+        const ms = Math.ceil(Math.abs((finalHeight - calendarHeight) / velocity) * 1000);
+
+        if (ms >= DRAG_OUT_DURATION || calendarHeight <= minHeight || calendarHeight >= maxHeight) {
+          instance.$_drag_calendar_height!.value = timing(finalHeight, animOpt);
+          instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
         } else {
-          if (velocity < 0) {
-            const bounce = Math.floor(
-              critical
-                ? easeInOutSine(criticalDiff / maxCriticalDiff, maxBounce)
-                : easeInOutSine(velocityAbs / Layout.CriticalVelocity, maxBounce)
-            );
-            const height = critical ? minHeight : mainHeight;
-            view.value = critical ? View.week : View.month;
-            instance.$_drag_calendar_height!.value = sequence(
-              timing(height - bounce, animOpts, callback),
-              timing(height, bounceOpts)
-            );
-          } else {
-            const bounce = Math.floor(easeInOutSine(velocityAbs / Layout.MaxVelocity, maxBounce));
-            view.value = View.schedule;
-            instance.$_drag_calendar_height!.value = sequence(
-              timing(maxHeight + bounce, animOpts, callback),
-              timing(maxHeight, bounceOpts)
-            );
-          }
+          const bounceHeight = maxBounce - (maxBounce * ms) / DRAG_OUT_DURATION;
+          const bounceDuration = Math.floor(Math.asin(bounceHeight / maxBounce) * ELASTIC_COE);
+          const bounceOpt = easingOpt(bounceDuration);
+
+          const linearOpt = easingOpt(ms, Easing.bezier(0, 0, 1, 1));
+
+          const dragoutHeight = toMin
+            ? finalHeight - bounceHeight
+            : toMax
+            ? finalHeight + bounceHeight
+            : velocity > 0
+            ? finalHeight + bounceHeight
+            : finalHeight - bounceHeight;
+          instance.$_drag_calendar_height!.value = sequence(
+            timing(finalHeight, linearOpt, callback),
+            timing(dragoutHeight, bounceOpt),
+            timing(finalHeight, bounceOpt)
+          );
+
+          instance.$_drag_bar_rotate!.value = delay(bounceDuration + ms, timing(0, animOpt));
         }
-        instance.$_drag_bar_rotate!.value = delay(280, timing(0, bounceOpts));
       }
-      instance.$_drag_view_bar_translate_!.value = timing(view.value & View.week ? 60 : 0, animOpts);
-      instance.$_drag_schedule_opacity!.value = timing(view.value & View.schedule ? 1 : 0, animOpts);
+      instance.$_drag_view_bar_translate_!.value = timing(toMin ? 60 : 0, animOpt);
+      instance.$_drag_schedule_opacity!.value = timing(toMax ? 1 : 0, animOpt);
     });
   }
 
@@ -325,7 +325,7 @@ export class Dragger extends CalendarHandler {
     const instance = this._instance_;
     if (instance._view_ & view) return Promise.resolve();
     const { minHeight, maxHeight, mainHeight } = Layout.layout!;
-    const animOpts = { duration: 280, easing: Easing.out(Easing.sin) };
+    const animOpts = { duration: DRAG_OUT_DURATION, easing: Easing.out(Easing.sin) };
 
     return new Promise<void>(resolve => {
       const callback = () => {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 19:07:43
+ * @LastEditTime: 2024-01-13 13:36:13
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -131,6 +131,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     detached() {
       if (this.data.darkmode) this._printer_?.cancelThemeChange();
+      this._calendar_.service.dispatchEventHandle('detached');
     }
   },
   methods: {
@@ -338,7 +339,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const delta = direct * Math.min(Math.abs(e.deltaY), 10);
 
       /** 计算面板的高度 */
-      const height = this.$_drag_calendar_height!.value + delta * 0.5;
+      const height = this.$_drag_calendar_height!.value + delta * 0.6;
       const usefulHeight = Math.min(dragMaxHeight, Math.max(minHeight, height));
       this.$_drag_calendar_height!.value = usefulHeight;
 
@@ -363,7 +364,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this._dragger_!.bindScheduleAnimation();
     },
     async dragGestureEnd(e) {
-      const view = await this._dragger_!.dragout(e.velocityY);
+      const view = await this._dragger_!.dragout(e.velocityY * 0.6);
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
     selYear() {

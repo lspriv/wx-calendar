@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 14:16:49
+ * @LastEditTime: 2024-01-13 11:30:33
  */
 import { normalDate } from '../interface/calendar';
 
@@ -32,7 +32,7 @@ export class MarkPlugin implements Plugin {
 
     for (let i = 0; i < marks.length; i++) {
       const mark = marks[i];
-      const date = normalDate(mark.year, mark.month, mark.day);
+      const date = mark.date ? normalDate(mark.date) : normalDate(+mark.year!, +mark.month!, +mark.day!);
       const key = `${date.year}_${date.month}_${date.day}`;
       const _mark = map.get(key);
       if (_mark) {

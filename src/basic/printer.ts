@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 14:18:27
+ * @LastEditTime: 2024-01-13 20:45:33
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -164,7 +164,7 @@ export class YearPrinter extends CalendarHandler {
 
   private _title_size_: StateValue;
   private _title_height_: number;
-  private _title_padding_x_: StateValue;
+  private _title_padding_x_: number;
   private _title_padding_y_: number;
 
   private _mark_width_: StateValue;
@@ -191,7 +191,7 @@ export class YearPrinter extends CalendarHandler {
 
   private initializeSize() {
     const titleSizeMin = Layout.rpxToPx(40, Layout.layout!.windowWidth);
-    const titleSizeMax = Layout.rpxToPx(46, Layout.layout!.windowWidth);
+    const titleSizeMax = Layout.rpxToPx(60, Layout.layout!.windowWidth);
     this._title_size_ = createState(titleSizeMax, titleSizeMin);
 
     const weekSizeMin = Layout.rpxToPx(16, Layout.layout!.windowWidth);
@@ -209,9 +209,7 @@ export class YearPrinter extends CalendarHandler {
     const pannelPaddingMax = Layout.rpxToPx(0, Layout.layout!.windowWidth);
     this._pannel_padding_ = createState(pannelPaddingMax, pannelPaddingMin);
 
-    const titlePaddingXMax = Layout.rpxToPx(40, Layout.layout!.windowWidth);
-    const titlePaddingXMin = Layout.rpxToPx(20, Layout.layout!.windowWidth);
-    this._title_padding_x_ = createState(titlePaddingXMax, titlePaddingXMin);
+    this._title_padding_x_ = Layout.rpxToPx(20, Layout.layout!.windowWidth);
 
     const monthPaddingMin = Layout.rpxToPx(16, Layout.layout!.windowWidth);
     const monthPaddingMax = Layout.rpxToPx(10, Layout.layout!.windowWidth);
@@ -332,13 +330,6 @@ export class YearPrinter extends CalendarHandler {
     const titleSizeTo = isMax ? this._title_size_.min : this._title_size_.max;
     const titleFontSize = iframe(titleSizeFr, titleSizeTo, frame);
 
-    /** 月标题水平偏移量 */
-    const titlePaddingXFr = isMax ? this._title_padding_x_.max : this._title_padding_x_.min;
-    const titlePaddingXTo = isMax ? this._title_padding_x_.min : this._title_padding_x_.max;
-    const titlePaddingX = iframe(titlePaddingXFr, titlePaddingXTo, frame);
-
-    const titleColor = color('title');
-
     /** 星期字体大小 */
     const weekSizeFr = isMax ? this._week_size_.max : this._week_size_.min;
     const weekSizeTo = isMax ? this._week_size_.min : this._week_size_.max;
@@ -354,8 +345,6 @@ export class YearPrinter extends CalendarHandler {
     const weekPaddingYTo = isMax ? this._week_padding_y_.min : this._week_padding_y_.max;
     const weekPaddingY = iframe(weekPaddingYFr, weekPaddingYTo, frame);
 
-    const weekColor = color('week');
-
     /** 日期字体大小 */
     const dateSizeFr = isMax ? this._date_size_.max : this._date_size_.min;
     const dateSizeTo = isMax ? this._date_size_.min : this._date_size_.max;
@@ -365,9 +354,6 @@ export class YearPrinter extends CalendarHandler {
     const dateHeightFr = isMax ? this._date_height_ : row!;
     const dateHeightTo = isMax ? row! : this._date_height_;
     const dateHeight = iframe(dateHeightFr, dateHeightTo, frame);
-
-    const dateColor = color('date');
-    const restColor = color('rest');
 
     const markWidthFr = isMax ? this._mark_width_.max : this._mark_width_.min;
     const markWidthTo = isMax ? this._mark_width_.min : this._mark_width_.max;
@@ -398,18 +384,18 @@ export class YearPrinter extends CalendarHandler {
       titleHeight,
       titleOffsetY,
       titleFontSize,
-      titlePaddingX,
-      titleColor,
+      titlePaddingX: this._title_padding_x_,
+      titleColor: color('title'),
       weekHeight,
       weekFontSize,
       weekPaddingY,
-      weekColor,
+      weekColor: color('week'),
       dateRow,
       dateCol,
       dateFontSize,
       dateHeight,
-      dateColor,
-      restColor,
+      dateColor: color('date'),
+      restColor: color('rest'),
       markWidth,
       markHeight,
       checkedRadius,
@@ -790,6 +776,9 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
+  /**
+   * 绑定系统主题改变事件的监听
+   */
   private bindThemeChange() {
     this._theme_listener_ = res => {
       if (res.theme) {
@@ -800,6 +789,9 @@ export class YearPrinter extends CalendarHandler {
     wx.onThemeChange(this._theme_listener_);
   }
 
+  /**
+   * 移除系统主题改变事件的监听
+   */
   public cancelThemeChange() {
     if (this._theme_listener_) wx.offThemeChange(this._theme_listener_);
     this._theme_listener_ = void 0;

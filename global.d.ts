@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 声明
  * @Author: lspriv
- * @LastEditTime: 2023-10-31 03:17:27
+ * @LastEditTime: 2024-01-13 13:20:48
  */
 declare type SkylineStyleObject = Record<string, string | number>;
 
@@ -22,9 +22,11 @@ declare namespace WechatMiniprogram {
   }
 
   interface WorkletEasing {
+    in(easing?: Function): any;
     out(easing?: Function): any;
     inOut(easing?: Function): any;
     sin(...args: any[]): any;
+    bezier(x1: number, y1: number, x2: number, y2: number): any;
   }
 
   interface GragGestureEvent<DataSet extends IAnyObject = IAnyObject> {
