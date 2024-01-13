@@ -352,14 +352,14 @@ Component({
 #### 插件开发
 自定义插件需要实现Plugin接口
 ```typescript
-import { 
+import type { 
   Plugin, 
-  type CalendarDay, 
-  type WxCalendarYear, 
-  type TrackDateResult, 
-  type TrackYearResult, 
-  type PluginService,
-  type CalendarEventDetail
+  CalendarDay, 
+  WxCalendarYear, 
+  TrackDateResult, 
+  TrackYearResult, 
+  PluginService,
+  CalendarEventDetail
 } from '@lspriv/wx-calendar';
 
 class MyPlugin implements Plugin {
