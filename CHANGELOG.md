@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.0](https://github.com/lspriv/wx-calendar/compare/v1.4.0...v1.5.0) (2024-01-13)
+
+
+### Features
+
+* wxCalendar方法clearPlugins新增过滤器参数 ([1ab0845](https://github.com/lspriv/wx-calendar/commit/1ab084510b325e9986c66d817d7a45680229e4bc))
+* wxCalendar移除插件方法clearPlugin新增插件key过滤参数 ([6e3d913](https://github.com/lspriv/wx-calendar/commit/6e3d913a864d3d4a2470759690ede1841b37a1e5))
+* 插件新增日历销毁处理方法PLUGIN_ON_DETACHED ([0587289](https://github.com/lspriv/wx-calendar/commit/058728939fc404809368ef5161d05deea5ea6ede))
+* 新增工具类型UsePluginService ([204e2aa](https://github.com/lspriv/wx-calendar/commit/204e2aa79e0ebd0151d3f3d9a6497be26f628fe9))
+
+
+### Bug Fixes
+
+* **skyline:** 调整拖拽动画 ([e4b369d](https://github.com/lspriv/wx-calendar/commit/e4b369df5e08e52c73d58a6af916db32e0cedad2))
+* **webview:** 调整动画曲线 ([62a918c](https://github.com/lspriv/wx-calendar/commit/62a918c87136db092dfdafcff519f12de009f01b))
+* 对 mark 年月日数据处理 ([ec22197](https://github.com/lspriv/wx-calendar/commit/ec2219797acbfda54d3b9633c4f9ea07670ced3f))
+* 调整年度面板渲染 ([11ed90f](https://github.com/lspriv/wx-calendar/commit/11ed90f51c09f5d0b15e36a9e278a32534a7daa3))
+
 ## [1.4.0](https://github.com/lspriv/wx-calendar/compare/v1.3.0...v1.4.0) (2024-01-11)
 
 
