@@ -352,21 +352,29 @@ Component({
 #### 插件开发
 自定义插件需要实现Plugin接口
 ```typescript
-import { Plugin, CalendarDay, WxCalendarYear, TrackDateResult, TrackYearResult } from '@lspriv/wx-calendar';
+import { 
+  Plugin, 
+  type CalendarDay, 
+  type WxCalendarYear, 
+  type TrackDateResult, 
+  type TrackYearResult, 
+  type PluginService,
+  type CalendarEventDetail
+} from '@lspriv/wx-calendar';
 
 class MyPlugin implements Plugin {
   /** 需要定义插件的key，必填 */
   static KEY = 'my-plugin' as const;
 
-  constructor(options) {
+  constructor(options?: Record<string, any>) {
     // options 引入时的插件选项
   }
 
   /**
    * PliginService初始化完成，可选择实现该方法
-   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE(service) {
+  PLUGIN_INITIALIZE(service: PluginService) {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -408,39 +416,48 @@ class MyPlugin implements Plugin {
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
-   * @param {PluginService<PluginConstructor[]>} service PliginService实例
-   * @param {CalendarEventDetail} detail 事件数据
+   * @param service PliginService实例
+   * @param detail 事件数据
    */
-  PLUGIN_ON_LOAD(service, detail) {
+  PLUGIN_ON_LOAD(
+    service: PluginService, 
+    detail: CalendarEventDetail
+  ) {
     // 获取日历组件实例
     const component = service.component;
   }
 
   /**
    * 注册日期变化事件处理方法，可选择实现该方法
-   * @param {PluginService<PluginConstructor[]>} service PliginService实例
-   * @param {CalendarEventDetail} detail 事件数据
+   * @param service PliginService实例
+   * @param detail 事件数据
    */
-  PLUGIN_ON_CHANGE(service, detail) {
+  PLUGIN_ON_CHANGE(
+    service: PluginService, 
+    detail: CalendarEventDetail
+  ) {
     // 获取日历组件实例
     const component = service.component;
   }
   
   /**
    * 注册视图变化事件处理方法，可选择实现该方法
-   * @param {PluginService<PluginConstructor[]>} service PliginService实例
-   * @param {CalendarEventDetail} detail 事件数据
+   * @param service PliginService实例
+   * @param detail 事件数据
    */
-  PLUGIN_ON_VIEW_CHANGE(service, detail) {
+  PLUGIN_ON_VIEW_CHANGE(
+    service: PluginService, 
+    detail: CalendarEventDetail
+  ) {
     // 获取日历组件实例
     const component = service.component;
   }
 
   /**
    * 注册日历组件实例销毁事件处理方法，可选择实现该方法
-   * @param {PluginService<PluginConstructor[]>} service PliginService实例
+   * @param service PliginService实例
    */
-  PLUGIN_ON_DETACHED(service) {
+  PLUGIN_ON_DETACHED(service: PluginService) {
     // 获取日历组件实例
     const component = service.component;
   }
