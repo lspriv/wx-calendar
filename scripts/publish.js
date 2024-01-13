@@ -99,7 +99,7 @@ commander
 
     const version = require(path.join(process.cwd(), '/package.json')).version;
 
-    spinner.start('git pushing...');
+    spinner.start(`git pushing v${version} ...`);
     try {
       execSync('git add .');
       execSync(`git commit -m "build(package): version ${version}"`);
