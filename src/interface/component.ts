@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-09 14:06:59
+ * @LastEditTime: 2024-01-13 19:15:46
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -137,6 +137,7 @@ type SwiperAnimationFinishEvent<
 > = WechatMiniprogram.SwiperAnimationFinish<M, D>;
 
 type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
+export type UsePluginService<T extends Array<PluginConstructor> = []> = [...T, ...DEFAULT_PLUGINS];
 
 interface CalendarEventHandlers {
   /**
@@ -307,7 +308,10 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /**
    * 获取插件
    */
-  getPlugin<T extends Array<PluginConstructor>, K extends DefaultPluginKeyExtend<T> = DefaultPluginKeyExtend<T>>(
+  getPlugin<
+    T extends Array<PluginConstructor> = DEFAULT_PLUGINS,
+    K extends DefaultPluginKeyExtend<T> = DefaultPluginKeyExtend<T>
+  >(
     key: K
   ): Voidable<DefaultPluginMapExtend<T>[K]>;
   /**
