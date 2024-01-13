@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-12 12:34:52
+ * @LastEditTime: 2024-01-13 11:30:35
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isNumber, isString } from '../utils/shared';
@@ -22,7 +22,8 @@ export interface CalendarDay {
   today?: boolean;
 }
 
-export interface CalendarMark extends Pick<CalendarDay, 'day' | 'month' | 'year'> {
+export interface CalendarMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
+  date?: string | number | Date | CalendarDay;
   type: 'schedule' | 'corner' | 'festival';
   text: string;
   color?: Nullable<string>;

@@ -159,10 +159,12 @@ type CalendarDay = {
 > [!TIP] 
 > 关于属性 `marks`
 > ```typescript
+> // 标记里的日期，要么输入年月日year｜month｜day，要么输入日期 date
 > type Mark = {
->   year: number; // 年
->   month: number; // 月 
->   day: number; // 日
+>   year?: number; // 年
+>   month?: number; // 月 
+>   day?: number; // 日
+>   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | Date
 >   type: 'schedule' | 'corner' | 'festival'; // 日程｜角标｜节假日
 >   text: string; // 内容
 >   color: string; // 文本色
