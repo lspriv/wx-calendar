@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 19:08:56
+ * @LastEditTime: 2024-01-13 18:10:06
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -51,10 +51,10 @@ export const values = <T>(obj: Record<string, T>): T[] => Object.keys(obj).map(k
 
 export const notEmptyObject = (val: Object): boolean => !!Object.keys(val).length;
 
-export const easeInOutSine = (x: number, end: number = 1, start: number = 0): number => {
-  const t = end - start;
-  return (-(Math.cos(Math.PI * x) - 1) / 2) * t + start;
-};
+export const easingOpt = (
+  duration: number,
+  easing: (...args: any[]) => any = wx.worklet.Easing.out(wx.worklet.Easing.sin)
+): WechatMiniprogram.TimingOption => ({ duration, easing });
 
 export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]) =>
   Object.keys(obj).reduce(
