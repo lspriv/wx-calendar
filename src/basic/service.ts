@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-12 11:48:32
+ * @LastEditTime: 2024-01-14 00:06:45
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
@@ -44,24 +44,24 @@ interface PluginEventHandle {
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail): void;
   /**
    * 日期变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEW_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  PLUGIN_ON_VIEW_CHANGE?(service: PluginService, detail: CalendarEventDetail): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
    */
-  PLUGIN_ON_DETACHED?(service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
 export interface Plugin extends PluginEventHandle {
@@ -69,7 +69,7 @@ export interface Plugin extends PluginEventHandle {
    * PliginService初始化完成
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE?(service: PluginService<PluginConstructor[]>): void;
+  PLUGIN_INITIALIZE?(service: PluginService): void;
   /**
    * 插件绑定到日期数据
    * @param date 待绑定日期
@@ -171,7 +171,8 @@ export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventH
 
 type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<SnakeCase<T>>}`;
 
-export class PluginService<T extends Array<PluginConstructor>> {
+export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
+export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
 
