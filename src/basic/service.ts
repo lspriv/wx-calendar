@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 00:06:45
+ * @LastEditTime: 2024-01-14 00:24:11
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
@@ -161,7 +161,7 @@ type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
 
 type PluginInstance<T> = T extends abstract new (...args: any) => any ? InstanceType<T> : Plugin;
 
-export type PulginMap<T extends Array<PluginConstructor>> = {
+export type ServicePluginMap<T extends Array<PluginConstructor>> = {
   [P in Union<T> as PluginKey<P>]: PluginInstance<P>;
 };
 
@@ -388,9 +388,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * 获取插件
    * @param key 插件 key
    */
-  public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<PulginMap<T>[K]> {
+  public getPlugin<K extends PluginKeys<T>>(key: K): Voidable<ServicePluginMap<T>[K]> {
     const service = this._plugins_.find(s => s.key === key);
-    return service?.instance as Voidable<PulginMap<T>[K]>;
+    return service?.instance as Voidable<ServicePluginMap<T>[K]>;
   }
 
   /**
