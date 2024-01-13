@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 01:32:11
+ * @LastEditTime: 2024-01-13 18:34:38
  */
 import { View } from './constants';
 
@@ -37,9 +37,6 @@ export class Layout {
   public static CalendarSubHeight: number = 200;
   /** 日历最大高度下留余高度，单位rpx */
   public static CalendarSpareHeight: number = 100;
-
-  public static MaxVelocity: number = 8000;
-  public static CriticalVelocity: number = 6000;
 
   public static initialize() {
     if (Layout.layout) return;
@@ -92,10 +89,6 @@ export class Layout {
   public static rpxToPx(rpx: number, windowWidth: number) {
     return Math.floor((rpx * windowWidth) / Layout.RatioWidth);
   }
-
-  // public static pxToRpx(px: number, windowWidth: number) {
-  //   return Math.floor((px * Layout.RatioWidth) / windowWidth);
-  // }
 
   public static viewHeight(view: View) {
     if (view & View.week) return Layout.layout?.minHeight;

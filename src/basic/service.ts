@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-10 12:27:35
+ * @LastEditTime: 2024-01-12 11:48:32
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
@@ -21,6 +21,9 @@ import type {
   CalendarDateMark,
   WxCalendarYearMarks
 } from '../interface/calendar';
+
+const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
+type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
 
 type Schedules = Array<CalendarDateSchedule>;
 
@@ -54,6 +57,11 @@ interface PluginEventHandle {
    * @param detail 事件详情数据
    */
   PLUGIN_ON_VIEW_CHANGE?(service: PluginService<PluginConstructor[]>, detail: CalendarEventDetail): void;
+  /**
+   * 视图变化触发
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_DETACHED?(service: PluginService<PluginConstructor[]>): void;
 }
 
 export interface Plugin extends PluginEventHandle {
@@ -157,11 +165,11 @@ export type PulginMap<T extends Array<PluginConstructor>> = {
   [P in Union<T> as PluginKey<P>]: PluginInstance<P>;
 };
 
-type PluginEventName<T> = T extends `PLUGIN_ON_${infer R}` ? R : never;
+type PluginEventName<T> = T extends `${PEH_PRE}${infer R}` ? R : never;
 
 export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandle>>;
 
-type PluginEventHandlerName<T extends PluginEventNames> = `PLUGIN_ON_${Uppercase<SnakeCase<T>>}`;
+type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<SnakeCase<T>>}`;
 
 export class PluginService<T extends Array<PluginConstructor>> {
   /** 日历组件实例 */
@@ -363,7 +371,7 @@ export class PluginService<T extends Array<PluginConstructor>> {
    * @param detail 事件详情数据
    */
   public dispatchEventHandle<K extends PluginEventNames>(event: K, detail?: any): void {
-    const handler: PluginEventHandlerName<K> = `PLUGIN_ON_${
+    const handler: PluginEventHandlerName<K> = `${PLUGIN_EVENT_HANDLE_PREFIX}${
       camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
     }`;
     try {

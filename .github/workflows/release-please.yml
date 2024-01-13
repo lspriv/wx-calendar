@@ -34,7 +34,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
       - name: Publish to npm
-        if: ${{ steps.release.outputs.release_created && contains(github.event.head_commit.message, 'from lspriv/develop') }}
+        if: ${{ steps.release.outputs.release_created }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |

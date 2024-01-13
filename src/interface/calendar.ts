@@ -4,15 +4,15 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-08 16:22:55
+ * @LastEditTime: 2024-01-13 19:49:07
  */
 import { WEEKS } from '../basic/constants';
-import { Nullable, isDate, isNumber, isString } from '../utils/shared';
+import { Nullable, Voidable, isDate, isFunction, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MarkPlugin } from '../plugins/mark';
 
 import type { PluginConstructor, PluginUse } from '../basic/service';
-import type { CalendarInstance } from './component';
+import type { CalendarInstance, DefaultPluginKeyExtend } from './component';
 
 export interface CalendarDay {
   year: number;
@@ -22,7 +22,8 @@ export interface CalendarDay {
   today?: boolean;
 }
 
-export interface CalendarMark extends Pick<CalendarDay, 'day' | 'month' | 'year'> {
+export interface CalendarMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
+  date?: string | number | Date | CalendarDay;
   type: 'schedule' | 'corner' | 'festival';
   text: string;
   color?: Nullable<string>;
@@ -380,6 +381,9 @@ export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30,
 
 export type WxCalendarPlugins<T extends WxCalendar<any>> = T extends WxCalendar<infer R> ? R : never;
 
+interface ClearFilter {
+  (plugin: PluginUse): boolean;
+}
 export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
   /** 今天 */
   public static today = normalDate(new Date());
@@ -433,7 +437,27 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     }
   }
 
-  public static clearPlugins() {
-    this._PLUGINS_ = [];
+  /**
+   * 移除所有插件
+   */
+  public static clearPlugin(): void;
+  /**
+   * 移除某个插件
+   * @param key 插件 key
+   */
+  public static clearPlugin<T extends Array<PluginConstructor> = []>(key: DefaultPluginKeyExtend<T>): void;
+  /**
+   * 移除符合条件的插件
+   * @param filter 过滤条件
+   */
+  public static clearPlugin(filter: ClearFilter): void;
+  public static clearPlugin<T extends Voidable<Array<PluginConstructor> | ClearFilter> = undefined>(filter?: T) {
+    if (isString(filter)) {
+      this._PLUGINS_ = this._PLUGINS_.filter(plugin => plugin.construct.KEY === filter);
+    } else if (isFunction(filter)) {
+      this._PLUGINS_ = this._PLUGINS_.filter(plugin => !filter(plugin));
+    } else {
+      this._PLUGINS_ = [];
+    }
   }
 }
