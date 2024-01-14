@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 11:30:33
+ * @LastEditTime: 2024-01-14 13:38:15
  */
 import { normalDate } from '../interface/calendar';
 
@@ -23,7 +23,7 @@ const formDateByKey = (key: string): CalendarDay => {
 };
 
 export class MarkPlugin implements Plugin {
-  public static KEY = '_mark_' as const;
+  public static KEY = 'mark' as const;
 
   private _marks_: WxCalendarMarkMap;
 
