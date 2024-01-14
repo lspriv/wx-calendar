@@ -4,15 +4,15 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 19:49:07
+ * @LastEditTime: 2024-01-14 00:06:24
  */
 import { WEEKS } from '../basic/constants';
-import { Nullable, Voidable, isDate, isFunction, isNumber, isString } from '../utils/shared';
+import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MarkPlugin } from '../plugins/mark';
 
-import type { PluginConstructor, PluginUse } from '../basic/service';
-import type { CalendarInstance, DefaultPluginKeyExtend } from './component';
+import type { PluginConstructor, PluginKeys, PluginUse, ServicePlugins } from '../basic/service';
+import type { CalendarInstance, UsePluginService } from './component';
 
 export interface CalendarDay {
   year: number;
@@ -445,13 +445,15 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
    * 移除某个插件
    * @param key 插件 key
    */
-  public static clearPlugin<T extends Array<PluginConstructor> = []>(key: DefaultPluginKeyExtend<T>): void;
+  public static clearPlugin<T extends PluginService = UsePluginService>(key: PluginKeys<ServicePlugins<T>>): void;
   /**
    * 移除符合条件的插件
    * @param filter 过滤条件
    */
   public static clearPlugin(filter: ClearFilter): void;
-  public static clearPlugin<T extends Voidable<Array<PluginConstructor> | ClearFilter> = undefined>(filter?: T) {
+  public static clearPlugin<T extends PluginService = UsePluginService>(
+    filter?: PluginKeys<ServicePlugins<T>> | ClearFilter
+  ) {
     if (isString(filter)) {
       this._PLUGINS_ = this._PLUGINS_.filter(plugin => plugin.construct.KEY === filter);
     } else if (isFunction(filter)) {

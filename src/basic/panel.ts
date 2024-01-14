@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 14:04:59
+ * @LastEditTime: 2024-01-13 21:59:19
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -274,6 +274,7 @@ export class PanelTool extends CalendarHandler {
     if (toMonthView && !(instance._view_ & View.month)) {
       const currView = flagView(View.month);
       sets.currView = currView;
+      sets.info = getDateInfo(date, false);
       if (this.skyline) instance._dragger_?.toView(View.month, false);
       else sets.initView = 'month';
       instance._view_ = View.month;
