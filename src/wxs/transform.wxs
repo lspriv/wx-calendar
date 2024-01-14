@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 11:42:34
+ * @LastEditTime: 2024-01-14 13:57:22
  */
 
 var nonNullable = function (value) {
@@ -110,7 +110,7 @@ var touchMove = function (e, instance) {
   /**
    * 日历容器高度
    */
-  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + (deltaY * 3) / 5)));
+  var height = Math.floor(Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + (deltaY * 4) / 5)));
 
   /**
    * 触摸时的高度不能等于触摸结束后的最终高度，是为了有效触发容器的transitionend事件

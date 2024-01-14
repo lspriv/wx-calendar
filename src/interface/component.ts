@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-13 19:33:02
+ * @LastEditTime: 2024-01-14 00:28:23
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -18,7 +18,14 @@ import type { CalendarLayout } from '../basic/layout';
 import type { Nullable, Voidable } from '../utils/shared';
 import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
-import type { PluginConstructor, PluginEntireMarks, PluginKeys, PulginMap } from 'src/basic/service';
+import type {
+  PluginConstructor,
+  PluginEntireMarks,
+  PluginKeys,
+  PluginService,
+  ServicePluginMap,
+  ServicePlugins
+} from 'src/basic/service';
 
 export interface CalendarPanel extends WxCalendarMonth {
   /** 面板垂直偏移量 */
@@ -137,7 +144,7 @@ type SwiperAnimationFinishEvent<
 > = WechatMiniprogram.SwiperAnimationFinish<M, D>;
 
 type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
-export type UsePluginService<T extends Array<PluginConstructor> = []> = [...T, ...DEFAULT_PLUGINS];
+export type UsePluginService<T extends PluginConstructor[] = []> = PluginService<[...T, ...DEFAULT_PLUGINS]>;
 
 interface CalendarEventHandlers {
   /**
@@ -286,9 +293,6 @@ export type CalendarInstance = WechatMiniprogram.Component.Instance<
   CalendarCustomProp
 >;
 
-export type DefaultPluginKeyExtend<T extends Array<PluginConstructor>> = PluginKeys<T> | PluginKeys<DEFAULT_PLUGINS>;
-export type DefaultPluginMapExtend<T extends Array<PluginConstructor>> = PulginMap<T> & PulginMap<DEFAULT_PLUGINS>;
-
 export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /** 版本号 */
   version: string;
@@ -308,9 +312,12 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /**
    * 获取插件
    */
-  getPlugin<T extends Array<PluginConstructor> = [], K extends DefaultPluginKeyExtend<T> = DefaultPluginKeyExtend<T>>(
+  getPlugin<
+    T extends PluginService = UsePluginService,
+    K extends PluginKeys<ServicePlugins<T>> = PluginKeys<ServicePlugins<T>>
+  >(
     key: K
-  ): Voidable<DefaultPluginMapExtend<T>[K]>;
+  ): Voidable<ServicePluginMap<ServicePlugins<T>>[K]>;
   /**
    * 更新插件日期数据
    */
