@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.1](https://github.com/lspriv/wx-calendar/compare/v1.5.0...v1.5.1) (2024-01-14)
+
+
+### Bug Fixes
+
+* **webview:** 调整拖拽 ([6233c79](https://github.com/lspriv/wx-calendar/commit/6233c79a2588ad5337c35aa7469b1b3d1186564b))
+* 修正getPlugin方法参数 ([72b770d](https://github.com/lspriv/wx-calendar/commit/72b770d56667dd67f1bf1ccc23f64978afd6fe3b))
+* 修正WxCalendar.clearPlugin方法参数类型 ([3bdf3cd](https://github.com/lspriv/wx-calendar/commit/3bdf3cd3cb02d7b65b58292cbb11294d47af6bd0))
+* 调整年度面板月标题透明度 ([0fe2ee0](https://github.com/lspriv/wx-calendar/commit/0fe2ee0454f7db2af8e4b6cf131d29164a9c6acd))
+* 调整日期信息变动 ([bc70fc5](https://github.com/lspriv/wx-calendar/commit/bc70fc508c36c52abb8c1f4dd61827847c9a6b1b))
+* 调整类型UsePluginService ([6762a3a](https://github.com/lspriv/wx-calendar/commit/6762a3a460f7ba1d37d67704e176d9e239e3c987))
+
 ## [1.5.0](https://github.com/lspriv/wx-calendar/compare/v1.4.0...v1.5.0) (2024-01-13)
 
 
