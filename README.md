@@ -419,10 +419,7 @@ class MyPlugin implements Plugin {
    * @param service PliginService实例
    * @param detail 事件数据
    */
-  PLUGIN_ON_LOAD(
-    service: PluginService, 
-    detail: CalendarEventDetail
-  ) {
+  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -432,10 +429,7 @@ class MyPlugin implements Plugin {
    * @param service PliginService实例
    * @param detail 事件数据
    */
-  PLUGIN_ON_CHANGE(
-    service: PluginService, 
-    detail: CalendarEventDetail
-  ) {
+  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -445,10 +439,7 @@ class MyPlugin implements Plugin {
    * @param service PliginService实例
    * @param detail 事件数据
    */
-  PLUGIN_ON_VIEW_CHANGE(
-    service: PluginService, 
-    detail: CalendarEventDetail
-  ) {
+  PLUGIN_ON_VIEW_CHANGE(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
