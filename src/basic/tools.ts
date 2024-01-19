@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 20:24:23
+ * @LastEditTime: 2024-01-19 22:21:33
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -89,6 +89,9 @@ export const severalTicks = async (times: number) => {
   }
 };
 
+/**
+ * 绑定 worklet动画
+ */
 export const applyAnimated = (
   instance: ComponentInstance,
   selector: string,
@@ -102,6 +105,9 @@ export const applyAnimated = (
   });
 };
 
+/**
+ * 取消 worklet 动画绑定
+ */
 export const clearAnimated = (instance: ComponentInstance, selector: string, ids: Array<number>) => {
   return new Promise<void>(resolve => {
     instance.clearAnimatedStyle(selector, ids, () => {
@@ -110,6 +116,10 @@ export const clearAnimated = (instance: ComponentInstance, selector: string, ids
   });
 };
 
+/**
+ * 获取节点信息
+ * @param component 组件实例
+ */
 export const nodeRect = (component: ComponentInstance) => {
   const selectorQuery = component.createSelectorQuery().in(component);
   return (selector: string) =>
@@ -125,6 +135,20 @@ export const nodeRect = (component: ComponentInstance) => {
     });
 };
 
+/**
+ * 获取页面偏移
+ * @param component 组件实例
+ */
+export const viewportOffset = (component: ComponentInstance) => {
+  return new Promise<WechatMiniprogram.ScrollOffsetCallbackResult>(resolve => {
+    component.createSelectorQuery().selectViewport().scrollOffset(resolve).exec();
+  });
+};
+
+/**
+ * 合并字体
+ * @param fonts 字体
+ */
 export const mergeFonts = (...fonts: Array<string>) => {
   return fonts.flatMap(font => font.split(',').map(f => f.trim())).join(',');
 };

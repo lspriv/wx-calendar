@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 16:15:49
+ * @LastEditTime: 2024-01-19 22:23:38
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
-import { nodeRect } from './tools';
+import { nodeRect, viewportOffset } from './tools';
 
 import type { CalendarDay, CalendarMonth, WxCalendarYMonth, WxCalendarFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
@@ -580,8 +580,8 @@ export class YearPrinter extends CalendarHandler {
       ctx!.fillStyle = isToday(date)
         ? frame.todayCheckedColor!
         : showRest && ((this.isWeekend(w) && !this.getMark(marks, date, 'work')) || this.getMark(marks, date, 'rest'))
-        ? frame.restColor
-        : frame.dateColor;
+          ? frame.restColor
+          : frame.dateColor;
 
       ctx!.fillText(`${day}`, _x, _y);
 
@@ -697,9 +697,9 @@ export class YearPrinter extends CalendarHandler {
    * 年度面板打开动画
    * @param mon 指定月份
    * @param top 日历顶端在页面的位置
-   * @param callback 动画开始之前的操作
+   * @param prepose 动画开始之前的操作
    */
-  public async open(mon: CalendarMonth, top: number, callback?: () => void) {
+  public async open(mon: CalendarMonth, top: number, prepose?: () => void) {
     this._calendar_top_ = top;
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
@@ -719,7 +719,7 @@ export class YearPrinter extends CalendarHandler {
     }
 
     /** 执行动画前置操作 */
-    callback?.();
+    prepose?.();
 
     /** 执行动画 */
     await this.requestAnimation(canvas, year);
@@ -754,7 +754,9 @@ export class YearPrinter extends CalendarHandler {
 
     const query = nodeRect(this._instance_);
     const [rect] = await query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`);
-    const _y = y - (rect.top ?? 0);
+    const offset = await viewportOffset(this._instance_);
+
+    const _y = y - (rect.top ?? 0) - offset.scrollTop;
 
     if (x < padding || _y < padding || x > canvas.width - padding) throw new Error('beyond the boundary');
 

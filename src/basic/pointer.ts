@@ -4,14 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2023-10-30 15:48:59
+ * @LastEditTime: 2024-01-18 20:36:11
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
 
 import type { CalendarDay, WxCalendarMonth } from '../interface/calendar';
 import type { CalendarData } from '../interface/component';
-import type { Voidable } from '../utils/shared';
 
 interface PointerLocation {
   x: string | number;
@@ -33,12 +32,7 @@ interface PointerIndexLocation {
 export class Pointer extends CalendarHandler {
   private _vibrate_: boolean;
 
-  public update(
-    sets: Voidable<Partial<CalendarData>>,
-    vibrate: boolean = false,
-    checked?: CalendarDay,
-    flush: boolean = false
-  ) {
+  public update(sets?: Partial<CalendarData>, vibrate: boolean = false, checked?: CalendarDay, flush: boolean = false) {
     const instance = this._instance_;
     checked = checked || sets?.checked || instance.data.checked!;
     const current = sets?.current ?? instance.data.current;
