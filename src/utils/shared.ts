@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 18:10:06
+ * @LastEditTime: 2024-01-19 23:39:34
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -45,7 +45,13 @@ export type SnakeCase<T extends string> = T extends `${infer R}${infer P}`
 
 export const camelToSnake = <T extends string>(str: T) => str.replace(/([A-Z])/g, '_$1').toLowerCase() as SnakeCase<T>;
 
-export const promises = <T>(all: T[]) => Promise.all(all.filter(isPromise<T>));
+type AllAwaited<T> = T extends [infer R, ...infer P]
+  ? [Awaited<R>, ...AllAwaited<P>]
+  : T extends Array<infer Q>
+    ? Array<Awaited<Q>>
+    : Awaited<T>;
+
+export const promises = <T extends any[]>(all: T) => Promise.all(all.filter(isPromise)) as Promise<AllAwaited<T>>;
 
 export const values = <T>(obj: Record<string, T>): T[] => Object.keys(obj).map(key => obj[key]);
 

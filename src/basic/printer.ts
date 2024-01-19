@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-19 22:23:38
+ * @LastEditTime: 2024-01-19 23:43:19
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -753,10 +753,9 @@ export class YearPrinter extends CalendarHandler {
     const padding = this._pannel_padding_.min;
 
     const query = nodeRect(this._instance_);
-    const [rect] = await query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`);
-    const offset = await viewportOffset(this._instance_);
+    const [offset, rect] = await promises([viewportOffset(this._instance_), query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`)]);
 
-    const _y = y - (rect.top ?? 0) - offset.scrollTop;
+    const _y = y - (rect[0].top ?? 0) - offset.scrollTop;
 
     if (x < padding || _y < padding || x > canvas.width - padding) throw new Error('beyond the boundary');
 
