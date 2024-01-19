@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-19 23:43:19
+ * @LastEditTime: 2024-01-20 00:32:15
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -57,7 +57,6 @@ interface TitleFrames {
   titleFontSize: number;
   titlePaddingX: number;
   titleColor: string;
-  titleAlpha: number;
 }
 
 interface MonthFrames {
@@ -271,7 +270,9 @@ export class YearPrinter extends CalendarHandler {
     const isMax = state & PrinterState.maximize;
 
     /** 全局透明度 */
-    const alpha = isMax ? 1 : +iframe(1, 0, frame).toFixed(1);
+    const _alpha = isMax ? 1 : +iframe(1, 0, frame).toFixed(1);
+
+    const alpha = state & PrinterState.minimize && frame ? Math.max((_alpha * 10 * 15 - 50) / 100, 0) : _alpha;
 
     /** 面板内边距 */
     const paddingFr = isMax ? this._pannel_padding_.max : this._pannel_padding_.min;
@@ -331,9 +332,6 @@ export class YearPrinter extends CalendarHandler {
     const titleSizeTo = isMax ? this._title_size_.min : this._title_size_.max;
     const titleFontSize = iframe(titleSizeFr, titleSizeTo, frame);
 
-    /** 月标题透明度 */
-    const titleAlpha = state & PrinterState.minimize && frame ? Math.max((alpha * 10 * 15 - 50) / 100, 0) : alpha;
-
     /** 星期字体大小 */
     const weekSizeFr = isMax ? this._week_size_.max : this._week_size_.min;
     const weekSizeTo = isMax ? this._week_size_.min : this._week_size_.max;
@@ -390,7 +388,6 @@ export class YearPrinter extends CalendarHandler {
       titleFontSize,
       titlePaddingX: this._title_padding_x_,
       titleColor: color('title'),
-      titleAlpha,
       weekHeight,
       weekFontSize,
       weekPaddingY,
@@ -477,7 +474,7 @@ export class YearPrinter extends CalendarHandler {
     const { x, y } = locate;
 
     /** 回到主面板时月份标题隐藏 */
-    ctx!.globalAlpha = state & PrinterState.maximize ? alpha : frame.titleAlpha;
+    ctx!.globalAlpha = state & PrinterState.maximize ? alpha : frame.alpha;
 
     const { year, month } = WxCalendar.today;
     const curr = mon.year === year && mon.month === month;
