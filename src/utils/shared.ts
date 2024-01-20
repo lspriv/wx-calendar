@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-19 23:39:34
+ * @LastEditTime: 2024-01-20 19:10:13
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -23,7 +23,7 @@ export const isPromise = <T = any>(val: unknown): val is Promise<T> =>
 export const nonNullable = <T>(val: T): val is NonNullable<T> => val !== void 0 && val !== null;
 export const isVoid = (val: unknown): val is undefined => val === void 0;
 
-/** 元组 join */
+// /** 元组 join */
 // export type Join<T extends ReadonlyArray<string>, S = ',', U = ''> = T extends readonly [
 //   infer R,
 //   ...infer P extends ReadonlyArray<string>
@@ -32,18 +32,19 @@ export const isVoid = (val: unknown): val is undefined => val === void 0;
 //   : '';
 
 /** 下划线（snake_case）转小驼峰（lowerCamelCase） */
-export type LowerCamelCase<T extends string, K = Lowercase<T>> = K extends `${infer R}_${infer P}`
-  ? `${R}${Capitalize<LowerCamelCase<P, P>>}`
+export type SnakeToLowerCamel<T extends string, K = Lowercase<T>> = K extends `${infer R}_${infer P}`
+  ? `${R}${Capitalize<SnakeToLowerCamel<P, P>>}`
   : K;
 
 /** 小驼峰（lowerCamelCase）转下划线（snake_case） */
-export type SnakeCase<T extends string> = T extends `${infer R}${infer P}`
+export type LowerCamelToSnake<T extends string> = T extends `${infer R}${infer P}`
   ? R extends Lowercase<R>
-    ? `${R}${SnakeCase<P>}`
-    : `_${Lowercase<R>}${SnakeCase<P>}`
+    ? `${R}${LowerCamelToSnake<P>}`
+    : `_${Lowercase<R>}${LowerCamelToSnake<P>}`
   : T;
 
-export const camelToSnake = <T extends string>(str: T) => str.replace(/([A-Z])/g, '_$1').toLowerCase() as SnakeCase<T>;
+export const camelToSnake = <T extends string>(str: T) =>
+  str.replace(/([A-Z])/g, '_$1').toLowerCase() as LowerCamelToSnake<T>;
 
 type AllAwaited<T> = T extends [infer R, ...infer P]
   ? [Awaited<R>, ...AllAwaited<P>]
