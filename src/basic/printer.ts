@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 16:15:49
+ * @LastEditTime: 2024-01-20 00:32:15
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
-import { nodeRect } from './tools';
+import { nodeRect, viewportOffset } from './tools';
 
 import type { CalendarDay, CalendarMonth, WxCalendarYMonth, WxCalendarFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
@@ -57,7 +57,6 @@ interface TitleFrames {
   titleFontSize: number;
   titlePaddingX: number;
   titleColor: string;
-  titleAlpha: number;
 }
 
 interface MonthFrames {
@@ -271,7 +270,9 @@ export class YearPrinter extends CalendarHandler {
     const isMax = state & PrinterState.maximize;
 
     /** 全局透明度 */
-    const alpha = isMax ? 1 : +iframe(1, 0, frame).toFixed(1);
+    const _alpha = isMax ? 1 : +iframe(1, 0, frame).toFixed(1);
+
+    const alpha = state & PrinterState.minimize && frame ? Math.max((_alpha * 10 * 15 - 50) / 100, 0) : _alpha;
 
     /** 面板内边距 */
     const paddingFr = isMax ? this._pannel_padding_.max : this._pannel_padding_.min;
@@ -331,9 +332,6 @@ export class YearPrinter extends CalendarHandler {
     const titleSizeTo = isMax ? this._title_size_.min : this._title_size_.max;
     const titleFontSize = iframe(titleSizeFr, titleSizeTo, frame);
 
-    /** 月标题透明度 */
-    const titleAlpha = state & PrinterState.minimize && frame ? Math.max((alpha * 10 * 15 - 50) / 100, 0) : alpha;
-
     /** 星期字体大小 */
     const weekSizeFr = isMax ? this._week_size_.max : this._week_size_.min;
     const weekSizeTo = isMax ? this._week_size_.min : this._week_size_.max;
@@ -390,7 +388,6 @@ export class YearPrinter extends CalendarHandler {
       titleFontSize,
       titlePaddingX: this._title_padding_x_,
       titleColor: color('title'),
-      titleAlpha,
       weekHeight,
       weekFontSize,
       weekPaddingY,
@@ -477,7 +474,7 @@ export class YearPrinter extends CalendarHandler {
     const { x, y } = locate;
 
     /** 回到主面板时月份标题隐藏 */
-    ctx!.globalAlpha = state & PrinterState.maximize ? alpha : frame.titleAlpha;
+    ctx!.globalAlpha = state & PrinterState.maximize ? alpha : frame.alpha;
 
     const { year, month } = WxCalendar.today;
     const curr = mon.year === year && mon.month === month;
@@ -580,8 +577,8 @@ export class YearPrinter extends CalendarHandler {
       ctx!.fillStyle = isToday(date)
         ? frame.todayCheckedColor!
         : showRest && ((this.isWeekend(w) && !this.getMark(marks, date, 'work')) || this.getMark(marks, date, 'rest'))
-        ? frame.restColor
-        : frame.dateColor;
+          ? frame.restColor
+          : frame.dateColor;
 
       ctx!.fillText(`${day}`, _x, _y);
 
@@ -697,9 +694,9 @@ export class YearPrinter extends CalendarHandler {
    * 年度面板打开动画
    * @param mon 指定月份
    * @param top 日历顶端在页面的位置
-   * @param callback 动画开始之前的操作
+   * @param prepose 动画开始之前的操作
    */
-  public async open(mon: CalendarMonth, top: number, callback?: () => void) {
+  public async open(mon: CalendarMonth, top: number, prepose?: () => void) {
     this._calendar_top_ = top;
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
@@ -719,7 +716,7 @@ export class YearPrinter extends CalendarHandler {
     }
 
     /** 执行动画前置操作 */
-    callback?.();
+    prepose?.();
 
     /** 执行动画 */
     await this.requestAnimation(canvas, year);
@@ -753,8 +750,9 @@ export class YearPrinter extends CalendarHandler {
     const padding = this._pannel_padding_.min;
 
     const query = nodeRect(this._instance_);
-    const [rect] = await query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`);
-    const _y = y - (rect.top ?? 0);
+    const [offset, rect] = await promises([viewportOffset(this._instance_), query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`)]);
+
+    const _y = y - (rect[0].top ?? 0) - offset.scrollTop;
 
     if (x < padding || _y < padding || x > canvas.width - padding) throw new Error('beyond the boundary');
 
