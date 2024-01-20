@@ -3,7 +3,7 @@
   Distributed under MIT license.
   See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  -->
-<view class="wc__annual">
+<view class="wc__annual" catchtouchmove>
   <view class="wc__annual-header">
     <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
     <view class="wc__annual-header-tips">
