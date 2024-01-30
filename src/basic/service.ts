@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 00:24:11
+ * @LastEditTime: 2024-01-20 19:08:39
  */
 import { nextTick } from './tools';
 import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
 import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
-import type { LowerCamelCase, Nullable, SnakeCase, Voidable } from '../utils/shared';
+import type { SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
@@ -38,7 +38,7 @@ export type TrackYearResult = {
   marks?: WxCalendarYearMarks;
 };
 
-interface PluginEventHandle {
+interface PluginEventHandler {
   /**
    * 日历组件onLoad事件触发
    * @param service PliginService实例
@@ -64,7 +64,7 @@ interface PluginEventHandle {
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
-export interface Plugin extends PluginEventHandle {
+export interface Plugin extends PluginEventHandler {
   /**
    * PliginService初始化完成
    * @param service PliginService实例
@@ -167,9 +167,9 @@ export type ServicePluginMap<T extends Array<PluginConstructor>> = {
 
 type PluginEventName<T> = T extends `${PEH_PRE}${infer R}` ? R : never;
 
-export type PluginEventNames = LowerCamelCase<PluginEventName<keyof PluginEventHandle>>;
+export type PluginEventNames = SnakeToLowerCamel<PluginEventName<keyof PluginEventHandler>>;
 
-type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<SnakeCase<T>>}`;
+type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
@@ -373,7 +373,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    */
   public dispatchEventHandle<K extends PluginEventNames>(event: K, detail?: any): void {
     const handler: PluginEventHandlerName<K> = `${PLUGIN_EVENT_HANDLE_PREFIX}${
-      camelToSnake(event).toUpperCase() as Uppercase<SnakeCase<K>>
+      camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
     try {
       this.traversePlugins(plugin => {
