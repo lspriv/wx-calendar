@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/lspriv/wx-calendar/compare/v1.5.2...v1.5.3) (2024-01-30)
+
+
+### Bug Fixes
+
+* 调整非自定义导航栏页面下的年面板动画垂直方向平移 ([0467ec6](https://github.com/lspriv/wx-calendar/commit/0467ec61ca2e810616e38b8b7092c8b8a1fa36d4))
+
 ## [1.5.2](https://github.com/lspriv/wx-calendar/compare/v1.5.1...v1.5.2) (2024-01-20)
 
 
