@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-20 00:32:15
+ * @LastEditTime: 2024-01-20 20:53:01
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -176,6 +176,7 @@ export class YearPrinter extends CalendarHandler {
   private _translate_x_: number = 0;
   private _translate_y_: number = 0;
   private _calendar_top_: number = 0;
+  private _custom_offset_: number = 0;
 
   private _font_: string;
 
@@ -229,6 +230,10 @@ export class YearPrinter extends CalendarHandler {
     this._date_height_ = Layout.rpxToPx(100 - 24, Layout.layout!.windowWidth);
     this._checked_radius_max_ = Layout.rpxToPx(50, Layout.layout!.windowWidth);
     this._checked_offset_max_ = Layout.rpxToPx(12, Layout.layout!.windowWidth);
+
+    if (!this._instance_.data.customNavBar) {
+      this._custom_offset_ = Layout.layout!.menuBottom - this._title_height_;
+    }
   }
 
   private initializeCanvas(id: string, dpr: number) {
@@ -285,8 +290,9 @@ export class YearPrinter extends CalendarHandler {
     const translateX = iframe(translateXFr, translateXTo, frame);
 
     /** 面板垂直偏移 */
-    const translateYFr = isMax ? this._translate_y_ : 0;
-    const translateYTo = isMax ? 0 : this._translate_y_;
+    const translateYTt = this._translate_y_ + this._custom_offset_;
+    const translateYFr = isMax ? translateYTt : 0;
+    const translateYTo = isMax ? 0 : translateYTt;
     const translateY = iframe(translateYFr, translateYTo, frame);
 
     const minWidth = (canvas.width - padding * 2) / 3;
@@ -698,6 +704,7 @@ export class YearPrinter extends CalendarHandler {
    */
   public async open(mon: CalendarMonth, top: number, prepose?: () => void) {
     this._calendar_top_ = top;
+    console.log('top', top);
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
     await this.inintializeTransform(canvas, mon.month - 1);
