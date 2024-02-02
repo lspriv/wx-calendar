@@ -3,7 +3,7 @@ name: autorelease
 on:
   push:
     branches:
-      - issue
+      - master
   workflow_dispatch:
   
 permissions:
