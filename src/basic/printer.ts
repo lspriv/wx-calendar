@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-01-20 20:53:01
+ * @LastEditTime: 2024-02-02 11:53:27
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -173,13 +173,21 @@ export class YearPrinter extends CalendarHandler {
   private _checked_radius_max_: number;
   private _checked_offset_max_: number;
 
+  /** 最大化状态下面板水平偏移量（根据选择月份计算） */
   private _translate_x_: number = 0;
+  /** 最大化状态下面板垂直偏移量（根据选择月份计算） */
   private _translate_y_: number = 0;
-  private _calendar_top_: number = 0;
-  private _custom_offset_: number = 0;
+  /** 日历组件左侧处于页面中的位置 */
+  private _calendar_x_: number = 0;
+  /** 日历组件顶端处于页面中的位置 */
+  private _calendar_y_: number = 0;
+  /** 非自定义页面导航栏的情况下年度面板需要考虑头部高度 */
+  private _header_offset_: number = 0;
 
+  /** 字体 */
   private _font_: string;
 
+  /** 处理系统深色模式的监听 */
   private _theme_listener_?: ThemeListener;
 
   public async initialize() {
@@ -232,7 +240,7 @@ export class YearPrinter extends CalendarHandler {
     this._checked_offset_max_ = Layout.rpxToPx(12, Layout.layout!.windowWidth);
 
     if (!this._instance_.data.customNavBar) {
-      this._custom_offset_ = Layout.layout!.menuBottom - this._title_height_;
+      this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
     }
   }
 
@@ -290,7 +298,7 @@ export class YearPrinter extends CalendarHandler {
     const translateX = iframe(translateXFr, translateXTo, frame);
 
     /** 面板垂直偏移 */
-    const translateYTt = this._translate_y_ + this._custom_offset_;
+    const translateYTt = this._translate_y_ + this._header_offset_;
     const translateYFr = isMax ? translateYTt : 0;
     const translateYTo = isMax ? 0 : translateYTt;
     const translateY = iframe(translateYFr, translateYTo, frame);
@@ -673,9 +681,13 @@ export class YearPrinter extends CalendarHandler {
 
   private async inintializeTransform(canvas: Canvas, mdx: number) {
     this._translate_x_ = -canvas.width * (mdx % 3);
-    this._translate_y_ = -canvas.width * Math.floor(mdx / 3) + (this._calendar_top_ - Layout.layout!.menuBottom);
+    this._translate_y_ = -canvas.width * Math.floor(mdx / 3) + (this._calendar_y_ - Layout.layout!.menuBottom);
   }
 
+  /**
+   * 检查有未初始化的画布
+   * @param excludes 排除检查的画布索引
+   */
   private checkInitializeRender(excludes: number[] = []) {
     for (let i = 0; i < CALENDAR_PANELS; i++) {
       if (excludes.includes(i)) continue;
@@ -690,6 +702,11 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
+  /**
+   *  重置为最小化状态
+   * @param canvas 画布
+   * @param year 年度
+   */
   public renderMinimize(canvas: Canvas, year: WxCalendarFullYear) {
     canvas.frame = 0;
     canvas.state = PrinterState.minimize;
@@ -699,12 +716,17 @@ export class YearPrinter extends CalendarHandler {
   /**
    * 年度面板打开动画
    * @param mon 指定月份
-   * @param top 日历顶端在页面的位置
+   * @param rect 日历在页面的位置信息
    * @param prepose 动画开始之前的操作
    */
-  public async open(mon: CalendarMonth, top: number, prepose?: () => void) {
-    this._calendar_top_ = top;
-    console.log('top', top);
+  public async open(
+    mon: CalendarMonth,
+    rect: WechatMiniprogram.BoundingClientRectCallbackResult,
+    prepose?: () => void
+  ) {
+    this._calendar_x_ = rect.left;
+    this._calendar_y_ = rect.top;
+    console.log('rect', rect);
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
     await this.inintializeTransform(canvas, mon.month - 1);
@@ -752,6 +774,12 @@ export class YearPrinter extends CalendarHandler {
     canvas.state = PrinterState.maximize;
   }
 
+  /**
+   * 点击画布获取对应的月份
+   * @param ydx 年度数组索引
+   * @param x 点击位置水平坐标
+   * @param y 点击位置垂直坐标
+   */
   public async getTapMonth(ydx: number, x: number, y: number): Promise<CalendarMonth> {
     const canvas = this._canvas_[ydx];
     const padding = this._pannel_padding_.min;
@@ -777,6 +805,10 @@ export class YearPrinter extends CalendarHandler {
     return { year: this._instance_.data.years[ydx].year, month };
   }
 
+  /**
+   * 更新
+   * @param idxs 年度数组索引
+   */
   public update(idxs?: number[]) {
     idxs = idxs || Array.from({ length: CALENDAR_PANELS }, (_, i) => i);
     for (const idx of idxs) {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 14:04:47
+ * @LastEditTime: 2024-02-02 00:29:26
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
@@ -111,10 +111,10 @@ export class AnnualPanelSwitch extends CalendarHandler {
   /**
    * 计算日历顶端在页面中的位置
    */
-  private async calcCalendarTop() {
+  private async getCalendarRect() {
     const query = nodeRect(this._instance_);
     const rect = await query(SELECTOR.CALENDAR);
-    return rect[0].top;
+    return rect[0];
   }
 
   /**
@@ -143,12 +143,12 @@ export class AnnualPanelSwitch extends CalendarHandler {
        * 获取日历顶端在页面的位置
        * 用来处理年度面板动画垂直方向的初始偏移量
        */
-      const top = await this.calcCalendarTop();
-      if (isSkyline) this._top_!.value = `-${top}px`;
+      const rect = await this.getCalendarRect();
+      if (isSkyline) this._top_!.value = `-${rect.top}px`;
       else instance.setData({ annualTop: 0, annualDuration: 300 });
 
       /** 执行年度面板打开动画 */
-      await instance._printer_.open(mon, top, () => {
+      await instance._printer_.open(mon, rect, () => {
         /** 动画开始前将面板透明度设置可见 */
         if (isSkyline) this._opacity_!.value = 1;
         else instance.setData({ annualOpacity: 1 });
