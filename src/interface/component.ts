@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-01-14 00:28:23
+ * @LastEditTime: 2024-02-04 11:29:18
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -264,6 +264,8 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   _swiper_flag_: boolean;
   /** [Webview] Swiper滑动累积偏移量，Swiper滑动结束后用来判断滑动了几个滑块 */
   _swiper_accumulator_: number;
+  /** 日历组件容器宽度 */
+  $_calendar_width: Shared<number>;
   /** 周/月面板保存连续滑动中累积的偏移量 */
   $_swiper_trans: Shared<number>;
   /** 年面板保存连续滑动中累积的偏移量 */

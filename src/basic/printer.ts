@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-02 11:53:27
+ * @LastEditTime: 2024-02-04 13:35:10
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -293,8 +293,8 @@ export class YearPrinter extends CalendarHandler {
     const padding = iframe(paddingFr, paddingTo, frame);
 
     /** 面板水平偏移 */
-    const translateXFr = isMax ? this._translate_x_ : 0;
-    const translateXTo = isMax ? 0 : this._translate_x_;
+    const translateXFr = isMax ? this._translate_x_ + this._calendar_x_ : 0;
+    const translateXTo = isMax ? 0 : this._translate_x_ + this._calendar_x_;
     const translateX = iframe(translateXFr, translateXTo, frame);
 
     /** 面板垂直偏移 */
@@ -306,9 +306,11 @@ export class YearPrinter extends CalendarHandler {
     const minWidth = (canvas.width - padding * 2) / 3;
     const minHeight = (canvas.height - padding) / 4;
 
+    const calendarWidth = this._instance_.$_calendar_width.value;
+
     /** 月份宽度 */
-    const widthFr = isMax ? canvas.width : minWidth;
-    const widthTo = isMax ? minWidth : canvas.width;
+    const widthFr = isMax ? calendarWidth : minWidth;
+    const widthTo = isMax ? minWidth : calendarWidth;
     const width = iframe(widthFr, widthTo, frame);
 
     /** 月份高度 */
@@ -680,7 +682,8 @@ export class YearPrinter extends CalendarHandler {
   }
 
   private async inintializeTransform(canvas: Canvas, mdx: number) {
-    this._translate_x_ = -canvas.width * (mdx % 3);
+    const calendarWidth = this._instance_.$_calendar_width.value;
+    this._translate_x_ = -calendarWidth * (mdx % 3);
     this._translate_y_ = -canvas.width * Math.floor(mdx / 3) + (this._calendar_y_ - Layout.layout!.menuBottom);
   }
 
@@ -726,7 +729,7 @@ export class YearPrinter extends CalendarHandler {
   ) {
     this._calendar_x_ = rect.left;
     this._calendar_y_ = rect.top;
-    console.log('rect', rect);
+
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
     await this.inintializeTransform(canvas, mon.month - 1);
