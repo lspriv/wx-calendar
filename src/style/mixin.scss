@@ -29,11 +29,11 @@
 }
 
 @mixin if($states...) {
-	$selector: &;
+	$selector: '';
 	@each $state in $states {
 		$selector: $selector + #{&}--#{$state};
 	}
-	@at-root #{$selector} {
+	@at-root #{selector.unify(&, $selector)} {
 		@content;
 	}
 }
