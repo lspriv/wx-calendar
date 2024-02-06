@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.5](https://github.com/lspriv/wx-calendar/compare/v1.5.4...v1.5.5) (2024-02-06)
+
+
+### Bug Fixes
+
+* 调整选中日期样式一致 ([95d6287](https://github.com/lspriv/wx-calendar/commit/95d6287c5e1d252a6ae2b5856a25ddd8e8855007)), closes [#89](https://github.com/lspriv/wx-calendar/issues/89)
+
 ## [1.5.4](https://github.com/lspriv/wx-calendar/compare/v1.5.3...v1.5.4) (2024-02-04)
 
 
