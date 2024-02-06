@@ -143,6 +143,12 @@ type CalendarDay = {
         <td>''</td>
     </tr>
     <tr>
+        <td>sameChecked</td>
+        <td>boolean</td>
+        <td>保持选中日期样式一致</td>
+        <td>false</td>
+    </tr>
+    <tr>
         <td>font</td>
         <td>string</td>
         <td>设置字体</td>

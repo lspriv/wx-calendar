@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-04 11:33:54
+ * @LastEditTime: 2024-02-05 18:40:57
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -92,6 +92,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     style: {
       type: String,
       value: ''
+    },
+    sameChecked: {
+      type: Boolean,
+      value: false
     },
     customNavBar: {
       type: Boolean,

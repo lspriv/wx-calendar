@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-04 11:29:18
+ * @LastEditTime: 2024-02-05 18:46:08
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -95,6 +95,8 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   font: FullProperty<StringConstructor>;
   /** 容器样式 */
   style: FullProperty<StringConstructor>;
+  /** 选中圆圈外观在非今日和今日保持一致 */
+  sameChecked: FullProperty<BooleanConstructor>;
   /** 周首日，0 | 1 | 2 | 3 | 4 | 5 | 6 分别对应 日 | 一 | 二 | 三 | 四 | 五 | 六 */
   weekstart: FullProperty<NumberConstructor>;
   /** 点击选择日期时是否震动 */
