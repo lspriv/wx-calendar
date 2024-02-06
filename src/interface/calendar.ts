@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 00:06:24
+ * @LastEditTime: 2024-02-06 09:03:03
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -205,12 +205,12 @@ export function normalDate(
   const date = isString(fuzzy)
     ? new Date(fuzzy)
     : isNumber(fuzzy)
-    ? month !== undefined && day !== undefined
-      ? new Date(fuzzy, month - 1, day)
-      : new Date(fuzzy)
-    : isDate(fuzzy)
-    ? fuzzy
-    : new Date(fuzzy.year, fuzzy.month - 1, fuzzy.day);
+      ? month !== undefined && day !== undefined
+        ? new Date(fuzzy, month - 1, day)
+        : new Date(fuzzy)
+      : isDate(fuzzy)
+        ? fuzzy
+        : new Date(fuzzy.year, fuzzy.month - 1, fuzzy.day);
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
@@ -427,9 +427,12 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     return y;
   }
 
-  public static use(service: PluginConstructor, options?: Record<string, any>): void;
+  public static use<T extends PluginConstructor>(service: T, options?: ConstructorParameters<T>[0]): void;
   public static use(services: Array<PluginConstructor>): void;
-  public static use(services: PluginConstructor | Array<PluginConstructor>, options?: Record<string, any>) {
+  public static use<T extends PluginConstructor>(
+    services: T | Array<PluginConstructor>,
+    options?: ConstructorParameters<T>[0]
+  ) {
     if (Array.isArray(services)) {
       this._PLUGINS_ = services.map(service => ({ construct: service }));
     } else {
