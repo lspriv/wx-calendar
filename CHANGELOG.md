@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.4](https://github.com/lspriv/wx-calendar/compare/v1.5.3...v1.5.4) (2024-02-04)
+
+
+### Bug Fixes
+
+* 放开组件宽度限制,解决自定义宽度下出现的问题 ([f59fa12](https://github.com/lspriv/wx-calendar/commit/f59fa122b33e05411a95b8b42dc73998060038ee)), closes [#88](https://github.com/lspriv/wx-calendar/issues/88)
+
 ## [1.5.3](https://github.com/lspriv/wx-calendar/compare/v1.5.2...v1.5.3) (2024-01-30)
 
 
