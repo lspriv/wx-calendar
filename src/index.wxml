@@ -18,7 +18,7 @@
     mark:dragMax="{{ layout.dragMaxHeight }}"
     mark:view="{{ currView }}"
     mark:fixed="{{ viewFixed }}"
-    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }}"
+    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }} {{ sameChecked ? 'wc--same-checked' : '' }}"
     catchtransitionend="calendarTransitionEnd">
 
     <!-- Calendar Header Start -->

@@ -71,16 +71,7 @@
     }
 
     @include if(today, checked) {
-      .wc__panel-day {
-        &::after {
-          color: theme(checked-today-color) !important;
-        }
-      }
-      .wc__panel-solar,
-      .wc__panel-mark,
-      .wc__panel-corner {
-        color: theme(checked-today-color) !important;
-      }
+      @extend %date-today-checked;
     }
 
     @include if(scheduled) {
@@ -219,6 +210,14 @@
   }
 }
 
+.wc.wc--same-checked {
+  .wc__panel-date {
+    @include if (checked) {
+      @extend %date-today-checked;
+    }
+  }
+}
+
 .wc__panel-swiper {
   width: 100%;
   height: 100%;
@@ -235,5 +234,18 @@
   }
   .wc__panel-schedule {
     padding: 2rpx 6rpx;
+  }
+}
+
+%date-today-checked {
+  .wc__panel-day {
+    &::after {
+      color: theme(checked-today-color) !important;
+    }
+  }
+  .wc__panel-solar,
+  .wc__panel-mark,
+  .wc__panel-corner {
+    color: theme(checked-today-color) !important;
   }
 }
