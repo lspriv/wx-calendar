@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-04 11:33:54
+ * @LastEditTime: 2024-02-07 20:55:38
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -44,13 +44,6 @@ import type {
   CalendarExport,
   CalendarEventDetail
 } from './interface/component';
-
-export type * from './interface/component';
-export type * from './interface/calendar';
-export type * from './basic/service';
-
-export { WxCalendar } from './interface/calendar';
-export { LUNAR_PLUGIN_KEY } from './plugins/lunar';
 
 const initCurrent = middle(CALENDAR_PANELS);
 
