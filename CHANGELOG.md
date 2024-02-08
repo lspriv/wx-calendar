@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.6](https://github.com/lspriv/wx-calendar/compare/v1.5.5...v1.5.6) (2024-02-08)
+
+
+### Bug Fixes
+
+* 调整包结构 ([dea564b](https://github.com/lspriv/wx-calendar/commit/dea564bdb8ab380595051173a37efb9016e7747f))
+
 ## [1.5.5](https://github.com/lspriv/wx-calendar/compare/v1.5.4...v1.5.5) (2024-02-06)
 
 
