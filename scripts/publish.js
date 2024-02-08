@@ -84,8 +84,8 @@ commander
         ? semantic
         : `pre${semantic}`
       : semantic === 'prerelease'
-      ? 'patch'
-      : semantic;
+        ? 'patch'
+        : semantic;
     const preidArg = preid ? ` -preid ${preid}` : '';
     const command = `npm version ${semantic}${preidArg} --no-git-tag-version`;
 

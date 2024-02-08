@@ -1,11 +1,11 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "微信小程序日历",
   "type": "commonjs",
-  "main": "dist/index.js",
-  "miniprogram": "dist",
+  "main": "./dist/index.js",
   "types": "./types/index.d.ts",
+  "miniprogram": "dist",
   "files": [
     "dist/",
     "types/",
@@ -56,7 +56,6 @@
     "gulp-uglify": "^3.0.2",
     "jest": "^23.5.0",
     "miniprogram-api-typings": "^3.12.0",
-    "miniprogram-automator": "^0.12.0",
     "miniprogram-simulate": "^1.6.1",
     "ora": "^5.4.1",
     "prettier": "^3.0.3",
