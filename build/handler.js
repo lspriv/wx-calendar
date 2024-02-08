@@ -1,10 +1,10 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-27 14:56:53
+ * @LastEditTime: 2024-02-08 20:50:57
  */
 const through2 = require('through2');
-const { terminalTime, capitalize } = require('./utils');
+const { time, capitalize } = require('./utils');
 
 module.exports.wxss = function () {
   return through2.obj(function (chuck, _, callback) {
@@ -31,7 +31,7 @@ module.exports.wxml = function () {};
 module.exports.errorLogger = name => {
   /** @param {Error} error 错误信息 */
   return function (error) {
-    console.log('[' + `${terminalTime()} ${capitalize(name)}`.grey + ']', 'Error'.red, error.message.grey);
+    console.log(time(capitalize(name)), 'Error'.red, error.message.grey);
     this.emit('end');
   };
 };

@@ -1,7 +1,7 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2023-10-27 14:57:48
+ * @LastEditTime: 2024-02-08 17:51:11
  */
 const gulp = require('gulp');
 const uglify = require('gulp-uglify');
@@ -14,7 +14,7 @@ const size = require('gulp-size');
 const jsonFormat = require('gulp-json-format');
 const ts = require('gulp-typescript');
 
-const { projectName, htmlMinConfig, jsMiniOpts, wxsMiniOpts, unPackGlobs, dependenciesGlobs } = require('./config');
+const { PRJ_NAME, htmlMinConfig, jsMiniOpts, wxsMiniOpts, unPackGlobs, dependenciesGlobs } = require('./config');
 const { wxss, errorLogger } = require('./handler');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -41,6 +41,6 @@ module.exports = () =>
       gf(
         file => /\.d\.ts$/.test(file.basename),
         gulp.dest('types'),
-        gulp.dest(`${isDevelopment ? 'dev/components' : 'dist'}/${isDevelopment ? projectName : ''}`)
+        gulp.dest(`${isDevelopment ? 'dev/components' : 'dist'}/${isDevelopment ? PRJ_NAME : ''}`)
       )
     );
