@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 15:49:16
+ * @LastEditTime: 2024-02-09 15:54:12
  */
 
 var nonNullable = function (value) {
@@ -212,7 +212,7 @@ var touchEnd = function (e, instance) {
   const finalHeight = toMin ? mark.min : toMax ? mark.max : mark.main;
   const ms = Math.min(300, Math.abs((finalHeight - height) / state.vy));
 
-  const transition = ms < 170 ? 'cubic-bezier(0.77, 1.36, 0.82, 1)' : 'cubic-bezier(0.61, 1, 0.88, 1)';
+  const transition = ms < 160 ? 'cubic-bezier(0.77, 1.36, 0.82, 1)' : 'cubic-bezier(0.61, 1, 0.88, 1)';
 
   toView(view, mark, instance, 'all .3s ' + transition);
 
