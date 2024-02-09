@@ -1,7 +1,7 @@
 /*
  * @Description: Description
  * @Author: lishen
- * @LastEditTime: 2024-02-08 17:51:11
+ * @LastEditTime: 2024-02-09 10:57:27
  */
 const gulp = require('gulp');
 const uglify = require('gulp-uglify');
@@ -38,9 +38,10 @@ module.exports = () =>
     .pipe(plumber.stop())
     .pipe(size({ title: 'pack complete', showFiles: true, showTotal: true }))
     .pipe(
-      gf(
-        file => /\.d\.ts$/.test(file.basename),
-        gulp.dest('types'),
-        gulp.dest(`${isDevelopment ? 'dev/components' : 'dist'}/${isDevelopment ? PRJ_NAME : ''}`)
-      )
+      gulp.dest(`${isDevelopment ? 'dev/components' : 'dist'}/${isDevelopment ? PRJ_NAME : ''}`)
+      // gf(
+      //   file => /\.d\.ts$/.test(file.basename),
+      //   gulp.dest('types'),
+      //   gulp.dest(`${isDevelopment ? 'dev/components' : 'dist'}/${isDevelopment ? PRJ_NAME : ''}`)
+      // )
     );
