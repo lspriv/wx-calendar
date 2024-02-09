@@ -6,6 +6,7 @@
 <wxs src="../wxs/tool.wxs" module="tool_wxs" />
 <wxs src="../wxs/transform.wxs" module="trans_wxs" />
 <view 
+  id="panel"
   class="wc__panel"
   data-view="{{ currView }}"
   data-main="{{ layout.mainHeight }}"
@@ -17,7 +18,8 @@
   change:transView="{{ trans_wxs.transViewChange }}" transView="{{ transView }}"
   bindtouchstart="{{ trans_wxs.touchStart }}"
   catchtouchmove="{{ trans_wxs.touchMove }}" 
-  catchtouchend="{{ trans_wxs.touchEnd }}">
+  catchtouchend="{{ trans_wxs.touchEnd }}"
+  catchtransitionend="calendarTransitionEnd">
   <swiper 
     circular 
     duration="{{ 300 }}" 

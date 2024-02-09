@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-05 18:46:08
+ * @LastEditTime: 2024-02-09 12:32:38
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
@@ -73,7 +73,7 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** [webview] 周视图下强制更新各面板的垂直偏移量 */
   offsetChange: boolean;
   /** 布局数据 */
-  layout: Nullable<Omit<CalendarLayout, 'subHeight' | 'windowWidth' | 'windowHeight'>>;
+  layout: Nullable<Omit<CalendarLayout, 'windowWidth' | 'windowHeight'>>;
   /** 选中日期的额外信息 */
   info: string;
   /** 控制选中日期的圆圈⭕️位置和动画 */
@@ -279,7 +279,7 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   /** [Skyline] 周/月面板手势拖动状态 */
   $_drag_state?: Shared<0 | 1>;
   /** [Skyline] 周/月面板容器高度 */
-  $_drag_calendar_height?: Shared<number>;
+  $_drag_panel_height?: Shared<number>;
   /** [Skyline] 周/月面板各面板垂直偏移量 */
   $_drag_panel_trans?: Shared<Array<Shared<number>>>;
   /** [Skyline] 周/月面板底部控制条角度 */

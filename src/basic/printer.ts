@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-04 13:35:10
+ * @LastEditTime: 2024-02-09 13:28:05
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -423,8 +423,8 @@ export class YearPrinter extends CalendarHandler {
 
   private calcDateOuterHeight(canvas: Canvas, month: WxCalendarYMonth, frame: AnnualFrames): number {
     const isMax = canvas.state & PrinterState.maximize;
-    const { panelHeight } = Layout.layout!;
-    const heightMax = panelHeight / month.weeks;
+    const { mainHeight } = Layout.layout!;
+    const heightMax = mainHeight / month.weeks;
     const heightFr = isMax ? heightMax : frame.dateRow;
     const heightTo = isMax ? frame.dateRow : heightMax;
     return iframe(heightFr, heightTo, canvas.frame);

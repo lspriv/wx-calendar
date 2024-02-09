@@ -8,11 +8,8 @@
 
 .wc__panel {
   width: 100%;
-  height: calc(100% - $wc-calendar-sub-height);
-  position: absolute;
-  top: 150rpx;
-  left: 0;
-  z-index: 10;
+  height: $wc-calendar-panel-height;
+  position: relative;
   background: transparent;
   overflow: hidden;
   contain: layout style;

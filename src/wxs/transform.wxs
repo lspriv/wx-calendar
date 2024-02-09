@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 13:57:22
+ * @LastEditTime: 2024-02-09 14:28:17
  */
 
 var nonNullable = function (value) {
@@ -35,14 +35,13 @@ var refreshIncurrentOffset = function (view, instance) {
  * @param {boolean | string} transition
  */
 var toView = function (view, mark, instance, transition = true) {
-  var calendarHeight = view === 'week' ? mark.min : view === 'month' ? mark.main : mark.max;
-
-  var _transition = transition === true ? 'all .28s ease' : transition || 'unset';
+  var height = view === 'week' ? mark.min : view === 'month' ? mark.main : mark.max;
+  transition = transition === true ? 'all .28s ease' : transition || 'unset';
 
   /** 容器高度 */
-  instance.selectComponent('#calendar').setStyle({
-    transition: _transition,
-    height: calendarHeight + 'px'
+  instance.selectComponent('#panel').setStyle({
+    transition: transition,
+    height: height + 'px'
   });
 
   /** 当前面板 */
@@ -51,7 +50,7 @@ var toView = function (view, mark, instance, transition = true) {
   var offset = view === 'week' ? panel.getDataset().offset : 0;
   /** 面板样式 */
   panel.setStyle({
-    transition: _transition,
+    transition: transition,
     transform: 'translateY(' + -offset + 'px)'
   });
 
@@ -119,7 +118,7 @@ var touchMove = function (e, instance) {
     height == mark.min || height == mark.main || height == mark.max ? (deltaY < 0 ? height - 1 : height + 1) : height;
 
   /** 容器高度 */
-  instance.selectComponent('#calendar').setStyle({
+  instance.selectComponent('#panel').setStyle({
     transition: 'unset',
     height: height + 'px'
   });
@@ -196,7 +195,7 @@ var touchEnd = function (e, instance) {
   /** 计算容器高度 */
   var height = Math.min(mark.dragMax, Math.max(mark.min, state.currentHeight + deltaY));
   /** 临界高度 */
-  var unitHeight = mark.panel / 5;
+  var unitHeight = mark.min;
 
   var view;
   if (mark.view === 'week') {

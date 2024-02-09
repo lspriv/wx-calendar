@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-07 21:35:03
+ * @LastEditTime: 2024-02-09 12:32:49
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -180,7 +180,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const fonts = this.data.font ? mergeFonts(this.data.font, FONT) : FONT;
       const initView = flagView(this._view_);
       this.$_view_fixed.value = isViewFixed(this.data.view);
-      const layout = omit(Layout.layout!, ['subHeight', 'windowWidth', 'windowHeight']);
+      const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
 
       const sets: Partial<CalendarData> = {
         renderer: this.renderer!,
@@ -334,15 +334,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       }
       if (this.$_drag_state!.value !== 1) return;
 
-      const { dragMaxHeight, minHeight, maxHeight, mainHeight } = Layout.layout!;
+      const { dragMax, minHeight, maxHeight, mainHeight } = Layout.layout!;
 
       const direct = e.deltaY < 0 ? -1 : 1;
       const delta = direct * Math.min(Math.abs(e.deltaY), 10);
 
       /** 计算面板的高度 */
-      const height = this.$_drag_calendar_height!.value + delta * 0.6;
-      const usefulHeight = Math.min(dragMaxHeight, Math.max(minHeight, height));
-      this.$_drag_calendar_height!.value = usefulHeight;
+      const height = this.$_drag_panel_height!.value + delta * 0.6;
+      const usefulHeight = Math.min(dragMax, Math.max(minHeight, height));
+      this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
       const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;

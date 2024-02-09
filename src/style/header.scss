@@ -13,10 +13,7 @@
   height: $wc-calendar-header-height;
   padding: 20rpx 40rpx 0;
   align-items: center;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
+  position: relative;
   z-index: 1024;
   background: transparent;
   overflow: hidden;

@@ -8,18 +8,16 @@
 <view 
   class="wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
   style="--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
-
   <view 
-    id="calendar" 
+    id="calendar"
     mark:main="{{ layout.mainHeight }}"
     mark:max="{{ layout.maxHeight }}"
     mark:min="{{ layout.minHeight }}"
-    mark:panel="{{ layout.panelHeight }}"
-    mark:dragMax="{{ layout.dragMaxHeight }}"
+    mark:dragMax="{{ layout.dragMax }}"
     mark:view="{{ currView }}"
     mark:fixed="{{ viewFixed }}"
     class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }} {{ sameChecked ? 'wc--same-checked' : '' }}"
-    catchtransitionend="calendarTransitionEnd">
+  >
 
     <!-- Calendar Header Start -->
     <block wx:if="{{ tool_wxs.isSkyline(renderer) }}">

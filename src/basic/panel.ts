@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 21:59:19
+ * @LastEditTime: 2024-02-09 13:27:43
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -320,6 +320,6 @@ export class PanelTool extends CalendarHandler {
     const len = getMonthDays({ year, month });
     const weeksLen = Math.ceil((lastLen + len) / 7);
     const idx = Math.ceil((day + lastLen) / 7) - 1;
-    return mul(idx, div(Layout.layout!.panelHeight, weeksLen));
+    return mul(idx, div(Layout.layout!.mainHeight, weeksLen));
   }
 }

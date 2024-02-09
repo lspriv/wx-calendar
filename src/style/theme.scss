@@ -31,12 +31,10 @@ $wc-bg-5: #DFDFDF;
 $wc-error: #F56C6C;
 
 $wc-ratio-width: 750rpx;
-$wc-calendar-height: 800rpx;
 $wc-calendar-header-height: 100rpx;
 $wc-calendar-weeks-height: 50rpx;
 $wc-calendar-bar-height: 50rpx;
-$wc-calendar-sub-height: $wc-calendar-header-height + $wc-calendar-weeks-height + $wc-calendar-bar-height;
-$wc-calendar-panel-height: $wc-calendar-height - $wc-calendar-sub-height;
+$wc-calendar-panel-height: 600rpx;
 $wc-calendar-spare-height: 100rpx;
 $wc-calendar-pointer-size: 100rpx;
 

@@ -21,17 +21,22 @@ swiper {
   flex-direction: column;
   z-index: 1024;
   overflow: hidden;
-  $fixed-view-sub: $wc-calendar-header-height + $wc-calendar-weeks-height + 20rpx;
+  $fixed-view-sub: 20rpx;
   @include if (view-fixed) {
-    transition: all .28s ease;
     .wc__panel {
-      height: calc(100% - $fixed-view-sub);
+      transition: all .28s ease !important;
     }
   }
   @include if (view-fixed, week) {
-    height: $fixed-view-sub + calc($wc-calendar-panel-height / 5) !important;
+    padding-bottom: $fixed-view-sub;
+    .wc__panel {
+      height: calc($wc-calendar-panel-height / 5) !important;
+    }
   }
   @include if (view-fixed, month) {
-    height: $fixed-view-sub + $wc-calendar-panel-height !important;
+    padding-bottom: $fixed-view-sub;
+    .wc__panel {
+      height: $wc-calendar-panel-height !important;
+    }
   }
 }
