@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2024-01-18 20:36:11
+ * @LastEditTime: 2024-02-12 22:20:07
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
@@ -22,6 +22,17 @@ interface PointerIndexLocation {
   wdx: number;
   len: number;
 }
+
+export interface CalendarPointer {
+  x: string | number;
+  y: string | number;
+  show: boolean;
+  animate: boolean;
+  transition: boolean;
+}
+
+export const createPointer = (opts?: Partial<CalendarPointer>) =>
+  ({ x: 0, y: 0, show: true, animate: true, transition: true, ...opts }) as CalendarPointer;
 
 /**
  * 这个最开始是分skyline和webview渲染的，

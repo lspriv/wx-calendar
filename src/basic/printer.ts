@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 13:28:05
+ * @LastEditTime: 2024-02-12 22:27:57
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -13,7 +13,7 @@ import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
 import { nodeRect, viewportOffset } from './tools';
 
-import type { CalendarDay, CalendarMonth, WxCalendarYMonth, WxCalendarFullYear } from '../interface/calendar';
+import type { CalendarDay, CalendarMonth, WxCalendarAnnualMonth, WxCalendarFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
 
 const ANIMATE_FRAMES = 20;
@@ -421,7 +421,7 @@ export class YearPrinter extends CalendarHandler {
     };
   }
 
-  private calcDateOuterHeight(canvas: Canvas, month: WxCalendarYMonth, frame: AnnualFrames): number {
+  private calcDateOuterHeight(canvas: Canvas, month: WxCalendarAnnualMonth, frame: AnnualFrames): number {
     const isMax = canvas.state & PrinterState.maximize;
     const { mainHeight } = Layout.layout!;
     const heightMax = mainHeight / month.weeks;
@@ -481,7 +481,7 @@ export class YearPrinter extends CalendarHandler {
 
   private renderMonthTitle(
     canvas: Canvas,
-    mon: WxCalendarYMonth,
+    mon: WxCalendarAnnualMonth,
     locate: Location,
     frame: AnnualFrames,
     alpha: number
@@ -520,7 +520,7 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
-  private renderChecked(canvas: Canvas, month: WxCalendarYMonth, locate: Location, frame: AnnualFrames) {
+  private renderChecked(canvas: Canvas, month: WxCalendarAnnualMonth, locate: Location, frame: AnnualFrames) {
     const today = WxCalendar.today;
     const hasToday = month.year === today.year && month.month === today.month;
 
@@ -564,7 +564,7 @@ export class YearPrinter extends CalendarHandler {
 
   private renderDates(
     canvas: Canvas,
-    month: WxCalendarYMonth,
+    month: WxCalendarAnnualMonth,
     marks: WxCalendarFullYear['marks'],
     locate: Location,
     frame: AnnualFrames,

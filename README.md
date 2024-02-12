@@ -429,12 +429,6 @@ class MyPlugin implements Plugin {
   };
 
   /**
-   * 插件绑定到日期数据，可选择实现该方法
-   * @param date 待绑定日期
-   */
-  PLUGIN_DATA(date: CalendarDay): any {};
-
-  /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
    * @param service PliginService实例
    * @param detail 事件数据

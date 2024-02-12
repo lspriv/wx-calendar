@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-01-20 19:08:39
+ * @LastEditTime: 2024-02-12 22:17:02
  */
 import { nextTick } from './tools';
-import { camelToSnake, isVoid, notEmptyObject } from '../utils/shared';
+import { camelToSnake, notEmptyObject } from '../utils/shared';
 import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
 import type { SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
@@ -29,8 +29,6 @@ type Schedules = Array<CalendarDateSchedule>;
 
 export type TrackDateResult = {
   [P in CalendarMark['type']]?: P extends 'schedule' ? Schedules : CalendarDateMark;
-} & {
-  plugin?: Record<string, any>;
 };
 
 export type TrackYearResult = {
@@ -70,11 +68,6 @@ export interface Plugin extends PluginEventHandler {
    * @param service PliginService实例
    */
   PLUGIN_INITIALIZE?(service: PluginService): void;
-  /**
-   * 插件绑定到日期数据
-   * @param date 待绑定日期
-   */
-  PLUGIN_DATA?(date: CalendarDay): any;
   /**
    * 捕获日期
    * @param date 日期
@@ -201,7 +194,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   private walkForDate(date: CalendarDay) {
     const record: TrackDateResult = {};
 
-    this.traversePlugins((plugin, key) => {
+    this.traversePlugins(plugin => {
       /** 处理日期标记 */
       const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
@@ -210,12 +203,6 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         if (result.schedule?.length) {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
-      }
-      /** 处理插件数据 */
-      const pluginRes = plugin.PLUGIN_DATA?.(date);
-      if (!isVoid(pluginRes)) {
-        record.plugin = record.plugin || {};
-        record.plugin[key] = pluginRes;
       }
     });
 
@@ -272,7 +259,6 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             if (record.festival && !sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival;
             if (record.schedule?.length && !sameSchedules(record.schedule, day.schedules))
               sets[`${_key}.schedules`] = record.schedule;
-            if (record.plugin) sets[`${_key}.plugin`] = record.plugin;
           }
         }
       }
@@ -316,10 +302,6 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
               if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner;
               if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival;
               if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || [];
-
-              if (_day.plugin || record.plugin) {
-                sets[`${key}.plugin`] = record.plugin;
-              }
             }
           }
         }

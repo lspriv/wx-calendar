@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-09 12:32:38
+ * @LastEditTime: 2024-02-12 22:20:55
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
-import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
+import { isSkyline, type CalendarView } from '../basic/tools';
 import type { View } from '../basic/constants';
-import type { Pointer } from '../basic/pointer';
+import type { Pointer, CalendarPointer } from '../basic/pointer';
 import type { PanelTool } from '../basic/panel';
 import type { Dragger } from '../basic/drag';
 import type { AnnualPanelSwitch } from '../basic/annual';

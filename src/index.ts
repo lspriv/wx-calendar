@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 12:32:49
+ * @LastEditTime: 2024-02-12 22:21:41
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
-import { Pointer } from './basic/pointer';
+import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
 import { Layout } from './basic/layout';
 import { Dragger } from './basic/drag';
@@ -27,7 +27,6 @@ import {
   InitPanels,
   InitWeeks,
   mergeFonts,
-  createPointer,
   isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
