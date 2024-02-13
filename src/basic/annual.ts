@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2024-02-02 00:29:26
+ * @LastEditTime: 2024-02-13 08:34:45
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
@@ -135,24 +135,29 @@ export class AnnualPanelSwitch extends CalendarHandler {
       /** 跳转到指定年份 */
       await instance._panel_.toYear(mon.year);
       /**
-       * _panel_.toYear方法中setData后触发视图更新
-       * 虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
-       */
-      await severalTicks(10);
-      /**
        * 获取日历顶端在页面的位置
        * 用来处理年度面板动画垂直方向的初始偏移量
        */
       const rect = await this.getCalendarRect();
-      if (isSkyline) this._top_!.value = `-${rect.top}px`;
-      else instance.setData({ annualTop: 0, annualDuration: 300 });
+      if (isSkyline) {
+        this._top_!.value = `-${rect.top}px`;
+        this._opacity_!.value = 1;
+      } else {
+        instance.setData({
+          annualTop: 0,
+          annualDuration: 300,
+          annualOpacity: 1
+        });
+      }
+
+      /**
+       * _panel_.toYear方法中setData后触发视图更新
+       * 虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
+       */
+      await severalTicks(10);
 
       /** 执行年度面板打开动画 */
-      await instance._printer_.open(mon, rect, () => {
-        /** 动画开始前将面板透明度设置可见 */
-        if (isSkyline) this._opacity_!.value = 1;
-        else instance.setData({ annualOpacity: 1 });
-      });
+      await instance._printer_.open(mon, rect);
 
       /**
        * skyline下执行日历头部和拖拽bar的隐藏动画
