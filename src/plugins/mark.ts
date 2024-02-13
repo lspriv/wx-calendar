@@ -4,13 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 13:38:15
+ * @LastEditTime: 2024-02-13 08:50:19
  */
 import { normalDate } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
 import type { CalendarMark, CalendarDay } from '../interface/calendar';
+import type { CalendarInstance } from '../interface/component';
 
 type WxCalendarMarkTypes = {
   [P in CalendarMark['type']]: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
@@ -27,7 +28,7 @@ export class MarkPlugin implements Plugin {
 
   private _marks_: WxCalendarMarkMap;
 
-  public updateMarks(marks: Array<CalendarMark>) {
+  public update(instance: CalendarInstance, marks: Array<CalendarMark>) {
     const map: WxCalendarMarkMap = new Map();
 
     for (let i = 0; i < marks.length; i++) {
@@ -57,7 +58,8 @@ export class MarkPlugin implements Plugin {
     const updates = [...map.keys()].map(key => formDateByKey(key));
 
     this._marks_ = map;
-    return [...updates, ...deletes];
+
+    if (instance._loaded_) instance._calendar_.service.updateDates([...updates, ...deletes]);
   }
 
   public PLUGIN_TRACK_DATE(date: CalendarDay): Nullable<TrackDateResult> {
