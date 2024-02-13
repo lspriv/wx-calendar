@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板控制
  * @Author: lspriv
- * @LastEditTime: 2024-02-13 08:34:45
+ * @LastEditTime: 2024-02-13 09:07:51
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
@@ -141,7 +141,6 @@ export class AnnualPanelSwitch extends CalendarHandler {
       const rect = await this.getCalendarRect();
       if (isSkyline) {
         this._top_!.value = `-${rect.top}px`;
-        this._opacity_!.value = 1;
       } else {
         instance.setData({
           annualTop: 0,
@@ -157,7 +156,9 @@ export class AnnualPanelSwitch extends CalendarHandler {
       await severalTicks(10);
 
       /** 执行年度面板打开动画 */
-      await instance._printer_.open(mon, rect);
+      await instance._printer_.open(mon, rect, () => {
+        if (isSkyline) this._opacity_!.value = 1;
+      });
 
       /**
        * skyline下执行日历头部和拖拽bar的隐藏动画
