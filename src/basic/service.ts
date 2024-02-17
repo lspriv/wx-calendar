@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-12 22:17:02
+ * @LastEditTime: 2024-02-17 14:15:52
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -44,6 +44,12 @@ interface PluginEventHandler {
    */
   PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail): void;
   /**
+   * 日期点击触发
+   * @param service PliginService实例
+   * @param detail 事件详情数据
+   */
+  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail): void;
+  /**
    * 日期变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
@@ -54,7 +60,7 @@ interface PluginEventHandler {
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEW_CHANGE?(service: PluginService, detail: CalendarEventDetail): void;
+  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
@@ -94,6 +100,10 @@ export interface PluginConstructor {
    * 日历组件版本
    */
   REQUIER_VERSION?: string;
+  /**
+   * 原型
+   */
+  readonly prototype: Plugin;
 }
 
 interface TraverseCallback {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-13 08:54:21
+ * @LastEditTime: 2024-02-17 14:19:26
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -199,10 +199,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       };
       this._pointer_.update(sets);
       this.setData(sets);
-      wx.nextTick(() => {
+      wx.nextTick(async () => {
         if (isSkylineRender) this._dragger_!.bindAnimations();
-        this._printer_.initialize();
-        this.triggerLoad();
+        await this._printer_.initialize();
+        this._loaded_ = true;
+        this.trigger('load');
       });
     },
     async initializeRects() {
@@ -216,7 +217,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (this._view_ & view) return;
       if (!isSkyline(this.renderer)) return void (this._view_ = view);
       await this._panel_.refreshView(view);
-      this.triggerViewChange(view);
+      this.trigger('viewchange', { view: flagView(view) });
     },
     toToday() {
       this._panel_.toDate(WxCalendar.today);
@@ -225,21 +226,22 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
       await this._panel_.refreshView(_view, fixed);
-      this.triggerViewChange(this._view_);
+      this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async calendarTransitionEnd() {
       if (isSkyline(this.renderer)) return;
       const currView = viewFlag(this.data.currView);
       if (currView === this._view_) return;
       await this._panel_.refreshView(this._view_);
-      this.triggerViewChange(this._view_);
+      this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async selDate(e) {
       const { wdx, ddx } = e.currentTarget.dataset;
       const panel = this.data.panels[this.data.current];
       const date = panel.weeks[wdx].days[ddx];
-      if (isSameDate(date, this.data.checked!)) return;
+      if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
       const checked = normalDate(date);
+      // this.trigger('click', { checked });
       const isWeekView = this._view_ & View.week;
       if (date.kind === 'current') {
         const sets = { info: getDateInfo(checked, isWeekView), checked };
@@ -251,14 +253,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         if (isWeekView) await this._panel_.toWeekAdjoin(date);
         else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
       }
-      this.triggerDateChange(checked);
+      this.trigger('click', { checked });
+      this.trigger('change', { checked });
     },
     handlePointerAnimated() {
       this._pointer_.animationEnd();
     },
     async refreshPanels(...args) {
       await this._panel_.refresh(...args);
-      this.triggerDateChange();
+      this.trigger('change');
     },
     refreshAnnualPanels(...args) {
       this._panel_.refreshAnnualPanels(...args);
@@ -379,27 +382,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const mon = await this._printer_.getTapMonth(ydx, x, y);
       this._annual_.switch(false, mon);
     },
-    triggerLoad() {
-      this._loaded_ = true;
-      const checked = this.data.checked!;
-      const view = this.data.currView;
-      const detail: CalendarEventDetail = { checked, view };
-      this._calendar_.service.dispatchEventHandle('load', detail);
-      this.triggerEvent('load', detail);
-    },
-    triggerDateChange(date) {
-      date = date || (this.data.checked! as WxCalendarDay);
-      const view = this.data.currView;
-      const detail: CalendarEventDetail = { checked: date, view };
-      this._calendar_.service.dispatchEventHandle('change', detail);
-      this.triggerEvent('change', detail);
-    },
-    triggerViewChange(view) {
-      const _view = flagView(view || this._view_);
-      const checked = this.data.checked!;
-      const detail: CalendarEventDetail = { checked, view: _view };
-      this._calendar_.service.dispatchEventHandle('viewChange', detail);
-      this.triggerEvent('viewchange', detail);
+    trigger(event, detail, dispatchPlugin = true) {
+      detail = detail || <CalendarEventDetail>{};
+      detail.checked = detail.checked || this.data.checked!;
+      detail.view = detail.view || this.data.currView;
+
+      dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
+      this.triggerEvent(event, detail);
     }
   },
   pageLifetimes: {

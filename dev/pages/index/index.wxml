@@ -3,6 +3,7 @@
     id="calendar" 
     marks="{{ markers }}" 
     bindload="handleLoad"
+    bindclick="handleClick"
     bindchange="handleChange" 
     bindviewchange="handleViewChange">
   </calendar>

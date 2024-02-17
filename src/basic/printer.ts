@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-13 09:15:11
+ * @LastEditTime: 2024-02-17 12:50:41
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -195,7 +195,7 @@ export class YearPrinter extends CalendarHandler {
     this._weeks_ = sortWeeks(this._instance_.data.weekstart);
     if (this._instance_.data.darkmode) this.bindThemeChange();
     this.initializeSize();
-    this.initializeRender();
+    return this.initializeRender();
   }
 
   private initializeSize() {

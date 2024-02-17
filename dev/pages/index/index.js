@@ -3,7 +3,7 @@
  * @Author: lishen
  * @Date: 2023-08-31 16:46:44
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-01-06 02:29:02
+ * @LastEditTime: 2024-02-17 14:28:26
  */
 Page({
   data: {
@@ -31,6 +31,9 @@ Page({
   handleLoad() {
     const calendar = this.selectComponent('#calendar');
     console.log('calendar-load', calendar);
+  },
+  handleClick({ detail }) {
+    console.log('calendar-date-click', detail);
   },
   handleChange({ detail }) {
     console.log('calendar-date-change', detail);

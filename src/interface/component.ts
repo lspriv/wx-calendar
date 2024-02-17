@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-12 22:20:55
+ * @LastEditTime: 2024-02-17 14:19:35
  */
 import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -23,6 +23,7 @@ import type {
   PluginEntireMarks,
   PluginKeys,
   PluginService,
+  PluginEventNames,
   ServicePluginMap,
   ServicePlugins
 } from 'src/basic/service';
@@ -200,21 +201,18 @@ interface CalendarEventHandlers {
 }
 
 export interface CalendarEventDetail {
-  checked: CalendarDay;
-  view: CalendarView;
-}
-
-interface CalendarTrigger {
-  triggerLoad(): void;
-  triggerDateChange(date?: CalendarDay): void;
-  triggerViewChange(view?: View): void;
+  checked?: CalendarDay;
+  view?: CalendarView;
 }
 
 export interface CalendarMethod
   extends WechatMiniprogram.Component.MethodOption,
     CalendarInitialize,
-    CalendarEventHandlers,
-    CalendarTrigger {
+    CalendarEventHandlers {
+  /**
+   * 触发事件
+   */
+  trigger<T extends PluginEventNames>(event: T, detail?: CalendarEventDetail, dispatchPlugin?: boolean): void;
   /**
    * 刷新周/月面板数据
    * 单独写这个方法是worklet的需要

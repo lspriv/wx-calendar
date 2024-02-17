@@ -189,6 +189,16 @@ type LoadEventDetail = {
 }
 ```
 
+[***`bindclick`***](#bindload)  日期点击
+```typescript
+type LoadEventDetail = {
+    checked: CalenderDay; // 当前点击日期
+    view: 'week' | 'month' | 'schedule'; // 当前视图
+}
+```
+> [!NOTE]
+> 日期点击事件，请自行防抖处理
+
 [***`bindchange`***](#bindchange)  日期选中变化
 ```typescript
 type ChangeEventDetail = {
@@ -439,6 +449,16 @@ class MyPlugin implements Plugin {
   }
 
   /**
+   * 注册日期点击事件处理方法，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 事件数据
+   */
+  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+
+  /**
    * 注册日期变化事件处理方法，可选择实现该方法
    * @param service PliginService实例
    * @param detail 事件数据
@@ -453,7 +473,7 @@ class MyPlugin implements Plugin {
    * @param service PliginService实例
    * @param detail 事件数据
    */
-  PLUGIN_ON_VIEW_CHANGE(service: PluginService, detail: CalendarEventDetail) {
+  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
