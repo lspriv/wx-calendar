@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-02-12 22:19:57
+ * @LastEditTime: 2024-02-17 18:45:02
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -135,9 +135,10 @@ export const viewportOffset = (component: ComponentInstance) => {
 };
 
 /**
- * 合并字体
- * @param fonts 字体
+ * 合并字符串
+ * @param strs 字符串
+ * @param separator 分隔符，默认 ','
  */
-export const mergeFonts = (...fonts: Array<string>) => {
-  return fonts.flatMap(font => font.split(',').map(f => f.trim())).join(',');
+export const mergeStr = (strs: Array<string>, separator: string = ',') => {
+  return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
 };

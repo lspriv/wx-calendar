@@ -197,7 +197,7 @@ type LoadEventDetail = {
 }
 ```
 > [!NOTE]
-> 日期点击事件，请自行防抖处理
+> 日期点击事件，若有必要请自行防抖处理
 
 [***`bindchange`***](#bindchange)  日期选中变化
 ```typescript

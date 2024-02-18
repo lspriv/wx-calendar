@@ -26,7 +26,7 @@ import {
   isSkyline,
   InitPanels,
   InitWeeks,
-  mergeFonts,
+  mergeStr,
   isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -176,7 +176,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const years: Array<WxCalendarYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
       this._years_ = _years.map(({ year, months, marks }) => ({ year, months, marks }));
 
-      const fonts = this.data.font ? mergeFonts(this.data.font, FONT) : FONT;
+      const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;
       const initView = flagView(this._view_);
       this.$_view_fixed.value = isViewFixed(this.data.view);
       const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
