@@ -4,19 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-02-13 08:50:19
+ * @LastEditTime: 2024-02-18 15:03:51
  */
 import { normalDate } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
-import type { CalendarMark, CalendarDay } from '../interface/calendar';
+import type { CalendarMark, CalendarDay, WxCalendarMarkDict, WxCalendarMarkMap } from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
-
-type WxCalendarMarkTypes = {
-  [P in CalendarMark['type']]: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
-};
-type WxCalendarMarkMap = Map<string, WxCalendarMarkTypes>;
 
 const formDateByKey = (key: string): CalendarDay => {
   const [year, month, day] = key.split('_');
@@ -45,7 +40,7 @@ export class MarkPlugin implements Plugin {
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };
-        map.set(key, form as WxCalendarMarkTypes);
+        map.set(key, form as WxCalendarMarkDict);
       }
     }
 
