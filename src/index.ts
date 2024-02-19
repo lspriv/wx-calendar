@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-17 14:19:26
+ * @LastEditTime: 2024-02-19 16:46:32
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -199,10 +199,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       };
       this._pointer_.update(sets);
       this.setData(sets);
+      this._loaded_ = true;
       wx.nextTick(async () => {
         if (isSkylineRender) this._dragger_!.bindAnimations();
         await this._printer_.initialize();
-        this._loaded_ = true;
         this.trigger('load');
       });
     },
