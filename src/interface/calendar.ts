@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-18 15:03:35
+ * @LastEditTime: 2024-02-19 09:38:33
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -92,7 +92,7 @@ export interface WxCalendarSubYear {
 export type WxCalendarFullYear = WxCalendarYear & WxCalendarSubYear;
 
 export type WxCalendarMarkDict = {
-  [P in CalendarMark['type']]: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
+  [P in CalendarMark['type']]?: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
 };
 export type WxCalendarMarkMap = Map<string, WxCalendarMarkDict>;
 
