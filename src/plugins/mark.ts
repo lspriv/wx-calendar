@@ -4,19 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-02-18 15:03:51
+ * @LastEditTime: 2024-02-19 15:28:47
  */
-import { normalDate } from '../interface/calendar';
+import { normalDate, formDateByStrKey } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
 import type { CalendarMark, CalendarDay, WxCalendarMarkDict, WxCalendarMarkMap } from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
-
-const formDateByKey = (key: string): CalendarDay => {
-  const [year, month, day] = key.split('_');
-  return { year: +year, month: +month, day: +day };
-};
 
 export class MarkPlugin implements Plugin {
   public static KEY = 'mark' as const;
@@ -46,11 +41,11 @@ export class MarkPlugin implements Plugin {
 
     const deletes = this._marks_
       ? [...this._marks_.entries()].flatMap(([key]) => {
-          return map.has(key) ? [] : formDateByKey(key);
+          return map.has(key) ? [] : formDateByStrKey(key);
         })
       : [];
 
-    const updates = [...map.keys()].map(key => formDateByKey(key));
+    const updates = [...map.keys()].map(key => formDateByStrKey(key));
 
     this._marks_ = map;
 

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-19 09:50:11
+ * @LastEditTime: 2024-02-19 15:28:14
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -97,6 +97,11 @@ export type WxCalendarMarkDict = {
 export type WxCalendarMarkMap = Map<string, WxCalendarMarkDict>;
 
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
+
+export const formDateByStrKey = (key: string): CalendarDay => {
+  const [year, month, day] = key.split('_');
+  return { year: +year, month: +month, day: +day };
+};
 
 /**
  * 获取某个月份的天数
