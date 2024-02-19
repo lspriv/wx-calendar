@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-17 14:15:52
+ * @LastEditTime: 2024-02-19 15:10:37
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -87,7 +87,7 @@ export interface Plugin extends PluginEventHandler {
 }
 
 export interface PluginConstructor {
-  new (options?: Record<string, any>): Plugin;
+  new (options?: Record<string, any>, service?: PluginService): Plugin;
   /**
    * 插件 key
    */
@@ -188,7 +188,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       return service.construct.KEY
         ? {
             key: service.construct.KEY,
-            instance: new service.construct(service.options)
+            instance: new service.construct(service.options, this)
           }
         : [];
     });
