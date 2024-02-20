@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.6.0](https://github.com/lspriv/wx-calendar/compare/v1.5.6...v1.6.0) (2024-02-20)
+
+
+### Features
+
+* 新增click事件 ([ecdd8f3](https://github.com/lspriv/wx-calendar/commit/ecdd8f316fb8b25107c786b94a80ae3a3ab54297))
+
+
+### Bug Fixes
+
+* **webview:** 调整拖拽动画 ([5213468](https://github.com/lspriv/wx-calendar/commit/521346841541bdce79428635ef25a8bb4ff99c31))
+* **webview:** 调整拖拽动画 ([c1e4b0a](https://github.com/lspriv/wx-calendar/commit/c1e4b0ae9a4361d7a9ce668345b336dd2571e6c2))
+* 移除插件PLUGIN_DATA接口 ([a364002](https://github.com/lspriv/wx-calendar/commit/a364002c03644dce1110f87ea0cd9de3e6e80227))
+* 调整service.updateAnnuals方法,调整工具mergeAnnualMarks方法 ([7354b14](https://github.com/lspriv/wx-calendar/commit/7354b14d8203999ad3a431b5e742d23c3beaf4e2))
+* 调整属性_loaded_赋值时机 ([2d62bd9](https://github.com/lspriv/wx-calendar/commit/2d62bd91091c8cb2744f5e150249083bb02e50e0))
+* 调整年度面板开启动画时机 ([c1ee643](https://github.com/lspriv/wx-calendar/commit/c1ee643f2592b588b01cb2d8743434d41883a4b8))
+* 调整年面板标记结构,service新增updateAnnuals方法 ([621df33](https://github.com/lspriv/wx-calendar/commit/621df337499cd6d6d3820982555790e7c688d353))
+
 ## [1.5.6](https://github.com/lspriv/wx-calendar/compare/v1.5.5...v1.5.6) (2024-02-08)
 
 
