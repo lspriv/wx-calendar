@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 14:12:58
+ * @LastEditTime: 2024-02-20 15:20:40
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -105,17 +105,14 @@ export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${
  * 合并两个年面板标记
  */
 export const mergeAnnualMarks = (m1?: WcAnnualMarks, m2?: WcAnnualMarks) => {
-  if (!m1 || !m2) return m1 || m2;
-
+  if (!m2) return m1;
+  m1 = m1 || new Map();
   const entries = m2.entries();
   for (const [key, mark] of entries) {
-    const m = m1.get(key);
-    if (m) {
-      mark.rwtype && (m.rwtype = mark.rwtype);
-      mark.sub && (m.sub = mark.sub);
-    } else {
-      m1.set(key, mark);
-    }
+    const m = m1.get(key) || {};
+    mark.rwtype && (m.rwtype = mark.rwtype);
+    mark.sub && (m.sub = mark.sub);
+    m1.set(key, m);
   }
   return m1;
 };

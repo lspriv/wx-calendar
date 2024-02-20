@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 13:21:21
+ * @LastEditTime: 2024-02-20 15:25:00
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -800,6 +800,7 @@ export class YearPrinter extends CalendarHandler {
    */
   public update(idxs?: number[]) {
     idxs = idxs || Array.from({ length: CALENDAR_PANELS }, (_, i) => i);
+    idxs = [...new Set(idxs)];
     for (const idx of idxs) {
       const canvas = this._canvas_[idx];
       const year = this._instance_._panel_.getFullYear(idx);

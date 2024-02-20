@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 13:38:01
+ * @LastEditTime: 2024-02-20 15:24:12
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -233,7 +233,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo) record.subinfo = result.subinfo;
-        if (result.marks) record.marks = result.marks;
+        if (result.marks?.size) record.marks = mergeAnnualMarks(record.marks, result.marks);
       }
     });
     return notEmptyObject(record) ? record : null;
@@ -291,7 +291,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
         if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
-        if (year.result.marks) {
+        if (year.result.marks?.size) {
           this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, year.result.marks)!;
           this.component._printer_.update([ydx]);
         }
@@ -348,17 +348,22 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   /**
    * 刷新年度面板
    */
-  public async updateAnnuals(annuals?: Array<AnnualResult>) {
+  public async updateAnnuals(annuals?: Array<number>) {
     if (!annuals?.length) return;
     const years = this.component.data.years;
     const sets: Partial<CalendarData> = {};
     const ydxs: number[] = [];
-    for (const annual of annuals) {
-      const ydx = years.findIndex(y => y.year === annual.year);
+    for (let i = annuals.length; i--; ) {
+      const ydx = years.findIndex(y => y.year === annuals[i]);
       if (ydx >= 0) {
-        if (annual.result.subinfo) sets[`years[${ydx}].subinfo`] = annual.result.subinfo;
-        if (annual.result.marks) {
-          this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, annual.result.marks)!;
+        const year = years[ydx];
+        const result = this.walkForYear(year);
+        if (result) {
+          if (result.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo;
+          if (result.marks?.size) {
+            this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, result.marks)!;
+            ydxs.push(ydx);
+          }
         }
       }
     }
