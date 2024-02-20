@@ -10,10 +10,7 @@
   @include column-rect;
   height: $wc-calendar-weeks-height;
   padding: 10rpx 10rpx 0;
-  position: absolute;
-  width: 100%;
-  top: 100rpx;
-  left: 0;
+  position: relative;
   z-index: 1024;
   background: transparent;
   transition: all .28s ease 0s;

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-01-19 22:21:33
+ * @LastEditTime: 2024-02-17 18:45:02
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -13,14 +13,6 @@ import { values } from '../utils/shared';
 import type { Voidable } from '../utils/shared';
 import type { CalendarWeek } from '../interface/component';
 
-export interface CalendarPointer {
-  x: string | number;
-  y: string | number;
-  show: boolean;
-  animate: boolean;
-  transition: boolean;
-}
-
 export type BoundingClientRects = Array<WechatMiniprogram.BoundingClientRectCallbackResult>;
 
 export type ComponentInstance = WechatMiniprogram.Component.Instance<
@@ -28,9 +20,6 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
   WechatMiniprogram.Component.PropertyOption,
   WechatMiniprogram.Component.MethodOption
 >;
-
-export const createPointer = (opts?: Partial<CalendarPointer>) =>
-  ({ x: 0, y: 0, show: true, animate: true, transition: true, ...opts }) as CalendarPointer;
 
 export type CalendarView = (typeof VIEWS)[keyof typeof VIEWS];
 
@@ -146,9 +135,10 @@ export const viewportOffset = (component: ComponentInstance) => {
 };
 
 /**
- * 合并字体
- * @param fonts 字体
+ * 合并字符串
+ * @param strs 字符串
+ * @param separator 分隔符，默认 ','
  */
-export const mergeFonts = (...fonts: Array<string>) => {
-  return fonts.flatMap(font => font.split(',').map(f => f.trim())).join(',');
+export const mergeStr = (strs: Array<string>, separator: string = ',') => {
+  return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
 };

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板拖拽控制
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 18:37:04
+ * @LastEditTime: 2024-02-09 14:45:28
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { applyAnimated, clearAnimated, circularDiff } from './tools';
@@ -50,9 +50,9 @@ export class Dragger extends CalendarHandler {
     instance.$_current = shared(instance.data.current);
     instance.$_drag_schedule_opacity = shared(0);
 
-    /** 记录日历整体高度 */
-    const calendarHeight = shared(Layout.viewHeight(instance._view_)!);
-    instance.$_drag_calendar_height = calendarHeight;
+    /** 记录面板高度 */
+    const panelHeight = shared(Layout.viewHeight(instance._view_)!);
+    instance.$_drag_panel_height = panelHeight;
 
     const checked = instance.data.checked || normalDate(instance.data.date);
     /** 记录各面板week视图下的偏移量 */
@@ -81,7 +81,7 @@ export class Dragger extends CalendarHandler {
    * 绑定动画
    */
   public bindAnimations() {
-    this.bindCalendarAnimation();
+    this.bindContainerAnimation();
     this.bindPanelAnimation();
     this.bindBarAnimation();
     this.bindViewBarAnimation();
@@ -90,15 +90,15 @@ export class Dragger extends CalendarHandler {
   /**
    * 绑定日历容器动画，主要是整体高度变化
    */
-  private async bindCalendarAnimation() {
+  private async bindContainerAnimation() {
     const instance = this._instance_;
-    const id = await applyAnimated(instance, SELECTOR.CALENDAR, () => {
+    const id = await applyAnimated(instance, SELECTOR.PANEL_CONTAINER, () => {
       'worklet';
       return {
-        height: `${instance.$_drag_calendar_height!.value}px`
+        height: `${instance.$_drag_panel_height!.value}px`
       };
     });
-    this._style_ids_.set(SELECTOR.CALENDAR, id);
+    this._style_ids_.set(SELECTOR.PANEL_CONTAINER, id);
   }
 
   /**
@@ -106,14 +106,14 @@ export class Dragger extends CalendarHandler {
    */
   private async bindPanelAnimation() {
     const instance = this._instance_;
-    const { mainHeight, minHeight, dragMaxHeight } = Layout.layout!;
+    const { mainHeight, minHeight, dragMax } = Layout.layout!;
 
     for (let i = 0; i < CALENDAR_PANELS; i++) {
       const selector = SELECTOR.PANEL + i;
       const trans = instance.$_drag_panel_trans!.value[i];
       const id = await applyAnimated(instance, selector, () => {
         'worklet';
-        const usefulHeight = Math.min(dragMaxHeight, Math.max(minHeight, instance.$_drag_calendar_height!.value));
+        const usefulHeight = Math.min(dragMax, Math.max(minHeight, instance.$_drag_panel_height!.value));
         const offset =
           usefulHeight >= mainHeight ? 0 : (trans.value * (mainHeight - usefulHeight)) / (mainHeight - minHeight);
         return {
@@ -240,21 +240,21 @@ export class Dragger extends CalendarHandler {
    */
   public dragout(velocity: number): Promise<View> {
     const instance = this._instance_;
-    const { minHeight, maxHeight, mainHeight, panelHeight } = Layout.layout!;
+    const { minHeight, maxHeight, mainHeight } = Layout.layout!;
 
-    const calendarHeight = instance.$_drag_calendar_height!.value;
-    const maxBounce = panelHeight / 5;
+    const panelHeight = instance.$_drag_panel_height!.value;
+    const maxBounce = minHeight;
 
     const view = shared(0) as unknown as Shared<View>;
 
     if (instance._view_ & View.week) {
-      const dy = calendarHeight - minHeight;
+      const dy = panelHeight - minHeight;
       view.value = velocity > 0 ? View.month : dy < maxBounce ? View.week : View.month;
     } else if (instance._view_ & View.schedule) {
-      const dy = calendarHeight - maxBounce;
+      const dy = panelHeight - maxBounce;
       view.value = dy > -maxBounce ? (velocity < 0 ? View.month : View.schedule) : View.month;
     } else {
-      const dy = calendarHeight - mainHeight;
+      const dy = panelHeight - mainHeight;
       if (!velocity) {
         view.value = dy < -maxBounce ? View.week : dy > maxBounce ? View.schedule : View.month;
       } else {
@@ -280,13 +280,13 @@ export class Dragger extends CalendarHandler {
       };
 
       if (!velocity) {
-        instance.$_drag_calendar_height!.value = timing(finalHeight, animOpt);
+        instance.$_drag_panel_height!.value = timing(finalHeight, animOpt);
         instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
       } else {
-        const ms = Math.ceil(Math.abs((finalHeight - calendarHeight) / velocity) * 1000);
+        const ms = Math.ceil(Math.abs((finalHeight - panelHeight) / velocity) * 1000);
 
-        if (ms >= DRAG_OUT_DURATION || calendarHeight <= minHeight || calendarHeight >= maxHeight) {
-          instance.$_drag_calendar_height!.value = timing(finalHeight, animOpt);
+        if (ms >= DRAG_OUT_DURATION || panelHeight <= minHeight || panelHeight >= maxHeight) {
+          instance.$_drag_panel_height!.value = timing(finalHeight, animOpt);
           instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
         } else {
           const bounceHeight = maxBounce - (maxBounce * ms) / DRAG_OUT_DURATION;
@@ -298,11 +298,11 @@ export class Dragger extends CalendarHandler {
           const dragoutHeight = toMin
             ? finalHeight - bounceHeight
             : toMax
-            ? finalHeight + bounceHeight
-            : velocity > 0
-            ? finalHeight + bounceHeight
-            : finalHeight - bounceHeight;
-          instance.$_drag_calendar_height!.value = sequence(
+              ? finalHeight + bounceHeight
+              : velocity > 0
+                ? finalHeight + bounceHeight
+                : finalHeight - bounceHeight;
+          instance.$_drag_panel_height!.value = sequence(
             timing(finalHeight, linearOpt, callback),
             timing(dragoutHeight, bounceOpt),
             timing(finalHeight, bounceOpt)
@@ -335,7 +335,7 @@ export class Dragger extends CalendarHandler {
       const height = view & View.week ? minHeight : view & View.schedule ? maxHeight : mainHeight;
       const viewBarTrans = view & View.week ? 60 : 0;
       const scheduleOpacity = view & View.schedule ? 1 : 0;
-      instance.$_drag_calendar_height!.value = animate ? timing(height, animOpts, callback) : height;
+      instance.$_drag_panel_height!.value = animate ? timing(height, animOpts, callback) : height;
       instance.$_drag_view_bar_translate_!.value = animate ? timing(viewBarTrans, animOpts) : viewBarTrans;
       instance.$_drag_schedule_opacity!.value = animate ? timing(scheduleOpacity, animOpts) : scheduleOpacity;
       if (!animate) resolve();
@@ -357,7 +357,7 @@ export class Dragger extends CalendarHandler {
 
     instance.$_current = void 0;
     instance.$_drag_state = void 0;
-    instance.$_drag_calendar_height = void 0;
+    instance.$_drag_panel_height = void 0;
     instance.$_drag_panel_trans = void 0;
     instance.$_drag_bar_rotate = void 0;
     instance._dragger_ = void 0;

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-04 13:35:10
+ * @LastEditTime: 2024-02-20 15:25:00
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -13,7 +13,7 @@ import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
 import { nodeRect, viewportOffset } from './tools';
 
-import type { CalendarDay, CalendarMonth, WxCalendarYMonth, WxCalendarFullYear } from '../interface/calendar';
+import type { CalendarDay, CalendarMonth, WcAnnualMonth, WcFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
 
 const ANIMATE_FRAMES = 20;
@@ -195,7 +195,7 @@ export class YearPrinter extends CalendarHandler {
     this._weeks_ = sortWeeks(this._instance_.data.weekstart);
     if (this._instance_.data.darkmode) this.bindThemeChange();
     this.initializeSize();
-    this.initializeRender();
+    return this.initializeRender();
   }
 
   private initializeSize() {
@@ -421,10 +421,10 @@ export class YearPrinter extends CalendarHandler {
     };
   }
 
-  private calcDateOuterHeight(canvas: Canvas, month: WxCalendarYMonth, frame: AnnualFrames): number {
+  private calcDateOuterHeight(canvas: Canvas, month: WcAnnualMonth, frame: AnnualFrames): number {
     const isMax = canvas.state & PrinterState.maximize;
-    const { panelHeight } = Layout.layout!;
-    const heightMax = panelHeight / month.weeks;
+    const { mainHeight } = Layout.layout!;
+    const heightMax = mainHeight / month.weeks;
     const heightFr = isMax ? heightMax : frame.dateRow;
     const heightTo = isMax ? frame.dateRow : heightMax;
     return iframe(heightFr, heightTo, canvas.frame);
@@ -438,7 +438,7 @@ export class YearPrinter extends CalendarHandler {
     frame.todayCheckedColor = frame.todayIsChecked || isMax || !canvas.frame ? color('checked') : PrimaryColor;
   }
 
-  private render(canvas: Canvas, year: WxCalendarFullYear, month?: number) {
+  private render(canvas: Canvas, year: WcFullYear, month?: number) {
     if (!canvas || !canvas.ctx) return;
     if (canvas.year !== year.year) canvas.year = year.year;
     const { ctx } = canvas;
@@ -459,7 +459,7 @@ export class YearPrinter extends CalendarHandler {
 
   private renderMonth(
     canvas: Canvas,
-    year: WxCalendarFullYear,
+    year: WcFullYear,
     i: number,
     locate: Location,
     frame: AnnualFrames,
@@ -479,13 +479,7 @@ export class YearPrinter extends CalendarHandler {
     this.renderDates(canvas, mon, year.marks, { x, y: _y }, frame, alpha);
   }
 
-  private renderMonthTitle(
-    canvas: Canvas,
-    mon: WxCalendarYMonth,
-    locate: Location,
-    frame: AnnualFrames,
-    alpha: number
-  ) {
+  private renderMonthTitle(canvas: Canvas, mon: WcAnnualMonth, locate: Location, frame: AnnualFrames, alpha: number) {
     const { ctx, state } = canvas;
     const { x, y } = locate;
 
@@ -520,7 +514,7 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
-  private renderChecked(canvas: Canvas, month: WxCalendarYMonth, locate: Location, frame: AnnualFrames) {
+  private renderChecked(canvas: Canvas, month: WcAnnualMonth, locate: Location, frame: AnnualFrames) {
     const today = WxCalendar.today;
     const hasToday = month.year === today.year && month.month === today.month;
 
@@ -564,8 +558,8 @@ export class YearPrinter extends CalendarHandler {
 
   private renderDates(
     canvas: Canvas,
-    month: WxCalendarYMonth,
-    marks: WxCalendarFullYear['marks'],
+    month: WcAnnualMonth,
+    marks: WcFullYear['marks'],
     locate: Location,
     frame: AnnualFrames,
     alpha: number
@@ -592,8 +586,13 @@ export class YearPrinter extends CalendarHandler {
 
       ctx!.fillStyle = isToday(date)
         ? frame.todayCheckedColor!
-        : showRest && ((this.isWeekend(w) && !this.getMark(marks, date, 'work')) || this.getMark(marks, date, 'rest'))
-          ? frame.restColor
+        : showRest
+          ? (() => {
+              const mark = marks.get(getAnnualMarkKey(date));
+              if (mark?.rwtype === 'work') return frame.dateColor;
+              if (mark?.rwtype === 'rest' || this.isWeekend(w)) return frame.restColor;
+              return frame.dateColor;
+            })()
           : frame.dateColor;
 
       ctx!.fillText(`${day}`, _x, _y);
@@ -605,20 +604,20 @@ export class YearPrinter extends CalendarHandler {
   private renderMark(
     canvas: Canvas,
     day: CalendarDay,
-    marks: WxCalendarFullYear['marks'],
+    marks: WcFullYear['marks'],
     locate: Location,
     frame: AnnualFrames,
     alpha: number
   ) {
-    const mark = this.getMark(marks, day, 'color');
+    const mark = marks.get(getAnnualMarkKey(day));
 
-    if (mark) {
+    if (mark?.sub) {
       const ctx = canvas.ctx!;
       const _x = locate.x - frame.markWidth / 2;
       const _y = locate.y + frame.dateFontSize / 2 + this._mark_height_.min;
       const radius = frame.markHeight / 2;
       ctx.globalAlpha = canvas.state & PrinterState.maximize ? 1 : frame.alpha;
-      ctx.fillStyle = mark;
+      ctx.fillStyle = mark.sub;
 
       ctx.save();
       ctx.beginPath();
@@ -633,19 +632,6 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
-  private getMark(marks: WxCalendarFullYear['marks'], day: CalendarDay, type: Exclude<MarkType, 'color'>): boolean;
-  private getMark(marks: WxCalendarFullYear['marks'], day: CalendarDay, type: 'color'): string;
-  private getMark<T extends MarkType>(marks: WxCalendarFullYear['marks'], day: CalendarDay, type: T) {
-    const set = marks.get(getAnnualMarkKey(day));
-    if (type === 'color') {
-      if (!set) return '';
-      set?.delete('rest');
-      set?.delete('work');
-      return [...set.values()].pop() || '';
-    }
-    return set?.has(type) || false;
-  }
-
   /**
    * 是否周末日
    * @param wdx 周内index
@@ -655,13 +641,13 @@ export class YearPrinter extends CalendarHandler {
     return mod === 0 || mod === 6;
   }
 
-  private requestAnimation(canvas: Canvas, year: WxCalendarFullYear, month?: number) {
+  private requestAnimation(canvas: Canvas, year: WcFullYear, month?: number) {
     return new Promise<void>(resolve => {
       this.requestAnimationFrame(canvas, year, month, resolve);
     });
   }
 
-  private requestAnimationFrame(canvas: Canvas, year: WxCalendarFullYear, month?: number, callback?: () => void): void {
+  private requestAnimationFrame(canvas: Canvas, year: WcFullYear, month?: number, callback?: () => void): void {
     if (canvas.frame >= ANIMATE_FRAMES) {
       canvas.frame = 0;
       return void callback?.();
@@ -710,7 +696,7 @@ export class YearPrinter extends CalendarHandler {
    * @param canvas 画布
    * @param year 年度
    */
-  public renderMinimize(canvas: Canvas, year: WxCalendarFullYear) {
+  public renderMinimize(canvas: Canvas, year: WcFullYear) {
     canvas.frame = 0;
     canvas.state = PrinterState.minimize;
     this.render(canvas, year);
@@ -814,6 +800,7 @@ export class YearPrinter extends CalendarHandler {
    */
   public update(idxs?: number[]) {
     idxs = idxs || Array.from({ length: CALENDAR_PANELS }, (_, i) => i);
+    idxs = [...new Set(idxs)];
     for (const idx of idxs) {
       const canvas = this._canvas_[idx];
       const year = this._instance_._panel_.getFullYear(idx);

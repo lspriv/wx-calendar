@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-01-09 19:45:25
+ * @LastEditTime: 2024-02-09 14:38:11
  */
 
 declare const $_VERSION: string;
@@ -40,6 +40,7 @@ export const SELECTOR = {
   WEEK_ITEM: '.wc__week-item',
   PANEL_HEADER: '.wc__header',
   PANEL_SWIPER: '.wc__panel-swiper',
+  PANEL_CONTAINER: '#panel',
   PANEL: '.wc__panel--idx-',
   VIEW_BAR: '#view_bar',
   VIEW_BAR_1: '#view_bar_1',

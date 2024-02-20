@@ -7,7 +7,7 @@
 <vertical-drag-gesture-handler 
   worklet:ongesture="workletDragGesture"
   worklet:should-response-on-move="workletDragGesture">
-  <view class="wc__panel">
+  <view id="panel" class="wc__panel">
     <swiper 
       circular 
       duration="{{ 300 }}" 
