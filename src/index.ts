@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-07 21:35:03
+ * @LastEditTime: 2024-02-20 14:01:00
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
-import { Pointer } from './basic/pointer';
+import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
 import { Layout } from './basic/layout';
 import { Dragger } from './basic/drag';
@@ -26,14 +26,13 @@ import {
   isSkyline,
   InitPanels,
   InitWeeks,
-  mergeFonts,
-  createPointer,
+  mergeStr,
   isViewFixed
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
-import type { WxCalendarYear, CalendarMark, WxCalendarDay, CalendarDay } from './interface/calendar';
+import type { WcYear, CalendarMark } from './interface/calendar';
 import type { CalendarView } from './basic/tools';
 import type {
   CalendarData,
@@ -99,7 +98,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     renderer: 'unknown',
     checked: null,
     panels: InitPanels<CalendarPanel>('panel'),
-    years: InitPanels<WxCalendarYear>('year'),
+    years: InitPanels<WcYear>('year'),
     weeks: InitWeeks(),
     current: initCurrent,
     currView: VIEWS.MONTH,
@@ -174,13 +173,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const panels = isWeekView ? this._panel_.createWeekPanels(checked) : this._panel_.createMonthPanels(checked);
       const _years = this._panel_.createYearPanels(checked);
-      const years: Array<WxCalendarYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
+      const years: Array<WcYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
       this._years_ = _years.map(({ year, months, marks }) => ({ year, months, marks }));
 
-      const fonts = this.data.font ? mergeFonts(this.data.font, FONT) : FONT;
+      const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;
       const initView = flagView(this._view_);
       this.$_view_fixed.value = isViewFixed(this.data.view);
-      const layout = omit(Layout.layout!, ['subHeight', 'windowWidth', 'windowHeight']);
+      const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
 
       const sets: Partial<CalendarData> = {
         renderer: this.renderer!,
@@ -200,10 +199,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       };
       this._pointer_.update(sets);
       this.setData(sets);
-      wx.nextTick(() => {
+      this._loaded_ = true;
+      wx.nextTick(async () => {
         if (isSkylineRender) this._dragger_!.bindAnimations();
-        this._printer_.initialize();
-        this.triggerLoad();
+        await this._printer_.initialize();
+        this.trigger('load');
       });
     },
     async initializeRects() {
@@ -217,7 +217,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (this._view_ & view) return;
       if (!isSkyline(this.renderer)) return void (this._view_ = view);
       await this._panel_.refreshView(view);
-      this.triggerViewChange(view);
+      this.trigger('viewchange', { view: flagView(view) });
     },
     toToday() {
       this._panel_.toDate(WxCalendar.today);
@@ -226,21 +226,22 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
       await this._panel_.refreshView(_view, fixed);
-      this.triggerViewChange(this._view_);
+      this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async calendarTransitionEnd() {
       if (isSkyline(this.renderer)) return;
       const currView = viewFlag(this.data.currView);
       if (currView === this._view_) return;
       await this._panel_.refreshView(this._view_);
-      this.triggerViewChange(this._view_);
+      this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async selDate(e) {
       const { wdx, ddx } = e.currentTarget.dataset;
       const panel = this.data.panels[this.data.current];
       const date = panel.weeks[wdx].days[ddx];
-      if (isSameDate(date, this.data.checked!)) return;
+      if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
       const checked = normalDate(date);
+      // this.trigger('click', { checked });
       const isWeekView = this._view_ & View.week;
       if (date.kind === 'current') {
         const sets = { info: getDateInfo(checked, isWeekView), checked };
@@ -252,14 +253,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         if (isWeekView) await this._panel_.toWeekAdjoin(date);
         else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
       }
-      this.triggerDateChange(checked);
+      this.trigger('click', { checked });
+      this.trigger('change', { checked });
     },
     handlePointerAnimated() {
       this._pointer_.animationEnd();
     },
     async refreshPanels(...args) {
       await this._panel_.refresh(...args);
-      this.triggerDateChange();
+      this.trigger('change');
     },
     refreshAnnualPanels(...args) {
       this._panel_.refreshAnnualPanels(...args);
@@ -334,15 +336,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       }
       if (this.$_drag_state!.value !== 1) return;
 
-      const { dragMaxHeight, minHeight, maxHeight, mainHeight } = Layout.layout!;
+      const { dragMax, minHeight, maxHeight, mainHeight } = Layout.layout!;
 
       const direct = e.deltaY < 0 ? -1 : 1;
       const delta = direct * Math.min(Math.abs(e.deltaY), 10);
 
       /** 计算面板的高度 */
-      const height = this.$_drag_calendar_height!.value + delta * 0.6;
-      const usefulHeight = Math.min(dragMaxHeight, Math.max(minHeight, height));
-      this.$_drag_calendar_height!.value = usefulHeight;
+      const height = this.$_drag_panel_height!.value + delta * 0.6;
+      const usefulHeight = Math.min(dragMax, Math.max(minHeight, height));
+      this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
       const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
@@ -380,27 +382,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const mon = await this._printer_.getTapMonth(ydx, x, y);
       this._annual_.switch(false, mon);
     },
-    triggerLoad() {
-      this._loaded_ = true;
-      const checked = this.data.checked!;
-      const view = this.data.currView;
-      const detail: CalendarEventDetail = { checked, view };
-      this._calendar_.service.dispatchEventHandle('load', detail);
-      this.triggerEvent('load', detail);
-    },
-    triggerDateChange(date) {
-      date = date || (this.data.checked! as WxCalendarDay);
-      const view = this.data.currView;
-      const detail: CalendarEventDetail = { checked: date, view };
-      this._calendar_.service.dispatchEventHandle('change', detail);
-      this.triggerEvent('change', detail);
-    },
-    triggerViewChange(view) {
-      const _view = flagView(view || this._view_);
-      const checked = this.data.checked!;
-      const detail: CalendarEventDetail = { checked, view: _view };
-      this._calendar_.service.dispatchEventHandle('viewChange', detail);
-      this.triggerEvent('viewchange', detail);
+    trigger(event, detail, dispatchPlugin = true) {
+      detail = detail || <CalendarEventDetail>{};
+      detail.checked = detail.checked || this.data.checked!;
+      detail.view = detail.view || this.data.currView;
+
+      dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
+      this.triggerEvent(event, detail);
     }
   },
   pageLifetimes: {
@@ -417,9 +405,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       else this._dragger_!.update();
     },
     marks: function (marks: Array<CalendarMark>) {
-      const plugin = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
-      const updates = plugin?.updateMarks(marks);
-      if (this._loaded_) this._calendar_.service.updateDates(updates);
+      const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
+      mark?.update(this, marks);
     },
     view: function (view: string) {
       const _view = viewFlag(view);
@@ -460,7 +447,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       getPlugin(key) {
         return instance._calendar_.service.getPlugin(key);
       },
-      updateDates(dates?: Array<CalendarDay>) {
+      updateDates(dates) {
         return instance._calendar_.service.updateDates(dates);
       }
     } as CalendarExport;

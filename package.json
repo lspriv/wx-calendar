@@ -1,14 +1,13 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.5.6",
+  "version": "1.5.9",
   "description": "微信小程序日历",
   "type": "commonjs",
   "main": "./dist/index.js",
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "miniprogram": "dist",
   "files": [
     "dist/",
-    "types/",
     "global.d.ts"
   ],
   "scripts": {

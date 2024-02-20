@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 21:59:19
+ * @LastEditTime: 2024-02-20 13:44:23
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -26,7 +26,7 @@ import {
 
 import type { PartRequired } from '../utils/shared';
 import type { CalendarData, CalendarPanel } from '../interface/component';
-import type { CalendarDay, CalendarMonth, WxCalendarFullYear } from '../interface/calendar';
+import type { CalendarDay, CalendarMonth, WcFullYear } from '../interface/calendar';
 
 type RefreshFields = PartRequired<CalendarData, 'current' | 'checked'>;
 
@@ -200,7 +200,7 @@ export class PanelTool extends CalendarHandler {
     const instance = this._instance_;
     const weekstart = instance.data.weekstart;
     const panel = instance._calendar_.createYear(year, weekstart);
-    return { ...panel, key: `y_${key}` } as typeof panel;
+    return { ...panel, key: `y_${key}` } as WcFullYear;
   }
 
   private findWeekPanelIdx(date: CalendarDay): number {
@@ -240,7 +240,7 @@ export class PanelTool extends CalendarHandler {
       const offset = monthDiff(pannel, { year: d.year, month: d.month });
       await this.refresh(offset, d, idx >= 0 ? idx : current);
     }
-    instance.triggerDateChange(d);
+    instance.trigger('change', { checked: d });
   }
 
   public async toWeekAdjoin(checked: CalendarDay, vibrate: boolean = true) {
@@ -285,7 +285,7 @@ export class PanelTool extends CalendarHandler {
     instance.setData(sets);
     await this.update();
 
-    if (!isSameDate(date, checked!)) instance.triggerDateChange(date);
+    if (!isSameDate(date, checked!)) instance.trigger('change', { checked: date });
   }
 
   public toYear(year: number) {
@@ -299,7 +299,7 @@ export class PanelTool extends CalendarHandler {
     return this.refreshAnnualPanels(offset, idx >= 0 ? idx : current, !this.skyline);
   }
 
-  public getFullYear(idx: number): WxCalendarFullYear {
+  public getFullYear(idx: number): WcFullYear {
     return { ...this._instance_.data.years[idx], ...this._instance_._years_[idx] };
   }
 
@@ -320,6 +320,6 @@ export class PanelTool extends CalendarHandler {
     const len = getMonthDays({ year, month });
     const weeksLen = Math.ceil((lastLen + len) / 7);
     const idx = Math.ceil((day + lastLen) / 7) - 1;
-    return mul(idx, div(Layout.layout!.panelHeight, weeksLen));
+    return mul(idx, div(Layout.layout!.mainHeight, weeksLen));
   }
 }

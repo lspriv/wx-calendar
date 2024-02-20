@@ -4,31 +4,22 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-01-14 13:38:15
+ * @LastEditTime: 2024-02-19 15:28:47
  */
-import { normalDate } from '../interface/calendar';
+import { normalDate, formDateByStrKey } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
-import type { CalendarMark, CalendarDay } from '../interface/calendar';
-
-type WxCalendarMarkTypes = {
-  [P in CalendarMark['type']]: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
-};
-type WxCalendarMarkMap = Map<string, WxCalendarMarkTypes>;
-
-const formDateByKey = (key: string): CalendarDay => {
-  const [year, month, day] = key.split('_');
-  return { year: +year, month: +month, day: +day };
-};
+import type { CalendarMark, CalendarDay, WcMarkDict, WcMarkMap } from '../interface/calendar';
+import type { CalendarInstance } from '../interface/component';
 
 export class MarkPlugin implements Plugin {
   public static KEY = 'mark' as const;
 
-  private _marks_: WxCalendarMarkMap;
+  private _marks_: WcMarkMap;
 
-  public updateMarks(marks: Array<CalendarMark>) {
-    const map: WxCalendarMarkMap = new Map();
+  public update(instance: CalendarInstance, marks: Array<CalendarMark>) {
+    const map: WcMarkMap = new Map();
 
     for (let i = 0; i < marks.length; i++) {
       const mark = marks[i];
@@ -44,20 +35,21 @@ export class MarkPlugin implements Plugin {
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };
-        map.set(key, form as WxCalendarMarkTypes);
+        map.set(key, form as WcMarkDict);
       }
     }
 
     const deletes = this._marks_
       ? [...this._marks_.entries()].flatMap(([key]) => {
-          return map.has(key) ? [] : formDateByKey(key);
+          return map.has(key) ? [] : formDateByStrKey(key);
         })
       : [];
 
-    const updates = [...map.keys()].map(key => formDateByKey(key));
+    const updates = [...map.keys()].map(key => formDateByStrKey(key));
 
     this._marks_ = map;
-    return [...updates, ...deletes];
+
+    if (instance._loaded_) instance._calendar_.service.updateDates([...updates, ...deletes]);
   }
 
   public PLUGIN_TRACK_DATE(date: CalendarDay): Nullable<TrackDateResult> {

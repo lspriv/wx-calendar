@@ -32,13 +32,15 @@ jobs:
       - name: Get Local Version
         id: local_version
         if: ${{ steps.release.outputs.release_created }}
-        run: echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
+        run: |
+          echo "VERSION=$(cat ${{ github.workspace }}/package.json | jq '.version')" >> $GITHUB_OUTPUT
+          echo "PKG_NAME=$(cat ${{ github.workspace }}/package.json | jq '.name')" >> $GITHUB_OUTPUT
       - name: Publish to npm
         if: ${{ steps.release.outputs.release_created }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [[ $(npm view @lspriv/wx-calendar@${{ steps.local_version.outputs.VERSION }}) ]] || [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} == true ]]; then
+          if [[ $(npm view ${{ format('{0}@{1}', steps.local_version.outputs.PKG_NAME, steps.local_version.outputs.VERSION) }}) ]] || [[ ${{ contains(steps.local_version.outputs.VERSION, 'alpha') || contains(steps.local_version.outputs.VERSION, 'beta') || contains(steps.local_version.outputs.VERSION, 'rc') }} == true ]]; then
             echo "the package has published."
           else
             npm install

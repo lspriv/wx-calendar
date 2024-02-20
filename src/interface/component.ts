@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-05 18:46:08
+ * @LastEditTime: 2024-02-17 14:19:35
  */
-import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
-import { isSkyline, type CalendarPointer, type CalendarView } from '../basic/tools';
+import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear } from './calendar';
+import { isSkyline, type CalendarView } from '../basic/tools';
 import type { View } from '../basic/constants';
-import type { Pointer } from '../basic/pointer';
+import type { Pointer, CalendarPointer } from '../basic/pointer';
 import type { PanelTool } from '../basic/panel';
 import type { Dragger } from '../basic/drag';
 import type { AnnualPanelSwitch } from '../basic/annual';
@@ -23,11 +23,12 @@ import type {
   PluginEntireMarks,
   PluginKeys,
   PluginService,
+  PluginEventNames,
   ServicePluginMap,
   ServicePlugins
 } from 'src/basic/service';
 
-export interface CalendarPanel extends WxCalendarMonth {
+export interface CalendarPanel extends WcMonth {
   /** 面板垂直偏移量 */
   offset: number;
 }
@@ -51,7 +52,7 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** 周标题 */
   weeks: Array<CalendarWeek>;
   /** 年面板数据 */
-  years: Array<WxCalendarYear>;
+  years: Array<WcYear>;
   /** 周/月面板swiper当前所在滑块 */
   current: number;
   /** 年面板swiper当前所在滑块 */
@@ -73,7 +74,7 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** [webview] 周视图下强制更新各面板的垂直偏移量 */
   offsetChange: boolean;
   /** 布局数据 */
-  layout: Nullable<Omit<CalendarLayout, 'subHeight' | 'windowWidth' | 'windowHeight'>>;
+  layout: Nullable<Omit<CalendarLayout, 'windowWidth' | 'windowHeight'>>;
   /** 选中日期的额外信息 */
   info: string;
   /** 控制选中日期的圆圈⭕️位置和动画 */
@@ -200,21 +201,18 @@ interface CalendarEventHandlers {
 }
 
 export interface CalendarEventDetail {
-  checked: CalendarDay;
-  view: CalendarView;
-}
-
-interface CalendarTrigger {
-  triggerLoad(): void;
-  triggerDateChange(date?: CalendarDay): void;
-  triggerViewChange(view?: View): void;
+  checked?: CalendarDay;
+  view?: CalendarView;
 }
 
 export interface CalendarMethod
   extends WechatMiniprogram.Component.MethodOption,
     CalendarInitialize,
-    CalendarEventHandlers,
-    CalendarTrigger {
+    CalendarEventHandlers {
+  /**
+   * 触发事件
+   */
+  trigger<T extends PluginEventNames>(event: T, detail?: CalendarEventDetail, dispatchPlugin?: boolean): void;
   /**
    * 刷新周/月面板数据
    * 单独写这个方法是worklet的需要
@@ -246,7 +244,7 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   /** 日期中心水平坐标 */
   _centres_: Array<number>;
   /** 保存和视图无关的年度数据，和data里的years一一对应 */
-  _years_: Array<WxCalendarSubYear>;
+  _years_: Array<WcSubYear>;
   /** 控制选中日期圆圈的实例对象 */
   _pointer_: Pointer;
   /** 处理周/月/年面板数据的实例对象 */
@@ -279,7 +277,7 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   /** [Skyline] 周/月面板手势拖动状态 */
   $_drag_state?: Shared<0 | 1>;
   /** [Skyline] 周/月面板容器高度 */
-  $_drag_calendar_height?: Shared<number>;
+  $_drag_panel_height?: Shared<number>;
   /** [Skyline] 周/月面板各面板垂直偏移量 */
   $_drag_panel_trans?: Shared<Array<Shared<number>>>;
   /** [Skyline] 周/月面板底部控制条角度 */

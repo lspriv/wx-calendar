@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2024-01-18 20:36:11
+ * @LastEditTime: 2024-02-12 22:20:07
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
 
-import type { CalendarDay, WxCalendarMonth } from '../interface/calendar';
+import type { CalendarDay, WcMonth } from '../interface/calendar';
 import type { CalendarData } from '../interface/component';
 
 interface PointerLocation {
@@ -22,6 +22,17 @@ interface PointerIndexLocation {
   wdx: number;
   len: number;
 }
+
+export interface CalendarPointer {
+  x: string | number;
+  y: string | number;
+  show: boolean;
+  animate: boolean;
+  transition: boolean;
+}
+
+export const createPointer = (opts?: Partial<CalendarPointer>) =>
+  ({ x: 0, y: 0, show: true, animate: true, transition: true, ...opts }) as CalendarPointer;
 
 /**
  * 这个最开始是分skyline和webview渲染的，
@@ -69,13 +80,13 @@ export class Pointer extends CalendarHandler {
     }
   }
 
-  public static calcCurrIdx(mon: WxCalendarMonth, checked: CalendarDay): PointerIndexLocation {
+  public static calcCurrIdx(mon: WcMonth, checked: CalendarDay): PointerIndexLocation {
     const { month, day } = checked;
     const idx = findDateIndex(mon.weeks, date => date.month == month && date.day == day);
     return { ddx: idx % 7, wdx: Math.floor(idx / 7), len: mon.weeks.length };
   }
 
-  public static calcPosition(mon: WxCalendarMonth, checked: CalendarDay, centres: number[]): PointerLocation {
+  public static calcPosition(mon: WcMonth, checked: CalendarDay, centres: number[]): PointerLocation {
     const { ddx, wdx, len } = this.calcCurrIdx(mon, checked);
 
     const x = `${centres[ddx]}px`;

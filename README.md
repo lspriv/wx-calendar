@@ -189,6 +189,16 @@ type LoadEventDetail = {
 }
 ```
 
+[***`bindclick`***](#bindload)  日期点击
+```typescript
+type LoadEventDetail = {
+    checked: CalenderDay; // 当前点击日期
+    view: 'week' | 'month' | 'schedule'; // 当前视图
+}
+```
+> [!NOTE]
+> 日期点击事件，若有必要请自行防抖处理
+
 [***`bindchange`***](#bindchange)  日期选中变化
 ```typescript
 type ChangeEventDetail = {
@@ -337,13 +347,13 @@ type ViewChangeEventDetail = {
 ```
 
 ### 类型检查
-由于小程序构建npm的特殊性，本组件又是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的 jsconfig.json或是tsconfig.json指明路径。
+由于小程序构建npm的特殊性，本组件又是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的jsconfig.json或是tsconfig.json文件中指明路径。
 ```json
 {
   "compilerOptions": {
     "paths": {
       "@lspriv/wx-calendar/*": [
-          "./node_modules/@lspriv/wx-calendar/types/*"
+          "./node_modules/@lspriv/wx-calendar/dist/*"
         ]
     }
   }
@@ -351,7 +361,6 @@ type ViewChangeEventDetail = {
 ```
 
 ### 插件
-wx-calendar自带农历插件
 
 #### 插件使用
 ```javascript
@@ -374,13 +383,13 @@ Component({
 ```typescript
 import type { 
   Plugin, 
-  CalendarDay, 
-  WxCalendarYear, 
+  WcYear,
+  CalendarDay,  
   TrackDateResult, 
   TrackYearResult, 
   PluginService,
   CalendarEventDetail
-} from '@lspriv/wx-calendar';
+} from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
   /** 需要定义插件的key，必填 */
@@ -416,23 +425,17 @@ class MyPlugin implements Plugin {
    * 捕获年份，可选择实现该方法
    * @param year 年
    */
-  PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
+  PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
     return {
       subinfo: '', // 设置年份描述信息，可选
       marks: new Map([
-        ['2023-10-1', new Set(['rest'])], // 休息日，置灰
-        ['2023-10-7', new Set(['work'])], // 工作日，正常
-        ['2023-10-9', new Set(['#F56C6C'])] // 自定义颜色下标
+        ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
+        ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
+        ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
       ])
     }
   };
-
-  /**
-   * 插件绑定到日期数据，可选择实现该方法
-   * @param date 待绑定日期
-   */
-  PLUGIN_DATA(date: CalendarDay): any {};
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
@@ -440,6 +443,16 @@ class MyPlugin implements Plugin {
    * @param detail 事件数据
    */
   PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
+
+  /**
+   * 注册日期点击事件处理方法，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 事件数据
+   */
+  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -459,7 +472,7 @@ class MyPlugin implements Plugin {
    * @param service PliginService实例
    * @param detail 事件数据
    */
-  PLUGIN_ON_VIEW_CHANGE(service: PluginService, detail: CalendarEventDetail) {
+  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail) {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -477,8 +490,9 @@ class MyPlugin implements Plugin {
 
 
 #### 农历插件
+wx-calendar自带农历插件
 ```javascript
-const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar');
+const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar/lib');
 // 你的页面中
 const calendar = this.selectComponent('#calendar');
 const lunarPlugin = calendar.getPlugin(LUNAR_PLUGIN_KEY);
@@ -503,7 +517,7 @@ type LunarDate = {
 
 #### 插件画饼
 有计划做的插件
-- [ ] *ICS日历订阅插件*
+- [x] [***ICS日历订阅插件*** *查看*](https://github.com/lspriv/wc-plugin-ics)
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*
 
@@ -511,7 +525,7 @@ type LunarDate = {
 
 >     有任何问题或是需求请到 `Issues` 面板提交
 >     忙的时候还请见谅
->     有兴趣开发维护的小伙伴加微信
+>     有兴趣开发维护的道友加微信
 
 ![wx_qr](https://chat.qilianyun.net/static/git/calendar/wx.png)
  

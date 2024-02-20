@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-01-13 18:34:38
+ * @LastEditTime: 2024-02-09 12:49:35
  */
 import { View } from './constants';
 
@@ -12,29 +12,32 @@ export interface CalendarLayout {
   readonly maxHeight: number;
   readonly mainHeight: number;
   readonly minHeight: number;
-  readonly subHeight: number;
-  readonly panelHeight: number;
   readonly menuTop: number;
   readonly menuBottom: number;
   readonly windowWidth: number;
   readonly windowHeight: number;
-  readonly dragMaxHeight: number;
+  readonly dragMax: number;
   readonly safeBottom: number;
   readonly maxScheduleSize: number;
 }
 
 export type Theme = 'light' | 'dark';
 
+/** 小程序规定的屏幕宽度，单位rpx */
+const RATIO_WIDTH = 750;
+
 export class Layout {
   public static layout?: CalendarLayout;
   /** 深浅模式 */
   public static theme: Theme = 'light';
-  /** 小程序规定的屏幕宽度，单位rpx */
-  public static RatioWidth: number = 750;
   /** 常规状态下（月视图）的日历总高度，单位rpx */
-  public static CalendarHeight: number = 800;
-  /** 顶部operator，week和底部bar组件的总高度，单位rpx */
-  public static CalendarSubHeight: number = 200;
+  public static CalendarMainHeight: number = 600;
+  /** 日历头部高度，单位rpx */
+  public static CalendarHeaderHeight: number = 100;
+  /** 星期容器高度，单位rpx */
+  public static CalendarWeekHeight: number = 50;
+  /** 底部bar容器高度，单位rpx */
+  public static CalendarBarHeight: number = 50;
   /** 日历最大高度下留余高度，单位rpx */
   public static CalendarSpareHeight: number = 100;
 
@@ -44,31 +47,31 @@ export class Layout {
     const { safeArea, windowWidth, windowHeight, theme } = wx.getSystemInfoSync();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
-    const subHeight = Layout.rpxToPx(Layout.CalendarSubHeight, windowWidth);
-    const mainHeight = Layout.rpxToPx(Layout.CalendarHeight, windowWidth);
-    const panelHeight = mainHeight - subHeight;
-
+    const subHeight = Layout.rpxToPx(
+      Layout.CalendarHeaderHeight + Layout.CalendarWeekHeight + Layout.CalendarBarHeight,
+      windowWidth
+    );
     const spareHeight = Layout.rpxToPx(Layout.CalendarSpareHeight, windowWidth);
-    const maxHeight = (safeArea?.bottom ?? windowHeight) - bottom - spareHeight;
-    const minHeight = panelHeight / 5 + subHeight;
-    const dragMaxHeight = panelHeight / 5 + maxHeight;
 
+    const mainHeight = Layout.rpxToPx(Layout.CalendarMainHeight, windowWidth);
+    const maxHeight = (safeArea?.bottom ?? windowHeight) - bottom - spareHeight - subHeight;
+    const minHeight = mainHeight / 5;
+
+    const dragMax = minHeight + maxHeight;
     const safeBottom = windowHeight - (safeArea?.bottom ?? windowHeight);
 
     Layout.layout = Object.freeze({
       menuTop: top,
       menuBottom: bottom,
       safeBottom: safeBottom > 0 ? safeBottom : Layout.rpxToPx(60, windowWidth),
-      subHeight,
-      panelHeight,
       mainHeight,
       maxHeight,
       minHeight,
-      dragMaxHeight,
+      dragMax,
       windowWidth,
       windowHeight,
-      maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight - subHeight, windowWidth)
-    }) as CalendarLayout;
+      maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight, windowWidth)
+    });
 
     if (theme === 'dark') Layout.theme = 'dark';
   }
@@ -87,7 +90,7 @@ export class Layout {
   }
 
   public static rpxToPx(rpx: number, windowWidth: number) {
-    return Math.floor((rpx * windowWidth) / Layout.RatioWidth);
+    return Math.floor((rpx * windowWidth) / RATIO_WIDTH);
   }
 
   public static viewHeight(view: View) {
