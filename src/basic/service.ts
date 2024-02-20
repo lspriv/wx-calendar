@@ -4,36 +4,43 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-19 15:13:45
+ * @LastEditTime: 2024-02-20 13:38:01
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
-import { monthDiff, sameMark, sameSchedules, getWeekDateIdx, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
+import {
+  monthDiff,
+  sameMark,
+  sameSchedules,
+  getWeekDateIdx,
+  mergeAnnualMarks,
+  GREGORIAN_MONTH_DAYS
+} from '../interface/calendar';
 
 import type { SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
-  WxCalendarMonth,
-  WxCalendarYear,
+  WcMonth,
+  WcYear,
   CalendarMark,
-  CalendarDateSchedule,
-  CalendarDateMark,
-  WxCalendarYearMarks
+  WcScheduleMark,
+  WcMark,
+  WcAnnualMarks
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
 type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
 
-type Schedules = Array<CalendarDateSchedule>;
+type Schedules = Array<WcScheduleMark>;
 
 export type TrackDateResult = {
-  [P in CalendarMark['type']]?: P extends 'schedule' ? Schedules : CalendarDateMark;
+  [P in CalendarMark['type']]?: P extends 'schedule' ? Schedules : WcMark;
 };
 
 export type TrackYearResult = {
   subinfo?: string;
-  marks?: WxCalendarYearMarks;
+  marks?: WcAnnualMarks;
 };
 
 interface PluginEventHandler {
@@ -83,7 +90,7 @@ export interface Plugin extends PluginEventHandler {
    * 捕获年份
    * @param year 年
    */
-  PLUGIN_TRACK_YEAR?(year: WxCalendarYear): Nullable<TrackYearResult>;
+  PLUGIN_TRACK_YEAR?(year: WcYear): Nullable<TrackYearResult>;
 }
 
 export interface PluginConstructor {
@@ -141,7 +148,7 @@ interface MonthResult {
   days: Array<WalkResult>;
 }
 
-interface YearResult {
+export interface AnnualResult {
   year: number;
   result: TrackYearResult;
 }
@@ -149,7 +156,7 @@ interface YearResult {
 type PluginMark<T> = T & { key: string };
 
 export type PluginEntireMarks = {
-  [P in CalendarMark['type']]: Array<PluginMark<P extends 'schedule' ? CalendarDateSchedule : CalendarDateMark>>;
+  [P in CalendarMark['type']]: Array<PluginMark<P extends 'schedule' ? WcScheduleMark : WcMark>>;
 };
 
 export type PluginKey<T> = T extends PluginConstructor ? T['KEY'] : never;
@@ -219,20 +226,20 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     return notEmptyObject(record) ? record : null;
   }
 
-  private walkForYear(year: WxCalendarYear) {
+  private walkForYear(year: WcYear) {
     const record: TrackYearResult = {};
     this.traversePlugins(plugin => {
       if (record.subinfo && record.marks) return;
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo) record.subinfo = result.subinfo;
-        if (result.marks?.size) record.marks = result.marks;
+        if (result.marks) record.marks = result.marks;
       }
     });
     return notEmptyObject(record) ? record : null;
   }
 
-  public async catchMonth(month: WxCalendarMonth) {
+  public async catchMonth(month: WcMonth) {
     const records = await nextTick(() => {
       const records: Array<WalkResult> = [];
       for (let i = month.weeks.length; i--; ) {
@@ -249,8 +256,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     this.setMonth({ year: month.year, month: month.month, days: records });
   }
 
-  public async catchYear(year: WxCalendarYear) {
+  public async catchYear(year: WcYear) {
     const result = await nextTick(() => this.walkForYear(year));
+    await this.component._annual_.interaction();
     if (result) this.setYear({ year: year.year, result });
   }
 
@@ -276,7 +284,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     });
   }
 
-  private setYear(year: YearResult) {
+  private setYear(year: AnnualResult) {
     nextTick(() => {
       const years = this.component.data.years;
       const sets: Partial<CalendarData> = {};
@@ -284,7 +292,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       if (ydx >= 0) {
         if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
         if (year.result.marks) {
-          this.component._years_[ydx].marks = year.result.marks;
+          this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, year.result.marks)!;
           this.component._printer_.update([ydx]);
         }
       }
@@ -335,6 +343,28 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     }
     await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
+  }
+
+  /**
+   * 刷新年度面板
+   */
+  public async updateAnnuals(annuals?: Array<AnnualResult>) {
+    if (!annuals?.length) return;
+    const years = this.component.data.years;
+    const sets: Partial<CalendarData> = {};
+    const ydxs: number[] = [];
+    for (const annual of annuals) {
+      const ydx = years.findIndex(y => y.year === annual.year);
+      if (ydx >= 0) {
+        if (annual.result.subinfo) sets[`years[${ydx}].subinfo`] = annual.result.subinfo;
+        if (annual.result.marks) {
+          this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, annual.result.marks)!;
+        }
+      }
+    }
+    await this.component._annual_.interaction();
+    ydxs.length && this.component._printer_.update(ydxs);
+    notEmptyObject(sets) && this.component.setData(sets);
   }
 
   /**

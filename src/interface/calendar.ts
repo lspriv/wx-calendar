@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-19 15:28:14
+ * @LastEditTime: 2024-02-20 14:12:58
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -35,36 +35,36 @@ export interface CalendarMark extends Partial<Pick<CalendarDay, 'day' | 'month' 
   bgColor?: Nullable<string>;
 }
 
-export interface CalendarDateMark {
+export interface WcMark {
   key?: string;
   color?: Nullable<string>;
   text: string;
 }
 
-export interface CalendarDateSchedule extends CalendarDateMark {
+export interface WcScheduleMark extends WcMark {
   bgColor?: Nullable<string>;
 }
 
-export interface WxCalendarDay extends Required<CalendarDay> {
+export interface WcDate extends Required<CalendarDay> {
   key: string;
   kind: 'last' | 'current' | 'next';
-  mark: Nullable<CalendarDateMark>;
-  corner: Nullable<CalendarDateMark>;
-  schedules: Array<CalendarDateSchedule>;
+  mark: Nullable<WcMark>;
+  corner: Nullable<WcMark>;
+  schedules: Array<WcScheduleMark>;
 }
 
-export interface WxCalendarWeek {
+export interface WcWeek {
   key: string;
-  days: Array<WxCalendarDay>;
+  days: Array<WcDate>;
 }
 
-export interface WxCalendarMonth extends Required<CalendarMonth> {
+export interface WcMonth extends Required<CalendarMonth> {
   key: string;
   count: number;
-  weeks: Array<WxCalendarWeek>;
+  weeks: Array<WcWeek>;
 }
 
-export interface WxCalendarAnnualMonth {
+export interface WcAnnualMonth {
   key: string;
   year: number;
   month: number;
@@ -73,30 +73,52 @@ export interface WxCalendarAnnualMonth {
   start: number;
 }
 
-export type WxCalendarYearMark = 'rest' | 'work' | (string & {});
+export interface WcAnnualMark {
+  rwtype?: 'rest' | 'work';
+  sub?: string;
+}
 
-export type WxCalendarYearMarks = Map<string, Set<WxCalendarYearMark>>;
+export type WcAnnualMarks = Map<string, WcAnnualMark>;
 
-export interface WxCalendarYear {
+export interface WcYear {
   key: string;
   year: number;
   subinfo: string;
 }
 
-export interface WxCalendarSubYear {
+export interface WcSubYear {
   year: number;
-  months: Array<WxCalendarAnnualMonth>;
-  marks: WxCalendarYearMarks;
+  months: Array<WcAnnualMonth>;
+  marks: WcAnnualMarks;
 }
 
-export type WxCalendarFullYear = WxCalendarYear & WxCalendarSubYear;
+export type WcFullYear = WcYear & WcSubYear;
 
-export type WxCalendarMarkDict = {
+export type WcMarkDict = {
   [P in CalendarMark['type']]?: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
 };
-export type WxCalendarMarkMap = Map<string, WxCalendarMarkDict>;
+export type WcMarkMap = Map<string, WcMarkDict>;
 
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
+
+/**
+ * 合并两个年面板标记
+ */
+export const mergeAnnualMarks = (m1?: WcAnnualMarks, m2?: WcAnnualMarks) => {
+  if (!m1 || !m2) return m1 || m2;
+
+  const entries = m2.entries();
+  for (const [key, mark] of entries) {
+    const m = m1.get(key);
+    if (m) {
+      mark.rwtype && (m.rwtype = mark.rwtype);
+      mark.sub && (m.sub = mark.sub);
+    } else {
+      m1.set(key, mark);
+    }
+  }
+  return m1;
+};
 
 export const formDateByStrKey = (key: string): CalendarDay => {
   const [year, month, day] = key.split('_');
@@ -116,7 +138,7 @@ export const getMonthDays = (mon: CalendarMonth) => {
  * @param date 日期，可以是模糊的，比如「2024-01-01」可以表示为 { year: 2023, month: 13, day: 1 }
  * @param kind 日期类型 'last' | 'current' | 'next' | 'today'，对应 上个月 ｜ 当前月 ｜ 下个月 ｜ 今天
  */
-const createCalendarDay = (date: CalendarDay, kind: WxCalendarDay['kind']): WxCalendarDay => {
+const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
   const { year, month, day, week } = normalDate(date);
   const today = isToday({ year, month, day });
   const key = `${year}_${month}_${day}`;
@@ -139,7 +161,7 @@ const createCalendarDay = (date: CalendarDay, kind: WxCalendarDay['kind']): WxCa
  * @param monthFirstDay 月首
  * @param weekstart 周首日
  */
-const createMonthLastDays = (monthFirstDay: WxCalendarDay, weekstart: number = 0) => {
+const createMonthLastDays = (monthFirstDay: WcDate, weekstart: number = 0) => {
   const { year, month, week } = monthFirstDay;
   return Array.from({ length: Math.abs(week + 7 - weekstart) % 7 }, (_, i) =>
     createCalendarDay({ year, month, day: -i }, 'last')
@@ -151,7 +173,7 @@ const createMonthLastDays = (monthFirstDay: WxCalendarDay, weekstart: number = 0
  * @param monthFinalDay 月末
  * @param weekstart 周首日
  */
-const createMonthNextDays = (monthFinalDay: WxCalendarDay, weekstart: number = 0) => {
+const createMonthNextDays = (monthFinalDay: WcDate, weekstart: number = 0) => {
   const { year, month, day, week } = monthFinalDay;
   return Array.from({ length: 6 - (Math.abs(week + 7 - weekstart) % 7) }, (_, i) => {
     const _day = createCalendarDay({ year, month, day: day + i + 1 }, 'next');
@@ -174,7 +196,7 @@ const createMonthDays = (mon: CalendarMonth) => {
  * @param mon 月份
  * @param days 月份日期
  */
-const createMonthWeeks = (mon: CalendarMonth, days: Array<WxCalendarDay>): Array<WxCalendarWeek> => {
+const createMonthWeeks = (mon: CalendarMonth, days: Array<WcDate>): Array<WcWeek> => {
   return Array.from({ length: days.length / 7 }, (_, i) => ({
     key: `${mon.year}_${mon.month}_${i}`,
     days: Array.from({ length: 7 }, (_, idx) => days[i * 7 + idx])
@@ -264,8 +286,8 @@ export const weekRange = (date: CalendarDay, weekstart: number = 0): [start: Dat
  * @param predicate 查找条件
  */
 export const findInWeeks = (
-  weeks: Array<WxCalendarWeek>,
-  predicate: (value: WxCalendarDay, index: number, obj: WxCalendarDay[]) => boolean
+  weeks: Array<WcWeek>,
+  predicate: (value: WcDate, index: number, obj: WcDate[]) => boolean
 ) => {
   return weeks.flatMap(week => week.days).find(predicate);
 };
@@ -276,8 +298,8 @@ export const findInWeeks = (
  * @param predicate 查找条件
  */
 export const findDateIndex = (
-  weeks: Array<WxCalendarWeek>,
-  predicate: (value: WxCalendarDay, index: number, obj: WxCalendarDay[]) => boolean
+  weeks: Array<WcWeek>,
+  predicate: (value: WcDate, index: number, obj: WcDate[]) => boolean
 ) => {
   return weeks.flatMap(week => week.days).findIndex(predicate);
 };
@@ -287,7 +309,7 @@ export const findDateIndex = (
  * @param date 制定日期
  * @param weeks 所在月份的周数组
  */
-export const getWeekDateIdx = (date: CalendarDay, weeks: Array<WxCalendarWeek>): { wdx: number; ddx: number } => {
+export const getWeekDateIdx = (date: CalendarDay, weeks: Array<WcWeek>): { wdx: number; ddx: number } => {
   let wdx: number = -1;
   let ddx: number = -1;
   for (let i = 0; i < weeks.length; i++) {
@@ -328,7 +350,7 @@ export const monthDiff = (start: CalendarMonth, end: CalendarMonth) => {
  * @param mon 月份
  * @param weekstart 周首日
  */
-const createYearMonth = (mon: CalendarMonth, weekstart: number = 0): WxCalendarAnnualMonth => {
+const createYearMonth = (mon: CalendarMonth, weekstart: number = 0): WcAnnualMonth => {
   const days = getMonthDays(mon);
   const { year, month } = mon;
   const week = new Date(year, month - 1, 1).getDay();
@@ -351,7 +373,7 @@ export const getDateInfo = (date: CalendarDay, withWeek: boolean | number = fals
   return postfix;
 };
 
-export const sameMark = (m1?: Nullable<CalendarDateMark>, m2?: Nullable<CalendarDateMark>) => {
+export const sameMark = (m1?: Nullable<WcMark>, m2?: Nullable<WcMark>) => {
   if (m1 && m2) {
     if (m1.text !== m2.text && (m1.text || m2.text)) return false;
     if (m1.color !== m2.color && (m1.color || m2.color)) return false;
@@ -359,7 +381,7 @@ export const sameMark = (m1?: Nullable<CalendarDateMark>, m2?: Nullable<Calendar
   return true;
 };
 
-export const sameSchedules = (as1?: Array<CalendarDateSchedule>, as2?: Array<CalendarDateSchedule>) => {
+export const sameSchedules = (as1?: Array<WcScheduleMark>, as2?: Array<WcScheduleMark>) => {
   if (as1 && as2) {
     if (as1.length !== as2.length) return false;
     let i = 0;
@@ -413,16 +435,16 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
       month,
       weeks: createMonthWeeks({ year, month }, days),
       count: currDaysCount
-    } as WxCalendarMonth;
+    } as WcMonth;
     this.service.catchMonth(m);
     return m;
   }
 
   public createYear(year: number, weekstart: number = 0) {
-    const months: Array<WxCalendarAnnualMonth> = Array.from({ length: 12 }, (_, i) =>
+    const months: Array<WcAnnualMonth> = Array.from({ length: 12 }, (_, i) =>
       createYearMonth({ year, month: i + 1 }, weekstart)
     );
-    const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WxCalendarFullYear;
+    const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WcFullYear;
     this.service.catchYear(y);
     return y;
   }

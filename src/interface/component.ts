@@ -6,7 +6,7 @@
  * @Author: lishen
  * @LastEditTime: 2024-02-17 14:19:35
  */
-import type { CalendarDay, WxCalendar, WxCalendarMonth, WxCalendarYear, WxCalendarSubYear } from './calendar';
+import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
 import type { View } from '../basic/constants';
 import type { Pointer, CalendarPointer } from '../basic/pointer';
@@ -28,7 +28,7 @@ import type {
   ServicePlugins
 } from 'src/basic/service';
 
-export interface CalendarPanel extends WxCalendarMonth {
+export interface CalendarPanel extends WcMonth {
   /** 面板垂直偏移量 */
   offset: number;
 }
@@ -52,7 +52,7 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** 周标题 */
   weeks: Array<CalendarWeek>;
   /** 年面板数据 */
-  years: Array<WxCalendarYear>;
+  years: Array<WcYear>;
   /** 周/月面板swiper当前所在滑块 */
   current: number;
   /** 年面板swiper当前所在滑块 */
@@ -244,7 +244,7 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   /** 日期中心水平坐标 */
   _centres_: Array<number>;
   /** 保存和视图无关的年度数据，和data里的years一一对应 */
-  _years_: Array<WxCalendarSubYear>;
+  _years_: Array<WcSubYear>;
   /** 控制选中日期圆圈的实例对象 */
   _pointer_: Pointer;
   /** 处理周/月/年面板数据的实例对象 */

@@ -9,7 +9,7 @@
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
 
-import type { CalendarDay, WxCalendarMonth } from '../interface/calendar';
+import type { CalendarDay, WcMonth } from '../interface/calendar';
 import type { CalendarData } from '../interface/component';
 
 interface PointerLocation {
@@ -80,13 +80,13 @@ export class Pointer extends CalendarHandler {
     }
   }
 
-  public static calcCurrIdx(mon: WxCalendarMonth, checked: CalendarDay): PointerIndexLocation {
+  public static calcCurrIdx(mon: WcMonth, checked: CalendarDay): PointerIndexLocation {
     const { month, day } = checked;
     const idx = findDateIndex(mon.weeks, date => date.month == month && date.day == day);
     return { ddx: idx % 7, wdx: Math.floor(idx / 7), len: mon.weeks.length };
   }
 
-  public static calcPosition(mon: WxCalendarMonth, checked: CalendarDay, centres: number[]): PointerLocation {
+  public static calcPosition(mon: WcMonth, checked: CalendarDay, centres: number[]): PointerLocation {
     const { ddx, wdx, len } = this.calcCurrIdx(mon, checked);
 
     const x = `${centres[ddx]}px`;

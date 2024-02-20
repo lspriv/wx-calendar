@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-19 16:46:32
+ * @LastEditTime: 2024-02-20 14:01:00
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -32,7 +32,7 @@ import {
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
-import type { WxCalendarYear, CalendarMark, WxCalendarDay, CalendarDay } from './interface/calendar';
+import type { WcYear, CalendarMark } from './interface/calendar';
 import type { CalendarView } from './basic/tools';
 import type {
   CalendarData,
@@ -98,7 +98,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     renderer: 'unknown',
     checked: null,
     panels: InitPanels<CalendarPanel>('panel'),
-    years: InitPanels<WxCalendarYear>('year'),
+    years: InitPanels<WcYear>('year'),
     weeks: InitWeeks(),
     current: initCurrent,
     currView: VIEWS.MONTH,
@@ -173,7 +173,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const panels = isWeekView ? this._panel_.createWeekPanels(checked) : this._panel_.createMonthPanels(checked);
       const _years = this._panel_.createYearPanels(checked);
-      const years: Array<WxCalendarYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
+      const years: Array<WcYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
       this._years_ = _years.map(({ year, months, marks }) => ({ year, months, marks }));
 
       const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;

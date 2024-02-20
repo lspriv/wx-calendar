@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-17 13:00:00
+ * @LastEditTime: 2024-02-20 13:44:23
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -26,7 +26,7 @@ import {
 
 import type { PartRequired } from '../utils/shared';
 import type { CalendarData, CalendarPanel } from '../interface/component';
-import type { CalendarDay, CalendarMonth, WxCalendarFullYear } from '../interface/calendar';
+import type { CalendarDay, CalendarMonth, WcFullYear } from '../interface/calendar';
 
 type RefreshFields = PartRequired<CalendarData, 'current' | 'checked'>;
 
@@ -200,7 +200,7 @@ export class PanelTool extends CalendarHandler {
     const instance = this._instance_;
     const weekstart = instance.data.weekstart;
     const panel = instance._calendar_.createYear(year, weekstart);
-    return { ...panel, key: `y_${key}` } as typeof panel;
+    return { ...panel, key: `y_${key}` } as WcFullYear;
   }
 
   private findWeekPanelIdx(date: CalendarDay): number {
@@ -299,7 +299,7 @@ export class PanelTool extends CalendarHandler {
     return this.refreshAnnualPanels(offset, idx >= 0 ? idx : current, !this.skyline);
   }
 
-  public getFullYear(idx: number): WxCalendarFullYear {
+  public getFullYear(idx: number): WcFullYear {
     return { ...this._instance_.data.years[idx], ...this._instance_._years_[idx] };
   }
 

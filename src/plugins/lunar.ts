@@ -4,12 +4,12 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-01-07 14:15:13
+ * @LastEditTime: 2024-02-20 14:08:21
  */
 import { getAnnualMarkKey, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
 import type { Plugin, TrackDateResult, TrackYearResult } from '../basic/service';
-import type { CalendarDay, WxCalendarYear, WxCalendarYearMark } from '../interface/calendar';
+import type { CalendarDay, WcYear, WcAnnualMark, WcAnnualMarks } from '../interface/calendar';
 
 const CN_CALENDARS = [
   0x00, 0x04, 0xad, 0x08, 0x5a, 0x01, 0xd5, 0x54, 0xb4, 0x09, 0x64, 0x05, 0x59, 0x45, 0x95, 0x0a, 0xa6, 0x04, 0x55,
@@ -412,9 +412,9 @@ export class LunarPlugin implements Plugin {
     };
   }
 
-  public PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
+  public PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     let lunarYear: string = '';
-    const marks: Map<string, Set<WxCalendarYearMark>> = new Map();
+    const marks: WcAnnualMarks = new Map();
     for (let i = 0; i < 12; i++) {
       const days = i === 1 && isLeapYear(year.year) ? GREGORIAN_MONTH_DAYS[i] + 1 : GREGORIAN_MONTH_DAYS[i];
       const month = i + 1;
@@ -424,8 +424,8 @@ export class LunarPlugin implements Plugin {
         if (month === 10 && day === 1) lunarYear = lunar.lunarYear;
         if (lunar.day === 1) {
           const key = getAnnualMarkKey({ month, day });
-          const set = new Set<WxCalendarYearMark>();
-          set.add(lunar.month === 1 ? '#F56C6C' : '#409EFF');
+          const set: WcAnnualMark = {};
+          set.sub = lunar.month === 1 ? '#F56C6C' : '#409EFF';
           marks.set(key, set);
         }
       }

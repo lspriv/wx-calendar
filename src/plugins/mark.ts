@@ -10,16 +10,16 @@ import { normalDate, formDateByStrKey } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
-import type { CalendarMark, CalendarDay, WxCalendarMarkDict, WxCalendarMarkMap } from '../interface/calendar';
+import type { CalendarMark, CalendarDay, WcMarkDict, WcMarkMap } from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
 
 export class MarkPlugin implements Plugin {
   public static KEY = 'mark' as const;
 
-  private _marks_: WxCalendarMarkMap;
+  private _marks_: WcMarkMap;
 
   public update(instance: CalendarInstance, marks: Array<CalendarMark>) {
-    const map: WxCalendarMarkMap = new Map();
+    const map: WcMarkMap = new Map();
 
     for (let i = 0; i < marks.length; i++) {
       const mark = marks[i];
@@ -35,7 +35,7 @@ export class MarkPlugin implements Plugin {
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };
-        map.set(key, form as WxCalendarMarkDict);
+        map.set(key, form as WcMarkDict);
       }
     }
 
