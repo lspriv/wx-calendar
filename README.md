@@ -384,13 +384,13 @@ Component({
 ```typescript
 import type { 
   Plugin, 
-  CalendarDay, 
-  WxCalendarYear, 
+  WcYear,
+  CalendarDay,  
   TrackDateResult, 
   TrackYearResult, 
   PluginService,
   CalendarEventDetail
-} from '@lspriv/wx-calendar';
+} from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
   /** 需要定义插件的key，必填 */
@@ -426,14 +426,14 @@ class MyPlugin implements Plugin {
    * 捕获年份，可选择实现该方法
    * @param year 年
    */
-  PLUGIN_TRACK_YEAR(year: WxCalendarYear): TrackYearResult {
+  PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
     return {
       subinfo: '', // 设置年份描述信息，可选
       marks: new Map([
-        ['2023-10-1', new Set(['rest'])], // 休息日，置灰
-        ['2023-10-7', new Set(['work'])], // 工作日，正常
-        ['2023-10-9', new Set(['#F56C6C'])] // 自定义颜色下标
+        ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
+        ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
+        ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
       ])
     }
   };
@@ -525,7 +525,7 @@ type LunarDate = {
 
 >     有任何问题或是需求请到 `Issues` 面板提交
 >     忙的时候还请见谅
->     有兴趣开发维护的小伙伴加微信
+>     有兴趣开发维护的道友加微信
 
 ![wx_qr](https://chat.qilianyun.net/static/git/calendar/wx.png)
  
