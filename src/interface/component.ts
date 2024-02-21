@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-17 14:19:35
+ * @LastEditTime: 2024-02-21 08:58:22
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -81,6 +81,8 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   pointer: Nullable<CalendarPointer>;
   /** 日历字体 */
   fonts: string;
+  /** 暗黑模式 */
+  darkside: boolean;
 }
 
 export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption {

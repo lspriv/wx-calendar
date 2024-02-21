@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 14:01:00
+ * @LastEditTime: 2024-02-21 09:26:47
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
@@ -110,6 +110,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     annualOpacity: 0,
     annualDuration: 300,
     offsetChange: false,
+    darkside: true,
     layout: null,
     pointer: null,
     fonts: FONT,
@@ -126,7 +127,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.initializeRender();
     },
     detached() {
-      if (this.data.darkmode) this._printer_?.cancelThemeChange();
+      this._printer_?.cancelThemeChange();
       this._calendar_.service.dispatchEventHandle('detached');
     }
   },
@@ -195,7 +196,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         initView,
         viewFixed: this.$_view_fixed.value,
         info: getDateInfo(checked, isWeekView),
-        pointer: createPointer()
+        pointer: createPointer(),
+        darkside: this.data.darkmode && Layout.darkmode
       };
       this._pointer_.update(sets);
       this.setData(sets);
@@ -419,6 +421,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       } else {
         if (isSkylineRender) this._dragger_!.toView(_view, false);
         this._view_ = _view;
+      }
+    },
+    darkmode: function (darkmode: boolean) {
+      if (!darkmode) Layout.theme = 'light';
+      if (this._loaded_) {
+        const darkside = darkmode && Layout.darkmode;
+        if (darkside !== this.data.darkside) {
+          this.setData({ darkside });
+          if (darkside) this._printer_.bindThemeChange();
+          else this._printer_.cancelThemeChange();
+        }
       }
     }
   },

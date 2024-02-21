@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 08:25:47
+ * @LastEditTime: 2024-02-21 09:25:48
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -195,10 +195,10 @@ export class YearPrinter extends CalendarHandler {
   private _theme_listener_?: ThemeListener;
 
   public async initialize() {
-    const { fonts, weekstart, darkmode } = this._instance_.data;
+    const { fonts, weekstart, darkside } = this._instance_.data;
     this._font_ = fonts;
     this._weeks_ = sortWeeks(weekstart);
-    if (darkmode && Layout.layout!.darkmode) this.bindThemeChange();
+    if (darkside) this.bindThemeChange();
     this.initializeSize();
     return this.initializeRender();
   }
@@ -816,7 +816,7 @@ export class YearPrinter extends CalendarHandler {
   /**
    * 绑定系统主题改变事件的监听
    */
-  private bindThemeChange() {
+  public bindThemeChange() {
     this._theme_listener_ = res => {
       if (res.theme) {
         Layout.theme = res.theme;

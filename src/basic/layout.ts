@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 08:23:10
+ * @LastEditTime: 2024-02-21 09:29:16
  */
 import { View } from './constants';
 
@@ -19,7 +19,6 @@ export interface CalendarLayout {
   readonly dragMax: number;
   readonly safeBottom: number;
   readonly maxScheduleSize: number;
-  readonly darkmode: boolean;
 }
 
 export type Theme = 'light' | 'dark';
@@ -29,6 +28,8 @@ const RATIO_WIDTH = 750;
 
 export class Layout {
   public static layout?: CalendarLayout;
+  /** 深浅模式是否开启 */
+  public static darkmode: boolean = true;
   /** 深浅模式 */
   public static theme?: Theme;
   /** 常规状态下（月视图）的日历总高度，单位rpx */
@@ -49,6 +50,7 @@ export class Layout {
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
     Layout.theme = theme || 'light';
+    Layout.darkmode = !!theme;
 
     const subHeight = Layout.rpxToPx(
       Layout.CalendarHeaderHeight + Layout.CalendarWeekHeight + Layout.CalendarBarHeight,
@@ -64,7 +66,6 @@ export class Layout {
     const safeBottom = windowHeight - (safeArea?.bottom ?? windowHeight);
 
     Layout.layout = Object.freeze({
-      darkmode: !!theme,
       menuTop: top,
       menuBottom: bottom,
       safeBottom: safeBottom > 0 ? safeBottom : Layout.rpxToPx(60, windowWidth),
