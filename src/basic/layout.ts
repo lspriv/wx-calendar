@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 12:49:35
+ * @LastEditTime: 2024-02-21 08:23:10
  */
 import { View } from './constants';
 
@@ -19,6 +19,7 @@ export interface CalendarLayout {
   readonly dragMax: number;
   readonly safeBottom: number;
   readonly maxScheduleSize: number;
+  readonly darkmode: boolean;
 }
 
 export type Theme = 'light' | 'dark';
@@ -29,7 +30,7 @@ const RATIO_WIDTH = 750;
 export class Layout {
   public static layout?: CalendarLayout;
   /** 深浅模式 */
-  public static theme: Theme = 'light';
+  public static theme?: Theme;
   /** 常规状态下（月视图）的日历总高度，单位rpx */
   public static CalendarMainHeight: number = 600;
   /** 日历头部高度，单位rpx */
@@ -47,6 +48,8 @@ export class Layout {
     const { safeArea, windowWidth, windowHeight, theme } = wx.getSystemInfoSync();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
+    Layout.theme = theme || 'light';
+
     const subHeight = Layout.rpxToPx(
       Layout.CalendarHeaderHeight + Layout.CalendarWeekHeight + Layout.CalendarBarHeight,
       windowWidth
@@ -61,6 +64,7 @@ export class Layout {
     const safeBottom = windowHeight - (safeArea?.bottom ?? windowHeight);
 
     Layout.layout = Object.freeze({
+      darkmode: !!theme,
       menuTop: top,
       menuBottom: bottom,
       safeBottom: safeBottom > 0 ? safeBottom : Layout.rpxToPx(60, windowWidth),
@@ -72,8 +76,6 @@ export class Layout {
       windowHeight,
       maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight, windowWidth)
     });
-
-    if (theme === 'dark') Layout.theme = 'dark';
   }
 
   private static calcSchedulesMaxSize(maxPanelHeight: number, windowWidth: number): number {

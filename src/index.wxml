@@ -6,7 +6,7 @@
 <wxs src="./wxs/tool.wxs" module="tool_wxs" />
 <wxs src="./wxs/transform.wxs" module="trans_wxs" />
 <view 
-  class="wcc wcc--{{ renderer }} {{ darkmode ? 'wcc--darkmode' : '' }}"
+  class="wcc wcc--{{ renderer }} {{ darkmode && layout.darkmode ? 'wcc--darkmode' : '' }}"
   style="--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
   <view 
     id="calendar"

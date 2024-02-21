@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 15:25:00
+ * @LastEditTime: 2024-02-21 08:25:47
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -120,9 +120,11 @@ const iframe = (from: number, to: number, frame: number): number => {
   return c * (to - from) + from;
 };
 
+/** 主题色 */
 const PrimaryColor = '#409EFF';
 
-const PrinterTheme: Record<(typeof Layout)['theme'], Record<string, string>> = {
+/** 深浅模式色号 */
+const PrinterTheme = {
   light: {
     title: '#333',
     week: '#ABABAB',
@@ -139,9 +141,11 @@ const PrinterTheme: Record<(typeof Layout)['theme'], Record<string, string>> = {
     checked: '#D9D9D9',
     checkedBg: '#262626'
   }
-};
+} as const;
 
-const color = (key: string) => PrinterTheme[Layout.theme][key];
+type PrinterThemeMode = (typeof PrinterTheme)['dark' | 'light'];
+type PrinterThemeKey = keyof PrinterThemeMode;
+const color = <K extends PrinterThemeKey>(key: K): PrinterThemeMode[K] => PrinterTheme[Layout.theme!][key];
 
 interface ThemeListener {
   (res: { theme?: Theme }): void;
@@ -191,9 +195,10 @@ export class YearPrinter extends CalendarHandler {
   private _theme_listener_?: ThemeListener;
 
   public async initialize() {
-    this._font_ = this._instance_.data.fonts;
-    this._weeks_ = sortWeeks(this._instance_.data.weekstart);
-    if (this._instance_.data.darkmode) this.bindThemeChange();
+    const { fonts, weekstart, darkmode } = this._instance_.data;
+    this._font_ = fonts;
+    this._weeks_ = sortWeeks(weekstart);
+    if (darkmode && Layout.layout!.darkmode) this.bindThemeChange();
     this.initializeSize();
     return this.initializeRender();
   }
