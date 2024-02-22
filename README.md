@@ -517,7 +517,7 @@ type LunarDate = {
 
 #### 插件画饼
 有计划做的插件
-- [x] [***ICS日历订阅插件*** *查看*](https://github.com/lspriv/wc-plugin-ics)
+- [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">***ICS日历订阅插件*** 查看</a>
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*
 
