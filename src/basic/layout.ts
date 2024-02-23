@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 09:29:16
+ * @LastEditTime: 2024-02-23 08:02:05
  */
 import { View } from './constants';
 
@@ -92,7 +92,9 @@ export class Layout {
     return Math.floor((minUnitHeight - dateInnerHeight) / (scheduleHeight + margin));
   }
 
-  public static rpxToPx(rpx: number, windowWidth: number) {
+  public static rpxToPx(rpx: number, windowWidth?: number) {
+    windowWidth = windowWidth || Layout.layout?.windowWidth;
+    if (!windowWidth) throw new Error('missing parameter [windowWidth]');
     return Math.floor((rpx * windowWidth) / RATIO_WIDTH);
   }
 
