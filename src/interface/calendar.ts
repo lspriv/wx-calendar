@@ -4,15 +4,15 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 15:20:40
+ * @LastEditTime: 2024-02-24 06:26:41
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
 import { PluginService } from '../basic/service';
-import { MarkPlugin } from '../plugins/mark';
+import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
 import type { PluginConstructor, PluginKeys, PluginUse, ServicePlugins } from '../basic/service';
-import type { CalendarInstance, UsePluginService } from './component';
+import type { CalendarInstance, UsePluginService, ScheduleEventDetail, DEFAULT_PLUGINS } from './component';
 
 export interface CalendarDay {
   year: number;
@@ -99,7 +99,55 @@ export type WcMarkDict = {
 };
 export type WcMarkMap = Map<string, WcMarkDict>;
 
+export interface WcScheduleInfo {
+  dtStart?: Date;
+  dtEnd?: Date;
+  origin?: string;
+  originKey?: string;
+  description?: string;
+}
+
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
+
+/**
+ * 生成 mark key
+ * @param id 插件内部识别id，会整体回传给插件 PLUGIN_MARK_DATA 方法
+ * @param pluginKey 插件 KEY
+ */
+export const getMarkKey = (id: string, pluginKey?: string) => `${pluginKey ? `[[${pluginKey}]]` : ''}${id}`;
+
+const markPluginPattern = /^\[\[(.*?)\]\]/;
+
+export interface WcMarkKeyParse {
+  plugin?: string;
+  id: string;
+}
+
+/**
+ * 解析 mark key
+ * @param key mark key
+ */
+export const parseMarkKey = (key?: string): WcMarkKeyParse | undefined => {
+  if (!key) return void 0;
+  const plugin = key.match(markPluginPattern)?.[1] || void 0;
+  const id = key.replace(markPluginPattern, '');
+  return { id, plugin };
+};
+
+export const getScheduleDetail = (
+  schedule: WcScheduleMark,
+  service: PluginService<DEFAULT_PLUGINS>
+): ScheduleEventDetail => {
+  const parse = parseMarkKey(schedule.key);
+  const plugin = parse?.plugin ? service.getPlugin(parse.plugin as typeof MARK_PLUGIN_KEY) : void 0;
+  return {
+    text: schedule.text,
+    color: schedule.color,
+    bgColor: schedule.bgColor,
+    plugin: parse?.plugin,
+    info: plugin?.PLUGIN_TRACK_SCHEDULE?.(parse?.id)
+  };
+};
 
 /**
  * 合并两个年面板标记

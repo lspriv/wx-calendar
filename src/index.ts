@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 09:26:47
+ * @LastEditTime: 2024-02-23 21:49:16
  */
 
-import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo } from './interface/calendar';
+import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
@@ -41,7 +41,8 @@ import type {
   CalendarCustomProp,
   CalendarPanel,
   CalendarExport,
-  CalendarEventDetail
+  CalendarEventDetail,
+  ScheduleEventDetail
 } from './interface/component';
 
 const initCurrent = middle(CALENDAR_PANELS);
@@ -238,7 +239,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async selDate(e) {
-      const { wdx, ddx } = e.currentTarget.dataset;
+      const { wdx, ddx } = e.mark!;
       const panel = this.data.panels[this.data.current];
       const date = panel.weeks[wdx].days[ddx];
       if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
@@ -391,6 +392,21 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
       this.triggerEvent(event, detail);
+    },
+    selSchedule(e) {
+      const { wdx, ddx } = e.mark!;
+      const { sdx, all } = e.currentTarget.dataset;
+      const panel = this.data.panels[this.data.current];
+      const date = panel.weeks[wdx].days[ddx];
+      if (all) {
+        const schedules: Array<ScheduleEventDetail> = date.schedules.map(schedule =>
+          getScheduleDetail(schedule, this._calendar_.service)
+        );
+        this.triggerEvent('schedule', { schedules, all: true });
+      } else {
+        const schedule = getScheduleDetail(date.schedules[sdx!], this._calendar_.service);
+        this.triggerEvent('schedule', { schedule, all: false });
+      }
     }
   },
   pageLifetimes: {

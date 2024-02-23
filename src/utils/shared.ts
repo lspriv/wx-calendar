@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-01-20 19:10:13
+ * @LastEditTime: 2024-02-23 21:00:51
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -22,6 +22,8 @@ export const isPromise = <T = any>(val: unknown): val is Promise<T> =>
 
 export const nonNullable = <T>(val: T): val is NonNullable<T> => val !== void 0 && val !== null;
 export const isVoid = (val: unknown): val is undefined => val === void 0;
+
+export type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
 
 // /** 元组 join */
 // export type Join<T extends ReadonlyArray<string>, S = ',', U = ''> = T extends readonly [

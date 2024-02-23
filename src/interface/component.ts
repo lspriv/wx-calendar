@@ -4,9 +4,9 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-21 08:58:22
+ * @LastEditTime: 2024-02-24 06:26:35
  */
-import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear } from './calendar';
+import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
 import type { View } from '../basic/constants';
 import type { Pointer, CalendarPointer } from '../basic/pointer';
@@ -148,9 +148,8 @@ type SwiperAnimationFinishEvent<
   M extends WechatMiniprogram.IAnyObject = {}
 > = WechatMiniprogram.SwiperAnimationFinish<M, D>;
 
-type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
+export type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
 export type UsePluginService<T extends PluginConstructor[] = []> = PluginService<[...T, ...DEFAULT_PLUGINS]>;
-
 interface CalendarEventHandlers {
   /**
    * 跳转到今日
@@ -159,7 +158,7 @@ interface CalendarEventHandlers {
   /**
    * 点击选择日期
    */
-  selDate(event: TouchEvent<{ wdx: number; ddx: number }>): void;
+  selDate(event: TouchEvent<{}, {}, { wdx: number; ddx: number }>): void;
   /**
    * 点击周/月面板标题打开年面板选择年
    */
@@ -168,6 +167,10 @@ interface CalendarEventHandlers {
    * 年面板中选择月
    */
   selMonth(event: TouchEvent<{ ydx: number }, { x: number; y: number }>): void;
+  /**
+   * 选择日程
+   */
+  selSchedule(event: TouchEvent<{ sdx?: number; all?: boolean }, {}, { wdx: number; ddx: number }>): void;
   /**
    * 切换视图，周/月视图切换
    */
@@ -205,6 +208,11 @@ interface CalendarEventHandlers {
 export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
+}
+
+export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
+  plugin?: string;
+  info?: Nullable<WcScheduleInfo>;
 }
 
 export interface CalendarMethod

@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-02-19 15:28:47
+ * @LastEditTime: 2024-02-24 06:25:21
  */
-import { normalDate, formDateByStrKey } from '../interface/calendar';
+import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
-import type { CalendarMark, CalendarDay, WcMarkDict, WcMarkMap } from '../interface/calendar';
+import type { CalendarMark, CalendarDay, WcMarkDict, WcMarkMap, WcScheduleInfo } from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
 
 export class MarkPlugin implements Plugin {
@@ -67,13 +67,24 @@ export class MarkPlugin implements Plugin {
           text: schedule.text,
           color: schedule.color,
           bgColor: schedule.bgColor,
-          key: `_ms_${date.month}_${date.day}_${i}`
+          key: getMarkKey(key, MARK_PLUGIN_KEY)
         }));
       }
       return result;
     }
 
     return null;
+  }
+
+  PLUGIN_TRACK_SCHEDULE(id?: string): Nullable<WcScheduleInfo> {
+    if (!id) return null;
+    const date = formDateByStrKey(id!);
+    const month = date.month - 1;
+    return {
+      dtStart: new Date(date.year, month, date.day),
+      dtEnd: new Date(date.year, month, date.day + 1),
+      origin: '自定义'
+    };
   }
 }
 

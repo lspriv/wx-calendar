@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 15:24:12
+ * @LastEditTime: 2024-02-24 06:23:37
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -17,7 +17,7 @@ import {
   GREGORIAN_MONTH_DAYS
 } from '../interface/calendar';
 
-import type { SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
+import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
@@ -26,7 +26,8 @@ import type {
   CalendarMark,
   WcScheduleMark,
   WcMark,
-  WcAnnualMarks
+  WcAnnualMarks,
+  WcScheduleInfo
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
@@ -91,6 +92,11 @@ export interface Plugin extends PluginEventHandler {
    * @param year 年
    */
   PLUGIN_TRACK_YEAR?(year: WcYear): Nullable<TrackYearResult>;
+  /**
+   * 获取日程数据
+   * @param id plugin内部id
+   */
+  PLUGIN_TRACK_SCHEDULE?(id?: string): Nullable<WcScheduleInfo>;
 }
 
 export interface PluginConstructor {
@@ -166,8 +172,6 @@ export type PluginKeys<T extends Array<PluginConstructor>> = T extends [
 ]
   ? PluginKey<R> | PluginKeys<P>
   : never;
-
-type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
 
 type PluginInstance<T> = T extends abstract new (...args: any) => any ? InstanceType<T> : Plugin;
 
