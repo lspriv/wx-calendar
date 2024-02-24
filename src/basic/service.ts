@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 15:13:28
+ * @LastEditTime: 2024-02-25 07:17:53
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -220,8 +220,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       /** 处理日期标记 */
       const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
-        if (result.corner && (!record || !record.corner)) record.corner = result.corner;
-        if (result.festival && (!record || !record.festival)) record.festival = result.festival;
+        if (result.corner && !record.corner) record.corner = result.corner;
+        if (result.festival && !record.festival) record.festival = result.festival;
         if (result.schedule?.length) {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
@@ -278,10 +278,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             const { wdx, ddx, record } = month.days[i];
             const day = panels[k].weeks[wdx].days[ddx];
             const _key = `panels[${k}].weeks[${wdx}].days[${ddx}]`;
-            if (record.corner && !sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner;
-            if (record.festival && !sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival;
-            if (record.schedule?.length && !sameSchedules(record.schedule, day.schedules))
-              sets[`${_key}.schedules`] = record.schedule;
+            if (!sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner || null;
+            if (!sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival || null;
+            if (!sameSchedules(record.schedule, day.schedules)) sets[`${_key}.schedules`] = record.schedule || null;
           }
         }
       }
@@ -322,9 +321,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             if (wdx >= 0) {
               const key = `panels[${j}].weeks[${wdx}].days[${ddx}]`;
               const _day = panel.weeks[wdx].days[ddx];
-              if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner;
-              if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival;
-              if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || [];
+              if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner || null;
+              if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival || null;
+              if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || null;
             }
           }
         }
