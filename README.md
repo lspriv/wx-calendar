@@ -450,9 +450,10 @@ class MyPlugin implements Plugin {
 
   /**
    * 获取日程信息（点击日程时执行）
+   * @param date 日期
    * @param id 插件内标记, 由 getMarkKey 生成 key 时传入的 id，详见 PLUGIN_TRACK_DATE
    */
-  PLUGIN_TRACK_SCHEDULE(id:? string): WcScheduleInfo {}
+  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {}
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法

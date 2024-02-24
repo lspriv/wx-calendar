@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 06:25:21
+ * @LastEditTime: 2024-02-24 15:13:17
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
@@ -76,9 +76,8 @@ export class MarkPlugin implements Plugin {
     return null;
   }
 
-  PLUGIN_TRACK_SCHEDULE(id?: string): Nullable<WcScheduleInfo> {
+  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id?: string): Nullable<WcScheduleInfo> {
     if (!id) return null;
-    const date = formDateByStrKey(id!);
     const month = date.month - 1;
     return {
       dtStart: new Date(date.year, month, date.day),

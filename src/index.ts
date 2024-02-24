@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 21:49:16
+ * @LastEditTime: 2024-02-24 15:13:42
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -400,11 +400,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const date = panel.weeks[wdx].days[ddx];
       if (all) {
         const schedules: Array<ScheduleEventDetail> = date.schedules.map(schedule =>
-          getScheduleDetail(schedule, this._calendar_.service)
+          getScheduleDetail(date, schedule, this._calendar_.service)
         );
         this.triggerEvent('schedule', { schedules, all: true });
       } else {
-        const schedule = getScheduleDetail(date.schedules[sdx!], this._calendar_.service);
+        const schedule = getScheduleDetail(date, date.schedules[sdx!], this._calendar_.service);
         this.triggerEvent('schedule', { schedule, all: false });
       }
     }

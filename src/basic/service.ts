@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 06:23:37
+ * @LastEditTime: 2024-02-24 15:13:28
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -94,9 +94,10 @@ export interface Plugin extends PluginEventHandler {
   PLUGIN_TRACK_YEAR?(year: WcYear): Nullable<TrackYearResult>;
   /**
    * 获取日程数据
+   * @param date 日期
    * @param id plugin内部id
    */
-  PLUGIN_TRACK_SCHEDULE?(id?: string): Nullable<WcScheduleInfo>;
+  PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
 }
 
 export interface PluginConstructor {

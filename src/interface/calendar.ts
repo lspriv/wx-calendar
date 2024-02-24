@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 11:43:59
+ * @LastEditTime: 2024-02-24 15:13:24
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -136,6 +136,7 @@ export const parseMarkKey = (key?: string): WcMarkKeyParse | undefined => {
 };
 
 export const getScheduleDetail = (
+  date: CalendarDay,
   schedule: WcScheduleMark,
   service: PluginService<DEFAULT_PLUGINS>
 ): ScheduleEventDetail => {
@@ -146,7 +147,7 @@ export const getScheduleDetail = (
     color: schedule.color,
     bgColor: schedule.bgColor,
     plugin: parse?.plugin,
-    info: plugin?.PLUGIN_TRACK_SCHEDULE?.(parse?.id)
+    info: plugin?.PLUGIN_TRACK_SCHEDULE?.(date, parse?.id)
   };
 };
 
