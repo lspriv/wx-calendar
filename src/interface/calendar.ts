@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 06:26:41
+ * @LastEditTime: 2024-02-24 11:43:59
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -104,6 +104,7 @@ export interface WcScheduleInfo {
   dtEnd?: Date;
   origin?: string;
   originKey?: string;
+  summary?: string;
   description?: string;
 }
 
