@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 15:24:12
+ * @LastEditTime: 2024-02-25 08:42:23
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -12,12 +12,13 @@ import {
   monthDiff,
   sameMark,
   sameSchedules,
+  sameAnnualMarks,
   getWeekDateIdx,
   mergeAnnualMarks,
   GREGORIAN_MONTH_DAYS
 } from '../interface/calendar';
 
-import type { SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
+import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
@@ -26,7 +27,8 @@ import type {
   CalendarMark,
   WcScheduleMark,
   WcMark,
-  WcAnnualMarks
+  WcAnnualMarks,
+  WcScheduleInfo
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
@@ -91,6 +93,12 @@ export interface Plugin extends PluginEventHandler {
    * @param year 年
    */
   PLUGIN_TRACK_YEAR?(year: WcYear): Nullable<TrackYearResult>;
+  /**
+   * 获取日程数据
+   * @param date 日期
+   * @param id plugin内部id
+   */
+  PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
 }
 
 export interface PluginConstructor {
@@ -167,8 +175,6 @@ export type PluginKeys<T extends Array<PluginConstructor>> = T extends [
   ? PluginKey<R> | PluginKeys<P>
   : never;
 
-type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
-
 type PluginInstance<T> = T extends abstract new (...args: any) => any ? InstanceType<T> : Plugin;
 
 export type ServicePluginMap<T extends Array<PluginConstructor>> = {
@@ -215,8 +221,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       /** 处理日期标记 */
       const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
-        if (result.corner && (!record || !record.corner)) record.corner = result.corner;
-        if (result.festival && (!record || !record.festival)) record.festival = result.festival;
+        if (result.corner && !record.corner) record.corner = result.corner;
+        if (result.festival && !record.festival) record.festival = result.festival;
         if (result.schedule?.length) {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
@@ -273,10 +279,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             const { wdx, ddx, record } = month.days[i];
             const day = panels[k].weeks[wdx].days[ddx];
             const _key = `panels[${k}].weeks[${wdx}].days[${ddx}]`;
-            if (record.corner && !sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner;
-            if (record.festival && !sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival;
-            if (record.schedule?.length && !sameSchedules(record.schedule, day.schedules))
-              sets[`${_key}.schedules`] = record.schedule;
+            if (!sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner || null;
+            if (!sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival || null;
+            if (!sameSchedules(record.schedule, day.schedules)) sets[`${_key}.schedules`] = record.schedule || null;
           }
         }
       }
@@ -290,9 +295,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
-        if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
-        if (year.result.marks?.size) {
-          this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, year.result.marks)!;
+        if (year.result.subinfo !== years[ydx].subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo || null;
+        if (!sameAnnualMarks(this.component._years_[ydx].marks, year.result.marks)) {
+          this.component._years_[ydx].marks = year.result.marks || new Map();
           this.component._printer_.update([ydx]);
         }
       }
@@ -317,9 +322,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             if (wdx >= 0) {
               const key = `panels[${j}].weeks[${wdx}].days[${ddx}]`;
               const _day = panel.weeks[wdx].days[ddx];
-              if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner;
-              if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival;
-              if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || [];
+              if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner || null;
+              if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival || null;
+              if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || null;
             }
           }
         }
@@ -359,9 +364,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         const year = years[ydx];
         const result = this.walkForYear(year);
         if (result) {
-          if (result.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo;
-          if (result.marks?.size) {
-            this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, result.marks)!;
+          if (result.subinfo !== year.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
+          if (!sameAnnualMarks(this.component._years_[ydx].marks, result.marks)) {
+            this.component._years_[ydx].marks = result.marks || new Map();
             ydxs.push(ydx);
           }
         }

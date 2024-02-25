@@ -57,6 +57,8 @@
             wx:for-item="day" 
             wx:for-index="ddx"
             wx:key="key"
+            mark:wdx="{{ wdx }}"
+            mark:ddx="{{ ddx }}"
             class="
               wc__panel-date
               wc__panel-date--{{ day.kind }} 
@@ -64,11 +66,7 @@
               {{ tool_wxs.isChecked(day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
             ">
-            <view 
-              class="wc__panel-day"
-              data-wdx="{{ wdx }}"
-              data-ddx="{{ ddx }}"
-              catchtap="selDate">
+            <view class="wc__panel-day" catchtap="selDate">
               <view class="wc__panel-solar">{{ day.day }}<view 
                 wx:if="{{ day.corner }}"
                 class="wc__panel-corner"
@@ -86,10 +84,14 @@
                 wx:for-item="schedule"
                 wx:key="key"
                 style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
-                class="wc__panel-schedule">{{ schedule.text }}</view>
+                class="wc__panel-schedule"
+                data-sdx="{{ sdx }}"
+                catchtap="selSchedule">{{ schedule.text }}</view>
               <view 
                 wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
                 class="wc__panel-schedule wc__panel-schedule--center"
+                data-all
+                catchtap="selSchedule"
               >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</view>
             </view>
           </view>

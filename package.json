@@ -1,6 +1,6 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "微信小程序日历",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -29,6 +29,10 @@
   "engines": {
     "node": ">=16.13.0"
   },
+  "bugs": {
+    "url": "https://github.com/lspriv/wx-calendar/issues"
+  },
+  "homepage": "https://github.com/lspriv/wx-calendar#readme",
   "devDependencies": {
     "@inquirer/prompts": "^3.2.0",
     "@types/eslint": "^8.44.2",

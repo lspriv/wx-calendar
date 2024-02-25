@@ -215,6 +215,15 @@ type ViewChangeEventDetail = {
 }
 ```
 
+[***`bindschedule`***](#bindviewchange)   点击日程触发
+```typescript
+type ScheduleEventDetail = {
+    schedules?: Array<ScheduleEventDetail>; // 所有日程
+    schedule?: ScheduleEventDetail; // 当前点击日程
+    all: boolean; // 是否所有日程
+}
+```
+
 ### Methods 方法
 
 [***`toDate`***](#toDate) 跳转到指定日期
@@ -381,14 +390,16 @@ Component({
 #### 插件开发
 自定义插件需要实现Plugin接口
 ```typescript
-import type { 
+import { 
   Plugin, 
   WcYear,
   CalendarDay,  
   TrackDateResult, 
   TrackYearResult, 
   PluginService,
-  CalendarEventDetail
+  WcScheduleInfo,
+  CalendarEventDetail,
+  getMarkKey
 } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
@@ -415,7 +426,7 @@ class MyPlugin implements Plugin {
   PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
     // do something...
     return {
-      schedule: [{ text: '', color: '', bgColor: '' }], // 设置日程数组，可选
+      schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', 'my-plugin') }], // 设置日程数组，可选
       corner: { text: '', color: '' }, // 设置角标，可选
       festival: { text: '', color: '' } // 设置节假日，可选
     };
@@ -436,6 +447,13 @@ class MyPlugin implements Plugin {
       ])
     }
   };
+
+  /**
+   * 获取日程信息（点击日程时执行）
+   * @param date 日期
+   * @param id 插件内标记, 由 getMarkKey 生成 key 时传入的 id，详见 PLUGIN_TRACK_DATE
+   */
+  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {}
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
@@ -517,7 +535,7 @@ type LunarDate = {
 
 #### 插件画饼
 有计划做的插件
-- [x] [***ICS日历订阅插件*** *查看*](https://github.com/lspriv/wc-plugin-ics)
+- [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">***ICS日历订阅插件*** 查看</a>
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*
 

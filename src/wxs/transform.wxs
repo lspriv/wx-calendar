@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 15:54:12
+ * @LastEditTime: 2024-02-21 18:41:26
  */
 
 var nonNullable = function (value) {
@@ -56,6 +56,18 @@ var toView = function (view, mark, instance, transition = true) {
 
   /** 更新非当前面板垂直方向偏移 */
   refreshIncurrentOffset(view, instance);
+};
+
+var setCurrPanelSchedule = function (instance, opacity, transition = 'unset', all = false) {
+  var selector = all ? '' : '.wc__panel-container--current ';
+  selector += '.wc__panel-schedules';
+  var schedules = instance.selectAllComponents(selector);
+  for (var i = 0; i < schedules.length; i++) {
+    schedules[i].setStyle({
+      transition: transition,
+      opacity: opacity
+    });
+  }
 };
 
 var TOUCH_CHECK_PASS = 1 << 0;
@@ -174,13 +186,7 @@ var touchMove = function (e, instance) {
   /** 计算日程透明度  */
   if (height > mark.main) {
     var opacity = Math.max(0, Math.min(1, (height - mark.main) / (mark.max - mark.main)));
-    var schedules = instance.selectAllComponents('.wc__panel-schedules');
-    for (var i = 0; i < schedules.length; i++) {
-      schedules[i].setStyle({
-        transition: 'unset',
-        opacity: opacity
-      });
-    }
+    setCurrPanelSchedule(instance, opacity, 'unset', true);
   }
 };
 
@@ -247,13 +253,7 @@ var touchEnd = function (e, instance) {
 
   /** 计算日程透明度  */
   var opacity = toMax ? 1 : 0;
-  var schedules = instance.selectAllComponents('.wc__panel-container--current .wc__panel-schedules');
-  for (var i = 0; i < schedules.length; i++) {
-    schedules[i].setStyle({
-      transition: 'all .3s ease',
-      opacity: opacity
-    });
-  }
+  setCurrPanelSchedule(instance, opacity, 'all .3s ease');
 
   instance.callMethod('refreshView', { view: toMin ? 1 : toMax ? 4 : 2 });
 };
@@ -344,6 +344,8 @@ var initViewChange = function (view, old, owner, instance) {
   if (view) {
     const dataset = instance.getDataset();
     toView(view, dataset, owner, false);
+    const opacity = view === 'schedule' ? 1 : 0;
+    setCurrPanelSchedule(owner, opacity, 'unset');
   }
 };
 
