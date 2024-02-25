@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 08:04:28
+ * @LastEditTime: 2024-02-25 12:46:00
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -100,8 +100,6 @@ interface AnnualFrames extends MonthFrames, TitleFrames, WeekFrames, DateFrames,
   todayCheckedColor?: string;
 }
 
-type MarkType = 'rest' | 'work' | 'color';
-
 const createState = (max: number, min: number = 0) => {
   return { min, max } as StateValue;
 };
@@ -154,7 +152,6 @@ interface ThemeListener {
 export class YearPrinter extends CalendarHandler {
   private _canvas_: Array<Canvas> = [];
   private _weeks_: string;
-  private _dpr_: number;
 
   private _week_size_: StateValue;
   private _week_height_: number;
@@ -249,7 +246,7 @@ export class YearPrinter extends CalendarHandler {
     }
   }
 
-  private initializeCanvas(id: string, dpr: number) {
+  private initializeCanvas(id: string) {
     return new Promise<Canvas>(resolve => {
       const query = this._instance_.createSelectorQuery().in(this._instance_);
       query
@@ -258,7 +255,7 @@ export class YearPrinter extends CalendarHandler {
         .exec((res: Array<CanvasElementResult>) => {
           const { node, width, height } = res[0];
           const ctx = node?.getContext('2d');
-
+          const dpr = Layout.dpr;
           node && (node.width = width * dpr);
           node && (node.height = height * dpr);
           ctx?.scale(dpr, dpr);
@@ -269,12 +266,10 @@ export class YearPrinter extends CalendarHandler {
   }
 
   private async initializeRender() {
-    this._dpr_ = wx.getSystemInfoSync().pixelRatio;
-
     if (!this.skyline) {
       this._canvas_ = await promises(
         Array.from({ length: CALENDAR_PANELS }, (_, i) => {
-          return this.initializeCanvas(`${SELECTOR.ANNUAL_CANVAS}${i}`, this._dpr_);
+          return this.initializeCanvas(`${SELECTOR.ANNUAL_CANVAS}${i}`);
         })
       );
       this._canvas_.forEach((canvas, i) => {
@@ -667,7 +662,7 @@ export class YearPrinter extends CalendarHandler {
 
   private async getCanvas(idx: number): Promise<Canvas> {
     if (this._canvas_[idx]) return this._canvas_[idx];
-    const canvas = await this.initializeCanvas(`${SELECTOR.ANNUAL_CANVAS}${idx}`, this._dpr_);
+    const canvas = await this.initializeCanvas(`${SELECTOR.ANNUAL_CANVAS}${idx}`);
     this._canvas_[idx] = canvas;
     return canvas;
   }
