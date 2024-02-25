@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 15:25:00
+ * @LastEditTime: 2024-02-23 08:04:28
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -120,9 +120,11 @@ const iframe = (from: number, to: number, frame: number): number => {
   return c * (to - from) + from;
 };
 
+/** 主题色 */
 const PrimaryColor = '#409EFF';
 
-const PrinterTheme: Record<(typeof Layout)['theme'], Record<string, string>> = {
+/** 深浅模式色号 */
+const PrinterTheme = {
   light: {
     title: '#333',
     week: '#ABABAB',
@@ -139,9 +141,11 @@ const PrinterTheme: Record<(typeof Layout)['theme'], Record<string, string>> = {
     checked: '#D9D9D9',
     checkedBg: '#262626'
   }
-};
+} as const;
 
-const color = (key: string) => PrinterTheme[Layout.theme][key];
+type PrinterThemeMode = (typeof PrinterTheme)['dark' | 'light'];
+type PrinterThemeKey = keyof PrinterThemeMode;
+const color = <K extends PrinterThemeKey>(key: K): PrinterThemeMode[K] => PrinterTheme[Layout.theme!][key];
 
 interface ThemeListener {
   (res: { theme?: Theme }): void;
@@ -191,53 +195,54 @@ export class YearPrinter extends CalendarHandler {
   private _theme_listener_?: ThemeListener;
 
   public async initialize() {
-    this._font_ = this._instance_.data.fonts;
-    this._weeks_ = sortWeeks(this._instance_.data.weekstart);
-    if (this._instance_.data.darkmode) this.bindThemeChange();
+    const { fonts, weekstart, darkside } = this._instance_.data;
+    this._font_ = fonts;
+    this._weeks_ = sortWeeks(weekstart);
+    if (darkside) this.bindThemeChange();
     this.initializeSize();
     return this.initializeRender();
   }
 
   private initializeSize() {
-    const titleSizeMin = Layout.rpxToPx(40, Layout.layout!.windowWidth);
-    const titleSizeMax = Layout.rpxToPx(60, Layout.layout!.windowWidth);
+    const titleSizeMin = Layout.rpxToPx(40);
+    const titleSizeMax = Layout.rpxToPx(60);
     this._title_size_ = createState(titleSizeMax, titleSizeMin);
 
-    const weekSizeMin = Layout.rpxToPx(16, Layout.layout!.windowWidth);
-    const weekSizeMax = Layout.rpxToPx(20, Layout.layout!.windowWidth);
+    const weekSizeMin = Layout.rpxToPx(16);
+    const weekSizeMax = Layout.rpxToPx(20);
     this._week_size_ = createState(weekSizeMax, weekSizeMin);
 
-    const weekPaddingY = Layout.rpxToPx(10, Layout.layout!.windowWidth);
+    const weekPaddingY = Layout.rpxToPx(10);
     this._week_padding_y_ = createState(weekPaddingY);
 
-    const dateSizeMin = Layout.rpxToPx(20, Layout.layout!.windowWidth);
-    const dateSizeMax = Layout.rpxToPx(36, Layout.layout!.windowWidth);
+    const dateSizeMin = Layout.rpxToPx(20);
+    const dateSizeMax = Layout.rpxToPx(36);
     this._date_size_ = createState(dateSizeMax, dateSizeMin);
 
-    const pannelPaddingMin = Layout.rpxToPx(16, Layout.layout!.windowWidth);
-    const pannelPaddingMax = Layout.rpxToPx(0, Layout.layout!.windowWidth);
+    const pannelPaddingMin = Layout.rpxToPx(16);
+    const pannelPaddingMax = Layout.rpxToPx(0);
     this._pannel_padding_ = createState(pannelPaddingMax, pannelPaddingMin);
 
-    this._title_padding_x_ = Layout.rpxToPx(20, Layout.layout!.windowWidth);
+    this._title_padding_x_ = Layout.rpxToPx(20);
 
-    const monthPaddingMin = Layout.rpxToPx(16, Layout.layout!.windowWidth);
-    const monthPaddingMax = Layout.rpxToPx(10, Layout.layout!.windowWidth);
+    const monthPaddingMin = Layout.rpxToPx(16);
+    const monthPaddingMax = Layout.rpxToPx(10);
     this._month_padding_ = createState(monthPaddingMax, monthPaddingMin);
 
-    const markWidthMin = Layout.rpxToPx(14, Layout.layout!.windowWidth);
-    const markWidthMax = Layout.rpxToPx(24, Layout.layout!.windowWidth);
+    const markWidthMin = Layout.rpxToPx(14);
+    const markWidthMax = Layout.rpxToPx(24);
     this._mark_width_ = createState(markWidthMax, markWidthMin);
 
-    const markHeightMin = Layout.rpxToPx(4, Layout.layout!.windowWidth);
-    const markHeightMax = Layout.rpxToPx(8, Layout.layout!.windowWidth);
+    const markHeightMin = Layout.rpxToPx(4);
+    const markHeightMax = Layout.rpxToPx(8);
     this._mark_height_ = createState(markHeightMax, markHeightMin);
 
-    this._title_height_ = Layout.rpxToPx(100, Layout.layout!.windowWidth);
-    this._title_padding_y_ = Layout.rpxToPx(20, Layout.layout!.windowWidth);
-    this._week_height_ = Layout.rpxToPx(50, Layout.layout!.windowWidth);
-    this._date_height_ = Layout.rpxToPx(100 - 24, Layout.layout!.windowWidth);
-    this._checked_radius_max_ = Layout.rpxToPx(50, Layout.layout!.windowWidth);
-    this._checked_offset_max_ = Layout.rpxToPx(12, Layout.layout!.windowWidth);
+    this._title_height_ = Layout.rpxToPx(100);
+    this._title_padding_y_ = Layout.rpxToPx(20);
+    this._week_height_ = Layout.rpxToPx(50);
+    this._date_height_ = Layout.rpxToPx(100 - 24);
+    this._checked_radius_max_ = Layout.rpxToPx(50);
+    this._checked_offset_max_ = Layout.rpxToPx(12);
 
     if (!this._instance_.data.customNavBar) {
       this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
@@ -811,7 +816,7 @@ export class YearPrinter extends CalendarHandler {
   /**
    * 绑定系统主题改变事件的监听
    */
-  private bindThemeChange() {
+  public bindThemeChange() {
     this._theme_listener_ = res => {
       if (res.theme) {
         Layout.theme = res.theme;

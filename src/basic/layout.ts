@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 12:49:35
+ * @LastEditTime: 2024-02-23 08:02:05
  */
 import { View } from './constants';
 
@@ -28,8 +28,10 @@ const RATIO_WIDTH = 750;
 
 export class Layout {
   public static layout?: CalendarLayout;
+  /** 深浅模式是否开启 */
+  public static darkmode: boolean = true;
   /** 深浅模式 */
-  public static theme: Theme = 'light';
+  public static theme?: Theme;
   /** 常规状态下（月视图）的日历总高度，单位rpx */
   public static CalendarMainHeight: number = 600;
   /** 日历头部高度，单位rpx */
@@ -46,6 +48,9 @@ export class Layout {
 
     const { safeArea, windowWidth, windowHeight, theme } = wx.getSystemInfoSync();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
+
+    Layout.theme = theme || 'light';
+    Layout.darkmode = !!theme;
 
     const subHeight = Layout.rpxToPx(
       Layout.CalendarHeaderHeight + Layout.CalendarWeekHeight + Layout.CalendarBarHeight,
@@ -72,8 +77,6 @@ export class Layout {
       windowHeight,
       maxScheduleSize: Layout.calcSchedulesMaxSize(maxHeight, windowWidth)
     });
-
-    if (theme === 'dark') Layout.theme = 'dark';
   }
 
   private static calcSchedulesMaxSize(maxPanelHeight: number, windowWidth: number): number {
@@ -89,7 +92,9 @@ export class Layout {
     return Math.floor((minUnitHeight - dateInnerHeight) / (scheduleHeight + margin));
   }
 
-  public static rpxToPx(rpx: number, windowWidth: number) {
+  public static rpxToPx(rpx: number, windowWidth?: number) {
+    windowWidth = windowWidth || Layout.layout?.windowWidth;
+    if (!windowWidth) throw new Error('missing parameter [windowWidth]');
     return Math.floor((rpx * windowWidth) / RATIO_WIDTH);
   }
 
