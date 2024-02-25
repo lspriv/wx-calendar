@@ -104,6 +104,7 @@
     transform: scale(1) translateZ(0px);
   }
   @include if(views) {
+    color: theme(opt-color);
     transform-origin: 100% 50%;
     transition: all .28s ease;
     &::before, &::after {
@@ -113,7 +114,7 @@
       justify-content: center;
       width: var(--wc-operator-side);
       height: var(--wc-operator-side);
-      color: theme(opt-color);
+      color: inherit;
       font-size: theme(operator-size);
       line-height: 1;
       font-weight: bold;
