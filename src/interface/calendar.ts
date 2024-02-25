@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 15:13:24
+ * @LastEditTime: 2024-02-25 08:28:27
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
@@ -443,6 +443,17 @@ export const sameSchedules = (as1?: Array<WcScheduleMark>, as2?: Array<WcSchedul
     }
   } else if (!as1 && as2) return !as2.length;
   else if (as1 && !as2) return !as1.length;
+  return true;
+};
+
+export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
+  if (!m1.size && !m2?.size) return true;
+  if (m1.size !== m2?.size) return false;
+  const entries = m1.entries();
+  for (const [key, mk1] of entries) {
+    const mk2 = m2.get(key);
+    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub) return false;
+  }
   return true;
 };
 

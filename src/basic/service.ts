@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 07:17:53
+ * @LastEditTime: 2024-02-25 08:42:23
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -12,6 +12,7 @@ import {
   monthDiff,
   sameMark,
   sameSchedules,
+  sameAnnualMarks,
   getWeekDateIdx,
   mergeAnnualMarks,
   GREGORIAN_MONTH_DAYS
@@ -294,9 +295,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
-        if (year.result.subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo;
-        if (year.result.marks?.size) {
-          this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, year.result.marks)!;
+        if (year.result.subinfo !== years[ydx].subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo || null;
+        if (!sameAnnualMarks(this.component._years_[ydx].marks, year.result.marks)) {
+          this.component._years_[ydx].marks = year.result.marks || new Map();
           this.component._printer_.update([ydx]);
         }
       }
@@ -363,9 +364,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         const year = years[ydx];
         const result = this.walkForYear(year);
         if (result) {
-          if (result.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo;
-          if (result.marks?.size) {
-            this.component._years_[ydx].marks = mergeAnnualMarks(this.component._years_[ydx].marks, result.marks)!;
+          if (result.subinfo !== year.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
+          if (!sameAnnualMarks(this.component._years_[ydx].marks, result.marks)) {
+            this.component._years_[ydx].marks = result.marks || new Map();
             ydxs.push(ydx);
           }
         }
