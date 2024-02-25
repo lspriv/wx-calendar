@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.6.1](https://github.com/lspriv/wx-calendar/compare/v1.6.0...v1.6.1) (2024-02-25)
+
+
+### Bug Fixes
+
+* wcScheduleInfo类型补充 ([8204953](https://github.com/lspriv/wx-calendar/commit/82049531d386edc1d4545775e5a62f3b413a72b0))
+* **webview:** 解决日程视图到年面板再到月试图后日程漏出的问题 ([bed9ea0](https://github.com/lspriv/wx-calendar/commit/bed9ea01836c23fc9cb38a15e23b5abbab2c5166))
+* 修复mark删除时的bug ([5cc7b9b](https://github.com/lspriv/wx-calendar/commit/5cc7b9b33604a45528ce4a0f2a06d992706ab42f))
+* 修复年度面板删除mark是的问题 ([d23b5bc](https://github.com/lspriv/wx-calendar/commit/d23b5bcc138cbfa0cec991c9a8b45378a1c72052))
+* 修复日程点击 ([6c4b6e2](https://github.com/lspriv/wx-calendar/commit/6c4b6e251077f3d5726f22816119ac0ccce326e1))
+* 修复深色模式 ([5f41c26](https://github.com/lspriv/wx-calendar/commit/5f41c26da1aa2a45c3563d17d242fbe356ead54b))
+* 修复深色模式未开启时的处理 ([b2478ce](https://github.com/lspriv/wx-calendar/commit/b2478cecf38b160fc6f6dfb9ce0d7ec1c67de196))
+* 导出Layout ([da329d6](https://github.com/lspriv/wx-calendar/commit/da329d63897478327c215d25ac4f872a1609c96a))
+* 导出小程序相关工具类型 ([2086de8](https://github.com/lspriv/wx-calendar/commit/2086de8cf80fd589b87305781271649a4c37ccd0))
+* 导出常量 ([9f04953](https://github.com/lspriv/wx-calendar/commit/9f049534f3cd79d9429dd78b6775c3376d288ef2))
+* 调整插件方法PLUGIN_TRACK_SCHEDULE参数 ([a898fd1](https://github.com/lspriv/wx-calendar/commit/a898fd11150054201294798a09d5cd59e494ee0c))
+* 调整日程显示 ([29b21f7](https://github.com/lspriv/wx-calendar/commit/29b21f7bcdd0d49e7f8d8051177a09838240a2fd))
+
 ## [1.6.0](https://github.com/lspriv/wx-calendar/compare/v1.5.6...v1.6.0) (2024-02-20)
 
 
