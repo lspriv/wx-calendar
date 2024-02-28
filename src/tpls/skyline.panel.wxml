@@ -39,7 +39,7 @@
             wx:for-item="week" 
             wx:for-index="wdx"
             wx:key="key"
-            class="wc__panel-week wc__panel-week--{{ wdx }}">
+            class="wc__panel-week">
             <view 
               wx:for="{{ week.days }}" 
               wx:for-item="day" 
@@ -49,7 +49,6 @@
               mark:ddx="{{ ddx }}"
               class="
                 wc__panel-date
-                wc__panel-date--{{ ddx }} 
                 wc__panel-date--{{ day.kind }} 
                 {{ day.today ? 'wc__panel-date--today' : '' }}
                 {{ tool_wxs.isChecked(day, checked, pdx, current) ? 'wc__panel-date--checked' : '' }}
@@ -73,7 +72,7 @@
                   wx:for-item="schedule"
                   wx:key="key"
                   style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
-                  class="wc__panel-schedule wc__panel-schedule--{{ sdx }}"
+                  class="wc__panel-schedule"
                   data-sdx="{{ sdx }}"
                   catchtap="selSchedule">{{ schedule.text }}</text>
                 <text 
