@@ -35,7 +35,11 @@
       wx:key="key"
       skip-hidden-item-layout>
       <view 
-        class="wc__panel-container {{ current === pdx ? 'wc__panel-container--current' : 'wc__panel-container--incurrent' }}"
+        class="
+          wc__panel-container 
+          {{ current === pdx ? 'wc__panel-container--current' : 'wc__panel-container--incurrent' }}
+          wc__panel-container--wl-{{ panel.weeks.length }}
+        "
         data-offset="{{ panel.offset }}"
         >
         <view
@@ -46,12 +50,12 @@
             class="wc__panel-pointer-inner {{ pointer.animate ? 'wc__panel-pointer-inner--animate' : '' }}" 
             bindanimationend="handlePointerAnimated"></view>
         </view>
-        <view 
-          class="wc__panel-week wc__panel-week--l-{{ panel.weeks.length }}" 
+        <view  
           wx:for="{{ panel.weeks }}" 
           wx:for-item="week" 
           wx:for-index="wdx"
-          wx:key="key">
+          wx:key="key"
+          class="wc__panel-week wc__panel-week--{{ wdx }}">
           <view 
             wx:for="{{ week.days }}" 
             wx:for-item="day" 
@@ -61,6 +65,7 @@
             mark:ddx="{{ ddx }}"
             class="
               wc__panel-date
+              wc__panel-date--{{ ddx }} 
               wc__panel-date--{{ day.kind }} 
               {{ day.today ? 'wc__panel-date--today' : '' }}
               {{ tool_wxs.isChecked(day, checked) ? 'wc__panel-date--checked' : '' }}
@@ -84,12 +89,12 @@
                 wx:for-item="schedule"
                 wx:key="key"
                 style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
-                class="wc__panel-schedule"
+                class="wc__panel-schedule wc__panel-schedule--{{ sdx }}"
                 data-sdx="{{ sdx }}"
                 catchtap="selSchedule">{{ schedule.text }}</view>
               <view 
                 wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
-                class="wc__panel-schedule wc__panel-schedule--center"
+                class="wc__panel-schedule wc__panel-schedule--more"
                 data-all
                 catchtap="selSchedule"
               >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</view>

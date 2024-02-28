@@ -24,15 +24,27 @@
     position: absolute;
     top: 0;
     left: 0;
+    @include if(wl-4) {
+      .wc__panel-week {
+        @include month-week-rows(4);
+      }
+    }
+    @include if(wl-5) {
+      .wc__panel-week {
+        @include month-week-rows(5);
+      }
+    }
+    @include if(wl-6) {
+      .wc__panel-week {
+        @include month-week-rows(6);
+      }
+    }
   }
   &-week {
     width: 100%;
     position: relative;
     z-index: 1024;
     @include column-rect;
-    @include month-week-rows(4);
-    @include month-week-rows(5);
-    @include month-week-rows(6);
   }
   &-date {
     @include column-width;
@@ -135,8 +147,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     @include animation-fade;
-    @include if(center) {
+    @include if(more) {
       text-align: center;
+      line-height: 1;
+      padding: unset !important;
+      margin-bottom: 0;
+      background-color: transparent;
+      color: theme(schedule-color);
     }
   }
   &-corner {

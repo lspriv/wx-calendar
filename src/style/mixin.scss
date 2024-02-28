@@ -23,9 +23,7 @@
 }
 
 @mixin month-week-rows ($length) {
-	&#{&}--l-#{$length} {
-		height: calc(100% / #{$length});
-	}
+	height: calc(100% / #{$length});
 }
 
 @mixin if($states...) {
