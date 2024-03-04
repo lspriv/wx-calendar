@@ -150,11 +150,11 @@
     padding: 0rpx 6rpx;
     border-radius: 2rpx;
     overflow: hidden;
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     @include animation-fade;
     @include if(more) {
-      text-align: center;
       line-height: 1;
       padding: unset !important;
       margin-bottom: 0;
