@@ -13,12 +13,6 @@
   background: transparent;
   overflow: hidden;
   contain: layout style;
-
-  border-top-color: theme(mark-color);
-  border-bottom-color: theme(schedule-bg);
-  border-left-color: theme(schedule-color);
-  border-right-color: theme(solar-color);
-  border-width: 0;
   
   &-container {
     width: 100%;
@@ -93,10 +87,12 @@
       .wc__panel-day::after {
         content: "･";
         position: absolute;
-        top: -6rpx;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
         color: theme(dot-color);
+        font-size: 32rpx;
+        line-height: 1;
         opacity: 1;
         transition: opacity .28s ease;
         @include animation-fade;
