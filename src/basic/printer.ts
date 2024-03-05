@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 12:46:00
+ * @LastEditTime: 2024-03-04 16:02:11
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -438,7 +438,7 @@ export class YearPrinter extends CalendarHandler {
     frame.todayCheckedColor = frame.todayIsChecked || isMax || !canvas.frame ? color('checked') : PrimaryColor;
   }
 
-  private render(canvas: Canvas, year: WcFullYear, month?: number) {
+  public render(canvas: Canvas, year: WcFullYear, month?: number) {
     if (!canvas || !canvas.ctx) return;
     if (canvas.year !== year.year) canvas.year = year.year;
     const { ctx } = canvas;
