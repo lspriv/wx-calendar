@@ -204,6 +204,7 @@ type LoadEventDetail = {
 type ChangeEventDetail = {
     checked: CalenderDay; // 当前选择日期
     view: 'week' | 'month' | 'schedule'; // 当前视图
+    range: [start: CalenderDay, end: CalenderDay]; // 当前渲染的月份范围
 }
 ```
 
