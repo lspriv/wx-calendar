@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 15:13:42
+ * @LastEditTime: 2024-03-18 17:25:39
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -285,8 +285,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (e.detail.source !== 'touch') return;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
-      if (this._swiper_accumulator_ % this.$_calendar_width.value === 0) {
-        const offset = this._swiper_accumulator_ / this.$_calendar_width.value;
+      const mod = this._swiper_accumulator_ % this.$_calendar_width.value;
+      const _offset = this._swiper_accumulator_ / this.$_calendar_width.value;
+      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
+      /**
+       * 部分安卓设备 webview 渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
+       * 测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
+       */
+      if (mod === 0 || this.$_calendar_width.value - Math.abs(mod) < Math.abs(offset)) {
         this._swiper_accumulator_ = 0;
         if (offset) {
           const type = e.currentTarget.dataset.type;
@@ -389,6 +395,18 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       detail = detail || <CalendarEventDetail>{};
       detail.checked = detail.checked || this.data.checked!;
       detail.view = detail.view || this.data.currView;
+
+      if (event === 'change') {
+        const panels = this.data.panels;
+        const { year: sy, month: sm, day: sd } = panels[0].weeks[0].days[0];
+        const lastWeeks = panels[panels.length - 1].weeks;
+        const lastDays = lastWeeks[lastWeeks.length - 1].days;
+        const { year: ey, month: em, day: ed } = lastDays[lastDays.length - 1];
+        detail.range = [
+          { year: sy, month: sm, day: sd },
+          { year: ey, month: em, day: ed }
+        ];
+      }
 
       dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
       this.triggerEvent(event, detail);

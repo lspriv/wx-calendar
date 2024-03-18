@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 08:02:05
+ * @LastEditTime: 2024-02-25 12:42:30
  */
 import { View } from './constants';
 
@@ -32,6 +32,8 @@ export class Layout {
   public static darkmode: boolean = true;
   /** 深浅模式 */
   public static theme?: Theme;
+  /** 设备像素比 */
+  public static dpr: number = 1;
   /** 常规状态下（月视图）的日历总高度，单位rpx */
   public static CalendarMainHeight: number = 600;
   /** 日历头部高度，单位rpx */
@@ -46,11 +48,12 @@ export class Layout {
   public static initialize() {
     if (Layout.layout) return;
 
-    const { safeArea, windowWidth, windowHeight, theme } = wx.getSystemInfoSync();
+    const { safeArea, windowWidth, windowHeight, theme, pixelRatio } = wx.getSystemInfoSync();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
     Layout.theme = theme || 'light';
     Layout.darkmode = !!theme;
+    Layout.dpr = pixelRatio;
 
     const subHeight = Layout.rpxToPx(
       Layout.CalendarHeaderHeight + Layout.CalendarWeekHeight + Layout.CalendarBarHeight,

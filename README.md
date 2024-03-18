@@ -204,6 +204,7 @@ type LoadEventDetail = {
 type ChangeEventDetail = {
     checked: CalenderDay; // 当前选择日期
     view: 'week' | 'month' | 'schedule'; // 当前视图
+    range: [start: CalenderDay, end: CalenderDay]; // 当前渲染的月份范围
 }
 ```
 
@@ -426,7 +427,7 @@ class MyPlugin implements Plugin {
   PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
     // do something...
     return {
-      schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', 'my-plugin') }], // 设置日程数组，可选
+      schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', MyPlugin.KEY) }], // 设置日程数组，可选
       corner: { text: '', color: '' }, // 设置角标，可选
       festival: { text: '', color: '' } // 设置节假日，可选
     };
