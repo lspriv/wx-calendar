@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.2](https://github.com/lspriv/wx-calendar/compare/v1.6.1...v1.6.2) (2024-06-03)
+
+
+### Bug Fixes
+
+* change事件返回月份范围信息[range] ([96bc506](https://github.com/lspriv/wx-calendar/commit/96bc506782dfbc74267cbd6e8a5340095aafacc3))
+* **webview:** 修复部分安卓设备月/周视图滑动bug ([2491fe3](https://github.com/lspriv/wx-calendar/commit/2491fe3baa6a8db3581ab0fa750b61273d41c69c))
+* 寄存css变量以供查询 ([f0eccc1](https://github.com/lspriv/wx-calendar/commit/f0eccc1d9a0bf2832697086a22dde90b2f33a190))
+* 调整日程为居中 ([d7b3ea6](https://github.com/lspriv/wx-calendar/commit/d7b3ea62b12b10097bdeabd95d23bf8cfe7aa5d2))
+* 调整有日程日期上方圆点的样式 ([c376cb5](https://github.com/lspriv/wx-calendar/commit/c376cb5a4e9b98cefb46970a17933c218fb04052))
+* 调整设备像素比变量 ([a13f578](https://github.com/lspriv/wx-calendar/commit/a13f578b48cd3fccc26ddc60d8b23f8f6c475df6))
+
 ## [1.6.1](https://github.com/lspriv/wx-calendar/compare/v1.6.0...v1.6.1) (2024-02-25)
 
 
