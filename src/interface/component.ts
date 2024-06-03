@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-02-24 06:26:35
+ * @LastEditTime: 2024-06-04 02:38:08
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -19,13 +19,13 @@ import type { Nullable, Voidable } from '../utils/shared';
 import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
 import type {
+  Plugin,
   PluginConstructor,
   PluginEntireMarks,
   PluginKeys,
   PluginService,
   PluginEventNames,
-  ServicePluginMap,
-  ServicePlugins
+  ServicePluginMap
 } from 'src/basic/service';
 
 export interface CalendarPanel extends WcMonth {
@@ -104,10 +104,7 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   weekstart: FullProperty<NumberConstructor>;
   /** 点击选择日期时是否震动 */
   vibrate: FullProperty<BooleanConstructor>;
-  /**
-   * 是否自定义导航栏
-   * 用以调整年面板的布局
-   */
+  /** 是否自定义导航栏，用以调整年面板的布局 */
   customNavBar: FullProperty<BooleanConstructor>;
 }
 
@@ -149,7 +146,9 @@ type SwiperAnimationFinishEvent<
 > = WechatMiniprogram.SwiperAnimationFinish<M, D>;
 
 export type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
-export type UsePluginService<T extends PluginConstructor[] = []> = PluginService<[...T, ...DEFAULT_PLUGINS]>;
+export type UsePlugins<T extends PluginConstructor[]> = [...T, ...DEFAULT_PLUGINS];
+export type UsePluginService<T extends PluginConstructor[] = []> = PluginService<UsePlugins<T>>;
+
 interface CalendarEventHandlers {
   /**
    * 跳转到今日
@@ -208,6 +207,7 @@ interface CalendarEventHandlers {
 export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
+  range?: [startDate: CalendarDay, endDate: CalendarDay];
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
@@ -305,7 +305,7 @@ export type CalendarInstance = WechatMiniprogram.Component.Instance<
   CalendarCustomProp
 >;
 
-export interface CalendarExport extends WechatMiniprogram.IAnyObject {
+export interface CalendarExport<T extends PluginConstructor[] = []> extends WechatMiniprogram.IAnyObject {
   /** 版本号 */
   version: string;
   /**
@@ -324,12 +324,9 @@ export interface CalendarExport extends WechatMiniprogram.IAnyObject {
   /**
    * 获取插件
    */
-  getPlugin<
-    T extends PluginService = UsePluginService,
-    K extends PluginKeys<ServicePlugins<T>> = PluginKeys<ServicePlugins<T>>
-  >(
+  getPlugin<K extends PluginKeys<UsePlugins<T>> = PluginKeys<UsePlugins<T>>>(
     key: K
-  ): Voidable<ServicePluginMap<ServicePlugins<T>>[K]>;
+  ): Voidable<ServicePluginMap<UsePlugins<T>>[K]>;
   /**
    * 更新插件日期数据
    */
