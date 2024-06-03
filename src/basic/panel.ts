@@ -4,11 +4,11 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 13:44:23
+ * @LastEditTime: 2024-05-28 15:30:44
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
-import { CALENDAR_PANELS, View } from './constants';
+import { CALENDAR_PANELS, View, VIEWS } from './constants';
 import { circularDiff, flagView, nextTick, middle } from './tools';
 import { mul, div } from '../utils/calc';
 import { nonNullable } from '../utils/shared';
@@ -276,7 +276,7 @@ export class PanelTool extends CalendarHandler {
       sets.currView = currView;
       sets.info = getDateInfo(date, false);
       if (this.skyline) instance._dragger_?.toView(View.month, false);
-      else sets.initView = 'month';
+      else sets.initView = VIEWS.MONTH;
       instance._view_ = View.month;
     }
 
