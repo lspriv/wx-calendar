@@ -186,7 +186,23 @@ type CalendarDay = {
 type LoadEventDetail = {
     checked: CalenderDay; // 当前选择日期
     view: 'week' | 'month' | 'schedule'; // 当前视图
+    range: [start: CalenderDay, end: CalenderDay]; // 当前渲染的月份范围
 }
+```
+获取组件实例
+```html
+<calendar id="calendar" bindload="handleLoad" />
+```
+```typescript
+import { CalendarExport } from '@lspriv/wx-calendar/lib';
+
+Page({
+  handleLoad() {
+    const calendar = this.selectComponent('#calendar') as CalendarExport; 
+    // 如果你使用了其他插件，比如 WxCalendar.use(AnyPlugin)，则可以
+    // const calendar = ... as CalendarExport<[typeof AnyPlugin]>;
+  }
+});
 ```
 
 [***`bindclick`***](#bindload)  日期点击

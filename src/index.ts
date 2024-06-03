@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-03-18 17:25:39
+ * @LastEditTime: 2024-03-18 17:35:35
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -396,7 +396,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       detail.checked = detail.checked || this.data.checked!;
       detail.view = detail.view || this.data.currView;
 
-      if (event === 'change') {
+      if (event === 'change' || event === 'load') {
         const panels = this.data.panels;
         const { year: sy, month: sm, day: sd } = panels[0].weeks[0].days[0];
         const lastWeeks = panels[panels.length - 1].weeks;

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-02-24 15:13:17
+ * @LastEditTime: 2024-04-24 16:31:09
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
@@ -82,7 +82,7 @@ export class MarkPlugin implements Plugin {
     return {
       dtStart: new Date(date.year, month, date.day),
       dtEnd: new Date(date.year, month, date.day + 1),
-      origin: '自定义'
+      origin: 'component_prop_marks'
     };
   }
 }
