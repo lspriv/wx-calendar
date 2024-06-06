@@ -4,9 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 16:33:10
+ * @LastEditTime: 2024-06-06 20:34:45
  */
 import { nextTick } from './tools';
+import { CALENDAR_PANELS } from './constants';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
 import {
   monthDiff,
@@ -17,7 +18,9 @@ import {
   mergeAnnualMarks,
   GREGORIAN_MONTH_DAYS,
   styleParse,
-  styleStringify
+  styleStringify,
+  timestamp,
+  normalDate
 } from '../interface/calendar';
 
 import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
@@ -62,8 +65,9 @@ interface PluginEventHandler {
   /**
    * 日历组件attche阶段
    * @param service PliginService实例
+   * @param sets 视图初次渲染数据
    */
-  PLUGIN_ON_ATTACH?(service: PluginService): void;
+  PLUGIN_ON_ATTACH?(service: PluginService, sets: Partial<CalendarData>): void;
   /**
    * 日历组件onLoad事件触发
    * @param service PliginService实例
@@ -206,6 +210,8 @@ export type PluginEventNames = SnakeToLowerCamel<PluginEventName<keyof PluginEve
 type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
+
+type DateRange = [start: CalendarDay, end: CalendarDay];
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -360,22 +366,49 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     });
   }
 
-  public async updateDates(dates?: Array<CalendarDay>) {
+  public async updateDates(dates?: Array<CalendarDay> | DateRange, type: 'range' | 'multi' = 'multi') {
     const panels = this.component.data.panels;
-    dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
+    const current = this.component.data.current;
+
+    let st: number, ed: number;
+
+    if (type === 'range') {
+      const half = Math.floor(CALENDAR_PANELS / 2);
+      const pstart = timestamp(panels[(current - half + CALENDAR_PANELS) % CALENDAR_PANELS].weeks[0].days[0]);
+      const lastPanel = panels[(current + half) % CALENDAR_PANELS];
+      const lastDays = lastPanel.weeks[lastPanel.weeks.length - 1];
+      const pend = timestamp(lastDays.days[lastDays.days.length - 1]);
+
+      const rstart = timestamp(dates![0]);
+      const rend = timestamp(dates![1]);
+
+      if (rstart > pend || rend < pstart) return;
+
+      st = Math.max(rstart, pstart);
+      ed = Math.min(rend, pend);
+    } else {
+      dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
+      st = 0;
+      ed = dates.length - 1;
+    }
 
     const map = new Map<string, DateResult>();
 
-    for (let i = dates.length; i--; ) {
-      const date = dates[i];
+    while (st <= ed) {
+      const date = type === 'range' ? normalDate(st) : dates![st];
       const key = `${date.year}_${date.month}_${date.day}`;
-      if (map.has(key)) continue;
-      const result = this.walkForDate(date);
-      if (result) {
-        result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
-        map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+
+      if (!map.has(key)) {
+        const result = this.walkForDate(date);
+        if (result) {
+          result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
+          map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+        }
       }
+
+      st += type === 'range' ? 86400000 : 1;
     }
+
     await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
   }

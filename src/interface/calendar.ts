@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 20:32:37
+ * @LastEditTime: 2024-06-06 20:02:11
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
@@ -489,6 +489,8 @@ export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
   }
   return true;
 };
+
+export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
 
 export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 

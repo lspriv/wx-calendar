@@ -4,14 +4,15 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wxs工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 20:17:33
+ * @LastEditTime: 2024-06-06 16:36:57
  */
 
 var isSkyline = function (renderer) {
   return renderer === 'skyline' || renderer === 'unknown';
 };
 
-var isChecked = function (date, checked, pdx, curr) {
+var isChecked = function (pointer, date, checked, pdx, curr) {
+  if (pointer && !pointer.show) return false;
   return pdx === curr && date.year === checked.year && date.month === checked.month && date.day === checked.day;
 };
 

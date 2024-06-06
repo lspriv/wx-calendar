@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 16:08:53
+ * @LastEditTime: 2024-06-06 19:46:28
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -167,8 +167,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         this._swiper_flag_ = false;
       }
 
-      this._calendar_.service.dispatchEvent('attach');
-
       const checked = normalDate(this.data.date) || WxCalendar.today;
       const weeks = InitWeeks(sortWeeks(this.data.weekstart));
       const isWeekView = this._view_ & View.week;
@@ -200,9 +198,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         pointer: createPointer(),
         darkside: this.data.darkmode && Layout.darkmode
       };
+
       this._pointer_.update(sets);
+      this._calendar_.service.dispatchEvent('attach', sets);
+
       this.setData(sets);
       this._loaded_ = true;
+
       wx.nextTick(async () => {
         if (isSkylineRender) this._dragger_!.bindAnimations();
         await this._printer_.initialize();
@@ -244,7 +246,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const date = panel.weeks[wdx].days[ddx];
       if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
       const checked = normalDate(date);
-      this.trigger('click', { checked });
       const isWeekView = this._view_ & View.week;
       if (date.kind === 'current') {
         const sets = { info: getDateInfo(checked, isWeekView), checked };
@@ -256,7 +257,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         if (isWeekView) await this._panel_.toWeekAdjoin(date);
         else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
       }
-      // this.trigger('click', { checked });
+      this.trigger('click', { checked });
       this.trigger('change', { checked });
     },
     handlePointerAnimated() {
