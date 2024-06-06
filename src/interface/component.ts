@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-04 02:38:08
+ * @LastEditTime: 2024-06-05 17:41:30
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -19,7 +19,6 @@ import type { Nullable, Voidable } from '../utils/shared';
 import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
 import type {
-  Plugin,
   PluginConstructor,
   PluginEntireMarks,
   PluginKeys,
@@ -298,12 +297,16 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   $_drag_view_bar_translate_?: Shared<number>;
 }
 
-export type CalendarInstance = WechatMiniprogram.Component.Instance<
+type DataSet = Record<string, any>;
+
+export type CalendarInstance<T extends DataSet = {}> = WechatMiniprogram.Component.Instance<
   CalendarData,
   CalendarProp,
   CalendarMethod,
   CalendarCustomProp
->;
+> & {
+  dataset: T;
+};
 
 export interface CalendarExport<T extends PluginConstructor[] = []> extends WechatMiniprogram.IAnyObject {
   /** 版本号 */

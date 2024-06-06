@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 08:42:23
+ * @LastEditTime: 2024-06-06 12:05:11
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -15,7 +15,9 @@ import {
   sameAnnualMarks,
   getWeekDateIdx,
   mergeAnnualMarks,
-  GREGORIAN_MONTH_DAYS
+  GREGORIAN_MONTH_DAYS,
+  styleParse,
+  styleStringify
 } from '../interface/calendar';
 
 import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
@@ -24,7 +26,10 @@ import type {
   CalendarDay,
   WcMonth,
   WcYear,
-  CalendarMark,
+  MarkDict,
+  CalendarMarkTypes,
+  DateStyle,
+  WcStyleMark,
   WcScheduleMark,
   WcMark,
   WcAnnualMarks,
@@ -32,12 +37,22 @@ import type {
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
+const PLUGIN_CATCH_HANDLE_PREFIX = 'PLUGIN_CATCH_';
 type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
+type PCH_PRE = typeof PLUGIN_CATCH_HANDLE_PREFIX;
 
 type Schedules = Array<WcScheduleMark>;
 
 export type TrackDateResult = {
-  [P in CalendarMark['type']]?: P extends 'schedule' ? Schedules : WcMark;
+  [P in CalendarMarkTypes]?: MarkDict<P, WcStyleMark, Schedules, WcMark>;
+};
+
+type TrackDateRecord = {
+  [P in keyof TrackDateResult]: P extends 'style' ? DateStyle : TrackDateResult[P];
+};
+
+type WalkDateRecord = {
+  [P in keyof TrackDateResult]: P extends 'style' ? string : TrackDateResult[P];
 };
 
 export type TrackYearResult = {
@@ -46,6 +61,11 @@ export type TrackYearResult = {
 };
 
 interface PluginEventHandler {
+  /**
+   * 日历组件attche阶段
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_ATTACH?(service: PluginService): void;
   /**
    * 日历组件onLoad事件触发
    * @param service PliginService实例
@@ -140,14 +160,14 @@ interface RegistPlugin {
 interface WalkResult {
   wdx: number;
   ddx: number;
-  record: TrackDateResult;
+  record: WalkDateRecord;
 }
 
 interface DateResult {
   year: number;
   month: number;
   day: number;
-  record: TrackDateResult;
+  record: WalkDateRecord;
 }
 
 interface MonthResult {
@@ -164,7 +184,7 @@ export interface AnnualResult {
 type PluginMark<T> = T & { key: string };
 
 export type PluginEntireMarks = {
-  [P in CalendarMark['type']]: Array<PluginMark<P extends 'schedule' ? WcScheduleMark : WcMark>>;
+  [P in CalendarMarkTypes]: Array<PluginMark<MarkDict<P, DateStyle, WcScheduleMark, WcMark>>>;
 };
 
 export type PluginKey<T> = T extends PluginConstructor ? T['KEY'] : never;
@@ -215,7 +235,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   }
 
   private walkForDate(date: CalendarDay) {
-    const record: TrackDateResult = {};
+    const record: TrackDateRecord = {};
 
     this.traversePlugins(plugin => {
       /** 处理日期标记 */
@@ -225,6 +245,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         if (result.festival && !record.festival) record.festival = result.festival;
         if (result.schedule?.length) {
           record.schedule = (record.schedule || []).concat(result.schedule);
+        }
+        if (result.style) {
+          const style = styleParse(result.style);
+          record.style = { ...style, ...record.style };
         }
       }
     });
@@ -253,7 +277,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         for (let j = week.days.length; j--; ) {
           const date = week.days[j];
           const record = this.walkForDate(date);
-          if (record) records.push({ wdx: i, ddx: j, record });
+          if (record) {
+            record.style && (record.style = styleStringify(record.style) as unknown as DateStyle);
+            records.push({ wdx: i, ddx: j, record: record as WalkDateRecord });
+          }
         }
       }
       return records;
@@ -282,6 +309,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             if (!sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner || null;
             if (!sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival || null;
             if (!sameSchedules(record.schedule, day.schedules)) sets[`${_key}.schedules`] = record.schedule || null;
+            if (record.style !== day.style) sets[`${_key}.style`] = record.style || '';
           }
         }
       }
@@ -325,6 +353,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
               if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner || null;
               if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival || null;
               if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || null;
+              if (record.style !== _day.style) sets[`${key}.style`] = record.style || '';
             }
           }
         }
@@ -344,7 +373,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const key = `${date.year}_${date.month}_${date.day}`;
       if (map.has(key)) continue;
       const result = this.walkForDate(date);
-      if (result) map.set(key, { year: date.year, month: date.month, day: date.day, record: result });
+      if (result) {
+        result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
+        map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+      }
     }
     await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
@@ -382,11 +414,12 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param date 日期
    */
   public getEntireMarks(date: CalendarDay): PluginEntireMarks {
-    const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [] };
+    const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [], style: [] };
 
     this.traversePlugins((plugin, key) => {
       const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
+        if (result.style) marks.style.push({ ...styleParse(result.style), key });
         if (result.corner) marks.corner.push({ ...result.corner, key });
         if (result.festival) marks.festival.push({ ...result.festival, key });
         if (result.schedule?.length) {

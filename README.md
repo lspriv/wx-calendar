@@ -25,16 +25,16 @@
 ### 使用
 小程序基础库 `SDKVersion` >= 3.0.0
 
-#### 安装
+#### 1.安装
 ```bash
 npm i @lspriv/wx-calendar -S
 ```
 
-#### 构建
+#### 2.构建
 微信小程序开发工具菜单栏：`工具` --> `构建 npm`
 [*官方文档*](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
 
-#### 引入配置
+#### 3.引入配置
 在页面或全局配置文件中配置
 ```json
 {
@@ -44,7 +44,7 @@ npm i @lspriv/wx-calendar -S
 }
 ```
 
-#### 页面使用
+#### 4.页面使用
 在页面wxml文件中使用
 ```html
 <calendar id="calendar" bindload="handleLoad" />
@@ -175,6 +175,14 @@ type CalendarDay = {
 >   text: string; // 内容
 >   color: string; // 文本色
 >   bgColor?: string; // 背景色，type为schedule时可选
+> }
+> // 样式标记
+> type StyleMark = {
+>   year?: number; // 年
+>   month?: number; // 月 
+>   day?: number; // 日
+>   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | 
+>   style: string | Record<string, string | number>;
 > }
 > ```
 > 角标内容最好一个字符长度，只对一个字符校正了位置，多出的请自行调整位置
@@ -471,6 +479,16 @@ class MyPlugin implements Plugin {
    * @param id 插件内标记, 由 getMarkKey 生成 key 时传入的 id，详见 PLUGIN_TRACK_DATE
    */
   PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {}
+
+  /**
+   * 注册日历组件attach阶段处理方法，可选择实现该方法
+   * 此时组件内部工具类初始化完成
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_ATTACH(service: PluginService) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法

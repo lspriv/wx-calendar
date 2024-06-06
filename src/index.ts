@@ -4,11 +4,11 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-03-18 17:35:35
+ * @LastEditTime: 2024-06-06 12:31:05
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
-import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
+import { VERSION, CALENDAR_PANELS, View, PURE_PROPS, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
 import { Layout } from './basic/layout';
@@ -32,7 +32,7 @@ import {
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
-import type { WcYear, CalendarMark } from './interface/calendar';
+import type { WcYear, CalendarMark, CalendarStyleMark } from './interface/calendar';
 import type { CalendarView } from './basic/tools';
 import type {
   CalendarData,
@@ -148,7 +148,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       /**
        * 实例化拖拽控制器
        */
-      this._dragger_ = new Dragger(this);
+      isSkyline(this.renderer) && (this._dragger_ = new Dragger(this));
       /**
        * 实例化WxCalendar处理数据和插件
        */
@@ -163,11 +163,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this._printer_ = new YearPrinter(this);
 
       if (!isSkylineRender) {
-        this._dragger_?.clear();
-        this._annual_.clearSkyline();
         this._swiper_accumulator_ = 0;
         this._swiper_flag_ = false;
       }
+
+      this._calendar_.service.dispatchEventHandle('attach');
 
       const checked = normalDate(this.data.date) || WxCalendar.today;
       const weeks = InitWeeks(sortWeeks(this.data.weekstart));
@@ -244,7 +244,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const date = panel.weeks[wdx].days[ddx];
       if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
       const checked = normalDate(date);
-      // this.trigger('click', { checked });
+      this.trigger('click', { checked });
       const isWeekView = this._view_ & View.week;
       if (date.kind === 'current') {
         const sets = { info: getDateInfo(checked, isWeekView), checked };
@@ -256,7 +256,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         if (isWeekView) await this._panel_.toWeekAdjoin(date);
         else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
       }
-      this.trigger('click', { checked });
+      // this.trigger('click', { checked });
       this.trigger('change', { checked });
     },
     handlePointerAnimated() {
@@ -440,7 +440,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (this._loaded_) this._panel_.toDate(date);
       else this._dragger_!.update();
     },
-    marks: function (marks: Array<CalendarMark>) {
+    marks: function (marks: Array<CalendarMark | CalendarStyleMark>) {
       const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
       mark?.update(this, marks);
     },

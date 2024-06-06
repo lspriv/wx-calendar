@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 08:28:27
+ * @LastEditTime: 2024-06-05 20:32:37
  */
 import { WEEKS } from '../basic/constants';
-import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
+import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
@@ -27,27 +27,44 @@ export interface CalendarMonth {
   month: number;
 }
 
-export interface CalendarMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
+interface DateMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
   date?: string | number | Date | CalendarDay;
+}
+
+export interface CalendarMark extends DateMark {
   type: 'schedule' | 'corner' | 'festival';
   text: string;
   color?: Nullable<string>;
   bgColor?: Nullable<string>;
 }
 
-export interface WcMark {
-  key?: string;
-  color?: Nullable<string>;
-  text: string;
+export type DateStyle = Record<string, string | number>;
+
+export interface CalendarStyleMark extends DateMark {
+  type: 'style';
+  style: string | DateStyle;
 }
 
-export interface WcScheduleMark extends WcMark {
-  bgColor?: Nullable<string>;
-}
+export type CalendarMarkTypes = CalendarMark['type'] | CalendarStyleMark['type'];
+
+export type WcMark = Pick<CalendarMark, 'text' | 'color'> & {
+  key?: string;
+};
+
+export type WcScheduleMark = WcMark & Pick<CalendarMark, 'bgColor'>;
+
+export type WcStyleMark = CalendarStyleMark['style'];
+
+export type MarkDict<T extends CalendarMarkTypes, Style, Schedule, CF> = T extends 'style'
+  ? Style
+  : T extends 'schedule'
+    ? Schedule
+    : CF;
 
 export interface WcDate extends Required<CalendarDay> {
   key: string;
   kind: 'last' | 'current' | 'next';
+  style: Nullable<string>;
   mark: Nullable<WcMark>;
   corner: Nullable<WcMark>;
   schedules: Array<WcScheduleMark>;
@@ -95,7 +112,12 @@ export interface WcSubYear {
 export type WcFullYear = WcYear & WcSubYear;
 
 export type WcMarkDict = {
-  [P in CalendarMark['type']]?: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
+  [P in CalendarMarkTypes]?: MarkDict<
+    P,
+    Nullable<CalendarStyleMark>,
+    Nullable<Array<CalendarMark>>,
+    Nullable<CalendarMark>
+  >;
 };
 export type WcMarkMap = Map<string, WcMarkDict>;
 
@@ -107,6 +129,16 @@ export interface WcScheduleInfo {
   summary?: string;
   description?: string;
 }
+
+export const styleParse = (style: string | DateStyle | null) =>
+  typeof style === 'string' ? strToStyle(style) : style || {};
+
+export const styleStringify = (style: DateStyle) => {
+  return Object.keys(style)
+    .sort()
+    .map(key => `${camelToSnake(key, '-')}:${style[key]};`)
+    .join('');
+};
 
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
 
@@ -197,6 +229,7 @@ const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
     week: week!,
     kind,
     today,
+    style: '',
     mark: null,
     corner: null,
     schedules: []
