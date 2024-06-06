@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 20:34:45
+ * @LastEditTime: 2024-06-06 23:53:02
  */
 import { nextTick } from './tools';
 import { CALENDAR_PANELS } from './constants';
@@ -211,7 +211,7 @@ type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
-type DateRange = [start: CalendarDay, end: CalendarDay];
+type DateRange = Array<[start: CalendarDay, end: CalendarDay]>;
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -366,51 +366,69 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     });
   }
 
-  public async updateDates(dates?: Array<CalendarDay> | DateRange, type: 'range' | 'multi' = 'multi') {
+  public async updateDates(dates?: Array<CalendarDay>) {
     const panels = this.component.data.panels;
-    const current = this.component.data.current;
-
-    let st: number, ed: number;
-
-    if (type === 'range') {
-      const half = Math.floor(CALENDAR_PANELS / 2);
-      const pstart = timestamp(panels[(current - half + CALENDAR_PANELS) % CALENDAR_PANELS].weeks[0].days[0]);
-      const lastPanel = panels[(current + half) % CALENDAR_PANELS];
-      const lastDays = lastPanel.weeks[lastPanel.weeks.length - 1];
-      const pend = timestamp(lastDays.days[lastDays.days.length - 1]);
-
-      const rstart = timestamp(dates![0]);
-      const rend = timestamp(dates![1]);
-
-      if (rstart > pend || rend < pstart) return;
-
-      st = Math.max(rstart, pstart);
-      ed = Math.min(rend, pend);
-    } else {
-      dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
-      st = 0;
-      ed = dates.length - 1;
-    }
+    dates = dates || panels.flatMap(panel => panel.weeks.flatMap(week => week.days));
 
     const map = new Map<string, DateResult>();
 
-    while (st <= ed) {
-      const date = type === 'range' ? normalDate(st) : dates![st];
-      const key = `${date.year}_${date.month}_${date.day}`;
-
-      if (!map.has(key)) {
-        const result = this.walkForDate(date);
-        if (result) {
-          result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
-          map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
-        }
-      }
-
-      st += type === 'range' ? 86400000 : 1;
+    for (let i = dates.length; i--; ) {
+      const date = dates![i];
+      this.setUpdateRecord(map, date);
     }
 
     await this.component._annual_.interaction();
     return this.setDates([...map.values()]);
+  }
+
+  public async updateRange(range: DateRange) {
+    const panels = this.component.data.panels;
+    const current = this.component.data.current;
+
+    const half = Math.floor(CALENDAR_PANELS / 2);
+    const pstart = timestamp(panels[(current - half + CALENDAR_PANELS) % CALENDAR_PANELS].weeks[0].days[0]);
+    const lastPanel = panels[(current + half) % CALENDAR_PANELS];
+    const lastDays = lastPanel.weeks[lastPanel.weeks.length - 1];
+    const pend = timestamp(lastDays.days[lastDays.days.length - 1]);
+
+    const map = new Map<string, DateResult>();
+
+    for (let i = 0; i < range.length; i++) {
+      const rangeItem = range[i];
+      if (range.length) {
+        if (range.length === 1) {
+          this.setUpdateRecord(map, rangeItem[0]);
+        } else {
+          const rstart = timestamp(rangeItem[0]);
+          const rend = timestamp(rangeItem[1]);
+
+          if (rstart > pend || rend < pstart) continue;
+
+          let st = Math.max(rstart, pstart);
+          let ed = Math.min(rend, pend);
+
+          while (st <= ed) {
+            const date = normalDate(st);
+            this.setUpdateRecord(map, date);
+            st += 86400000;
+          }
+        }
+      }
+    }
+
+    await this.component._annual_.interaction();
+    return this.setDates([...map.values()]);
+  }
+
+  private setUpdateRecord(map: Map<string, DateResult>, date: CalendarDay) {
+    const key = `${date.year}_${date.month}_${date.day}`;
+    if (!map.has(key)) {
+      const result = this.walkForDate(date);
+      if (result) {
+        result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
+        map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+      }
+    }
   }
 
   /**
