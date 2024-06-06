@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 12:31:05
+ * @LastEditTime: 2024-06-06 16:08:53
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -129,7 +129,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     detached() {
       this._printer_?.cancelThemeChange();
-      this._calendar_.service.dispatchEventHandle('detached');
+      this._calendar_.service.dispatchEvent('detached');
     }
   },
   methods: {
@@ -167,7 +167,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         this._swiper_flag_ = false;
       }
 
-      this._calendar_.service.dispatchEventHandle('attach');
+      this._calendar_.service.dispatchEvent('attach');
 
       const checked = normalDate(this.data.date) || WxCalendar.today;
       const weeks = InitWeeks(sortWeeks(this.data.weekstart));
@@ -408,7 +408,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail);
       this.triggerEvent(event, detail);
     },
     selSchedule(e) {

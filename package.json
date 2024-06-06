@@ -1,6 +1,6 @@
 {
   "name": "@lspriv/wx-calendar",
-  "version": "1.7.0-alpha.0",
+  "version": "1.7.0-alpha.1",
   "description": "微信小程序日历",
   "type": "commonjs",
   "main": "./dist/index.js",

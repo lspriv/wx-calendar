@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 12:05:11
+ * @LastEditTime: 2024-06-06 16:10:44
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -37,9 +37,7 @@ import type {
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
-const PLUGIN_CATCH_HANDLE_PREFIX = 'PLUGIN_CATCH_';
 type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
-type PCH_PRE = typeof PLUGIN_CATCH_HANDLE_PREFIX;
 
 type Schedules = Array<WcScheduleMark>;
 
@@ -436,13 +434,16 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param event 事件名
    * @param detail 事件详情数据
    */
-  public dispatchEventHandle<K extends PluginEventNames>(event: K, detail?: any): void {
+  public dispatchEvent<K extends PluginEventNames>(event: K, ...detail: any[]): void {
     const handler: PluginEventHandlerName<K> = `${PLUGIN_EVENT_HANDLE_PREFIX}${
       camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
+    console.log('dispatchEvent', event);
+    console.log('handler', handler);
     try {
-      this.traversePlugins(plugin => {
-        plugin[handler]?.call(plugin, this, detail);
+      this.traversePlugins((plugin, key) => {
+        console.log('plugin', key, plugin[handler]);
+        plugin[handler]?.call(plugin, this, ...detail);
       });
     } catch (e) {
       return;
