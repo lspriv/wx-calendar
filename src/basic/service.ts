@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 16:10:44
+ * @LastEditTime: 2024-06-06 16:33:10
  */
 import { nextTick } from './tools';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
@@ -438,11 +438,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     const handler: PluginEventHandlerName<K> = `${PLUGIN_EVENT_HANDLE_PREFIX}${
       camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
-    console.log('dispatchEvent', event);
-    console.log('handler', handler);
     try {
-      this.traversePlugins((plugin, key) => {
-        console.log('plugin', key, plugin[handler]);
+      this.traversePlugins(plugin => {
         plugin[handler]?.call(plugin, this, ...detail);
       });
     } catch (e) {
