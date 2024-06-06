@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 23:53:02
+ * @LastEditTime: 2024-06-07 00:55:40
  */
 import { nextTick } from './tools';
 import { CALENDAR_PANELS } from './constants';
@@ -211,7 +211,7 @@ type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
-type DateRange = Array<[start: CalendarDay, end: CalendarDay]>;
+export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -395,23 +395,22 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
 
     for (let i = 0; i < range.length; i++) {
       const rangeItem = range[i];
-      if (range.length) {
-        if (range.length === 1) {
-          this.setUpdateRecord(map, rangeItem[0]);
-        } else {
-          const rstart = timestamp(rangeItem[0]);
-          const rend = timestamp(rangeItem[1]);
+      if (!rangeItem.length) continue;
+      if (rangeItem.length === 1) {
+        this.setUpdateRecord(map, rangeItem[0]);
+      } else {
+        const rstart = timestamp(rangeItem[0]);
+        const rend = timestamp(rangeItem[1]!);
 
-          if (rstart > pend || rend < pstart) continue;
+        if (rstart > pend || rend < pstart) continue;
 
-          let st = Math.max(rstart, pstart);
-          let ed = Math.min(rend, pend);
+        let st = Math.max(rstart, pstart);
+        let ed = Math.min(rend, pend);
 
-          while (st <= ed) {
-            const date = normalDate(st);
-            this.setUpdateRecord(map, date);
-            st += 86400000;
-          }
+        while (st <= ed) {
+          const date = normalDate(st);
+          this.setUpdateRecord(map, date);
+          st += 86400000;
         }
       }
     }
