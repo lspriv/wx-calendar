@@ -4,8 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 17:42:05
+ * @LastEditTime: 2024-06-07 17:12:15
  */
+
+import type { LayoutArea } from '../interface/component';
 
 declare const $_VERSION: string;
 
@@ -15,13 +17,15 @@ export const VERSION = $_VERSION;
 export const CALENDAR_PANELS = 3;
 
 /** 纯数据字段 */
-export const PURE_PROPS = /^(date|view|weekstart|darkmode|vibrate|font)$/;
+export const PURE_PROPS = /^(date|view|weekstart|darkmode|vibrate|font|areas)$/;
 
 /** 字体 */
 export const FONT = 'ui-sans-serif';
 // '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif';
 
 export const WEEKS = '日一二三四五六';
+
+export const FULL_LAYOUT: Array<LayoutArea> = ['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar'];
 
 export const VIEWS = {
   WEEK: 'week',

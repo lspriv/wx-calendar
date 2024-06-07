@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 12:40:19
+ * @LastEditTime: 2024-06-07 18:14:11
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -28,7 +28,8 @@ import {
   InitWeeks,
   mergeStr,
   isViewFixed,
-  onceEmiter
+  onceEmiter,
+  layoutHideCls
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
@@ -94,6 +95,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     customNavBar: {
       type: Boolean,
       value: true
+    },
+    areas: {
+      type: Array
     }
   },
   data: {
@@ -113,6 +117,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     annualDuration: 300,
     offsetChange: false,
     darkside: true,
+    areaHideCls: '',
     layout: null,
     pointer: null,
     fonts: FONT,
@@ -181,6 +186,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const initView = flagView(this._view_);
       this.$_view_fixed.value = isViewFixed(this.data.view);
       const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
+      const areaHideCls = layoutHideCls(this.data.areas);
 
       const sets: Partial<CalendarData> = {
         renderer: this.renderer!,
@@ -197,7 +203,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         viewFixed: this.$_view_fixed.value,
         info: getDateInfo(checked, isWeekView),
         pointer: createPointer(),
-        darkside: this.data.darkmode && Layout.darkmode
+        darkside: this.data.darkmode && Layout.darkmode,
+        areaHideCls
       };
 
       this._pointer_.update(sets);
@@ -243,7 +250,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
     selDate(e) {
-      this._calendar_.service.interceptEvent('click', e, async () => {
+      this._calendar_.service.interceptEvent('tap', e, async () => {
         const { wdx, ddx } = e.mark!;
         const panel = this.data.panels[this.data.current];
         const date = panel.weeks[wdx].days[ddx];
@@ -384,17 +391,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const view = await this._dragger_!.dragout(e.velocityY * 0.6);
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
-    selYear() {
+    async selYear() {
       if (this.$_view_fixed.value && this._view_ & View.week) return;
       const { year, month } = this.data.panels[this.data.current];
       const mon = { year, month };
-      this._annual_.switch(true, mon);
+      return this._annual_.switch(true, mon);
     },
     async selMonth(e) {
       const { ydx } = e.currentTarget.dataset;
       const { x, y } = e.detail;
       const mon = await this._printer_.getTapMonth(ydx, x, y);
-      this._annual_.switch(false, mon);
+      return this._annual_.switch(false, mon);
     },
     trigger(event, detail, dispatchPlugin = true) {
       detail = detail || <CalendarEventDetail>{};
@@ -415,7 +422,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const emiter = onceEmiter(this, event);
       dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
-      emiter[0](detail);
+      emiter.emit(detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
@@ -493,6 +500,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
             transView: flagView(_view)
           });
         }
+      },
+      openAnuual() {
+        return instance.selYear();
       },
       getMarks(date) {
         return instance._calendar_.service.getEntireMarks(date);

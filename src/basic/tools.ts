@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 03:00:43
+ * @LastEditTime: 2024-06-07 17:49:43
  */
 
-import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
+import { WEEKS, VIEWS, CALENDAR_PANELS, FULL_LAYOUT, View } from './constants';
 import { values } from '../utils/shared';
 
 import type { Voidable } from '../utils/shared';
-import type { CalendarWeek } from '../interface/component';
+import type { CalendarWeek, LayoutArea } from '../interface/component';
 
 export type BoundingClientRects = Array<WechatMiniprogram.BoundingClientRectCallbackResult>;
 
@@ -143,18 +143,35 @@ export const mergeStr = (strs: Array<string>, separator: string = ',') => {
   return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
 };
 
-export type OnceEmiter = [emit: (...detail: any[]) => void, cancel: () => void];
+export interface OnceEmiter {
+  emit: (...detail: any[]) => void;
+  cancel: () => void;
+}
 /** 触发一次 */
 export const onceEmiter = (instance: ComponentInstance, event: string): OnceEmiter => {
   let emits = 0;
-  return [
-    function emit(...detail: any[]) {
+  return {
+    emit: function (...detail: any[]) {
       if (emits) return;
       instance.triggerEvent(event, ...detail);
       emits++;
     },
-    function cancel() {
+    cancel: function () {
       emits++;
     }
-  ];
+  };
 };
+
+export const layoutHideCls = (layout?: Array<LayoutArea>): string => {
+  if (!layout?.length) return '';
+  const hideAreas = FULL_LAYOUT.filter(item => !layout.includes(item));
+  return hideAreas.map(item => `wc--hide-${item}`).join(' ');
+};
+
+export const addLayoutHideCls = (cls: string, area: LayoutArea): string => {
+  const reg = new RegExp(`wc--hide-${area}\\s*`);
+  if (reg.test(cls)) return cls;
+  return `${cls} wc--hide-${area}`;
+};
+
+export const hasLayoutArea = (cls: string, area: LayoutArea) => !new RegExp(`wc--hide-${area}\\s*`).test(cls);

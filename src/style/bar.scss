@@ -64,3 +64,13 @@
     transform-origin: 50% 0;
   }
 }
+.wc {
+  @include if(hide-dragbar) {
+    .wc__bar {
+      opacity: 0 !important;
+      height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
+}

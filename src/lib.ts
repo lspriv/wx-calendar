@@ -4,14 +4,24 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 07:14:32
+ * @LastEditTime: 2024-06-07 17:49:53
  */
 export type * from './basic/tools';
 export type * from './interface/component';
 export type * from './basic/service';
 export * from './utils/shared';
 export * from './basic/constants';
-export { nextTick, severalTicks, viewFlag, flagView, isViewFixed, isSkyline } from './basic/tools';
+export {
+  nextTick,
+  severalTicks,
+  viewFlag,
+  flagView,
+  isViewFixed,
+  isSkyline,
+  layoutHideCls,
+  addLayoutHideCls,
+  hasLayoutArea
+} from './basic/tools';
 export * from './interface/calendar';
 export { Layout } from './basic/layout';
 export { LUNAR_PLUGIN_KEY } from './plugins/lunar';

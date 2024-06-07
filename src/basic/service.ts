@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 03:45:45
+ * @LastEditTime: 2024-06-07 18:13:59
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS } from './constants';
@@ -68,11 +68,11 @@ interface EventIntercept {
 }
 interface PluginInterception {
   /**
-   * 捕获日期点击
+   * 捕获日期点击动作
    * @param service PliginService实例
    * @param intercept 拦截
    */
-  PLUGIN_CATCH_CLICK?(
+  PLUGIN_CATCH_TAP?(
     service: PluginService,
     event: WechatMiniprogram.TouchEvent<{}, { wdx: number; ddx: number }>,
     intercept: EventIntercept

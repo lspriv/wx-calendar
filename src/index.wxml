@@ -16,7 +16,7 @@
     mark:dragMax="{{ layout.dragMax }}"
     mark:view="{{ currView }}"
     mark:fixed="{{ viewFixed }}"
-    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }} {{ sameChecked ? 'wc--same-checked' : '' }}"
+    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }}"
   >
 
     <!-- Calendar Header Start -->

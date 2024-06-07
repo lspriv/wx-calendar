@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-03-04 16:02:11
+ * @LastEditTime: 2024-06-07 17:55:18
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
-import { nodeRect, viewportOffset } from './tools';
+import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualMonth, WcFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
@@ -244,6 +244,8 @@ export class YearPrinter extends CalendarHandler {
     if (!this._instance_.data.customNavBar) {
       this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
     }
+    const hasHeader = hasLayoutArea(this._instance_.data.areaHideCls, 'header');
+    this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
   }
 
   private initializeCanvas(id: string) {

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-05 17:41:30
+ * @LastEditTime: 2024-06-07 17:50:04
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -40,6 +40,8 @@ export interface CalendarWeek {
 export type CalendarSwiperType = 'panel' | 'annual';
 
 type FullProperty<T extends WechatMiniprogram.Component.PropertyType> = WechatMiniprogram.Component.FullProperty<T>;
+
+export type LayoutArea = 'header' | 'title' | 'subinfo' | 'today' | 'viewbar' | 'dragbar';
 
 export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** 渲染模式 */
@@ -82,6 +84,8 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   fonts: string;
   /** 暗黑模式 */
   darkside: boolean;
+  /** 属性 layout 的翻版 */
+  areaHideCls: string;
 }
 
 export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption {
@@ -105,6 +109,8 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   vibrate: FullProperty<BooleanConstructor>;
   /** 是否自定义导航栏，用以调整年面板的布局 */
   customNavBar: FullProperty<BooleanConstructor>;
+  /** 布局区域 */
+  areas: FullProperty<ArrayConstructor>;
 }
 
 interface CalendarInitialize {
@@ -160,11 +166,11 @@ interface CalendarEventHandlers {
   /**
    * 点击周/月面板标题打开年面板选择年
    */
-  selYear(event: TouchEvent<{}>): void;
+  selYear(event?: TouchEvent<{}>): Promise<void>;
   /**
    * 年面板中选择月
    */
-  selMonth(event: TouchEvent<{ ydx: number }, { x: number; y: number }>): void;
+  selMonth(event: TouchEvent<{ ydx: number }, { x: number; y: number }>): Promise<void>;
   /**
    * 选择日程
    */
@@ -320,6 +326,11 @@ export interface CalendarExport<T extends PluginConstructor[] = []> extends Wech
    * 若果view未指定，会在周月视图之间切换
    */
   toggleView(view?: CalendarView): void;
+  /**
+   * 打开年度面板
+   * @param mon 指定月
+   */
+  openAnuual(): Promise<void>;
   /**
    * 获取日期标记
    */

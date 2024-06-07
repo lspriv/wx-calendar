@@ -47,6 +47,8 @@
     color: theme(title-sub-color);
     margin: 0 0 0 6rpx;
     font-weight: normal;
+    transition: all .28s ease 0s;
+    opacity: 1;
   }
 }
 
@@ -192,5 +194,36 @@
     margin-left: 0 !important;
     transform: scale(0);
     opacity: 0;
+  }
+}
+
+.wc {
+  @include if(hide-header) {
+    .wc__header {
+      height: 20rpx !important;
+      opacity: 0 !important;
+    }
+  }
+  @include if(hide-header, hide-title) {
+    .wc__header-title {
+      opacity: 0 !important;
+    }
+  }
+  @include if(hide-header, hide-subinfo) {
+    .wc__header-title-info {
+      opacity: 0 !important;
+    }
+    
+  }
+  @include if(hide-today, hide-header) {
+    .wc__operator--today {
+      display: none !important;
+    }
+    
+  }
+  @include if(hide-viewbar, hide-header) {
+    .wc__operator--views {
+      display: none !important;
+    }
   }
 }

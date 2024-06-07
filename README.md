@@ -160,6 +160,12 @@ type CalendarDay = {
         <td>组件所在页面是否自定义导航栏</td>
         <td>true</td>
     </tr>
+    <tr>
+        <td>areas</td>
+        <td>array</td>
+        <td>自定义布局区域</td>
+        <td>['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar']</td>
+    </tr>
 </table>
 
 > [!TIP] 
@@ -537,6 +543,19 @@ class MyPlugin implements Plugin {
   PLUGIN_ON_DETACHED(service: PluginService) {
     // 获取日历组件实例
     const component = service.component;
+  }
+
+  /**
+   * 拦截日期点击动作
+   * @param service PliginService实例
+   * @param event 事件参数
+   * @param intercept 拦截器
+   */
+  PLUGIN_CATCH_TAP(service: PluginService, event: TouchEvent, intercept: EventIntercept) {
+     // 获取日历组件实例
+    const component = service.component;
+    // 若不想事件继续传播
+    if (...) intercept();
   }
 }
 ```
