@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 18:40:33
+ * @LastEditTime: 2024-06-07 23:43:41
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -27,7 +27,6 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  isViewFixed,
   onceEmiter,
   layoutHideCls
 } from './basic/tools';
@@ -96,6 +95,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       type: Boolean,
       value: true
     },
+    viewGesture: {
+      type: Boolean,
+      value: true
+    },
     areas: {
       type: Array
     }
@@ -110,7 +113,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     currView: VIEWS.MONTH,
     initView: VIEWS.MONTH,
     transView: null,
-    viewFixed: false,
+    gesture: false,
     annualCurr: null,
     annualTop: '-150vh',
     annualOpacity: 0,
@@ -143,7 +146,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const { shared } = wx.worklet;
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
-      this.$_view_fixed = shared(false);
+      this.$_gesture = shared(false);
       this.$_calendar_width = shared(0);
     },
     initializeView() {
@@ -184,7 +187,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;
       const initView = flagView(this._view_);
-      this.$_view_fixed.value = isViewFixed(this.data.view);
+      // this.$_gesture.value = this.data.viewGesture;
       const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
       const areaHideCls = layoutHideCls(this.data.areas);
 
@@ -200,7 +203,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         annualCurr: isSkylineRender ? null : initCurrent,
         currView: initView,
         initView,
-        viewFixed: this.$_view_fixed.value,
+        gesture: this.data.viewGesture,
         info: getDateInfo(checked, isWeekView),
         pointer: createPointer(),
         darkside: this.data.darkmode && Layout.darkmode,
@@ -235,10 +238,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     toToday() {
       this._panel_.toDate(WxCalendar.today);
     },
-    async toggleView(view, fixed) {
+    async toggleView(view) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
-      await this._panel_.refreshView(_view, fixed);
+      await this._panel_.refreshView(_view);
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async calendarTransitionEnd() {
@@ -348,7 +351,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     workletDragGesture(e) {
       'worklet';
-      if (this.$_view_fixed.value || e.state === 0) return;
+      if (!this.$_gesture.value || e.state === 0) return;
       if (e.state === 1) {
         wx.worklet.runOnJS(this.dragGestureStart.bind(this))();
         this.$_drag_state!.value = 1;
@@ -391,7 +394,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
     async selYear() {
-      if (this.$_view_fixed.value && this._view_ & View.week) return;
+      if (!this.$_gesture.value && this._view_ & View.week) return;
       const { year, month } = this.data.panels[this.data.current];
       const mon = { year, month };
       return this._annual_.switch(true, mon);
@@ -461,12 +464,19 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const currView = flagView(_view);
       const isSkylineRender = isSkyline(this.renderer);
       if (this._loaded_) {
-        this.$_view_fixed.value = isViewFixed(view);
-        if (isSkylineRender) this.toggleView(_view, this.$_view_fixed.value);
-        else this.setData({ transView: currView, viewFixed: this.$_view_fixed.value });
+        if (isSkylineRender) this.toggleView(_view);
+        else this.setData({ transView: currView });
       } else {
         if (isSkylineRender) this._dragger_!.toView(_view, false);
         this._view_ = _view;
+      }
+    },
+    viewGesture: function (gesture: boolean) {
+      if (this._loaded_) {
+        if (gesture !== this.$_gesture.value) {
+          this.$_gesture.value = gesture;
+          this.setData({ gesture });
+        }
       }
     },
     darkmode: function (darkmode: boolean) {

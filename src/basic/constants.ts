@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 17:12:15
+ * @LastEditTime: 2024-06-07 23:17:23
  */
 
 import type { LayoutArea } from '../interface/component';
@@ -17,7 +17,7 @@ export const VERSION = $_VERSION;
 export const CALENDAR_PANELS = 3;
 
 /** 纯数据字段 */
-export const PURE_PROPS = /^(date|view|weekstart|darkmode|vibrate|font|areas)$/;
+export const PURE_PROPS = /^(date|view|weekstart|darkmode|vibrate|font|areas|viewGesture)$/;
 
 /** 字体 */
 export const FONT = 'ui-sans-serif';

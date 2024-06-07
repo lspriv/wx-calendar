@@ -15,8 +15,8 @@
     mark:min="{{ layout.minHeight }}"
     mark:dragMax="{{ layout.dragMax }}"
     mark:view="{{ currView }}"
-    mark:fixed="{{ viewFixed }}"
-    class="wc wc--{{ currView }} {{ viewFixed ? 'wc--view-fixed' : '' }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }}"
+    mark:gesture="{{ gesture }}"
+    class="wc wc--{{ currView }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }}"
   >
 
     <!-- Calendar Header Start -->

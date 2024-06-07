@@ -56,19 +56,11 @@
   }
 }
 
-.wc.wc--view-fixed {
-  .wc__bar {
-    height: 0 !important;
-    opacity: 0;
-    transform: scale(0);
-    transform-origin: 50% 0;
-  }
-}
 .wc {
   @include if(hide-dragbar) {
     .wc__bar {
       opacity: 0 !important;
-      height: 0 !important;
+      height: 20rpx !important;
       padding: 0 !important;
       margin: 0 !important;
     }

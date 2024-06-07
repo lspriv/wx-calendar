@@ -103,8 +103,8 @@ type CalendarDay = {
     <tr>
         <td>view</td>
         <td>string</td>
-        <td>视图，加后缀fixed可固定视图</td>
-        <td>month[week|schedule][-fixed]</td>
+        <td>视图</td>
+        <td>month[week|schedule]</td>
     </tr>
     <tr>
         <td>marks</td>
@@ -166,7 +166,29 @@ type CalendarDay = {
         <td>自定义布局区域</td>
         <td>['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar']</td>
     </tr>
+    <tr>
+        <td>viewGesture</td>
+        <td>boolean</td>
+        <td>是否滑动手势控制视图</td>
+        <td>true</td>
+    </tr>
 </table>
+
+> [!TIP] 
+> 1.7.0+版本已经移除了固定视图，新增手势控制属性 `viewGesture` ，用一下方式实现固定视图，有更高的自由度
+
+固定视图的新方式
+```html
+<!-- 固定为周视图 -->
+<!-- view 默认初始视图 -->
+<!-- view-gesture 取消手势控制 -->
+<!-- areas 只保留四个区域，将viewbar和dragbar移除 -->
+<calendar 
+  view="week"
+  view-gesture="{{ false }}"
+  areas="{{ ['header', 'title', 'subinfo', 'today'] }}"
+/>
+```
 
 > [!TIP] 
 > 关于属性 `marks`
@@ -470,7 +492,10 @@ class MyPlugin implements Plugin {
   PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
     return {
-      subinfo: '', // 设置年份描述信息，可选
+      subinfo: [
+        { text: '乙巳蛇年', color: '#F56C6C' },
+        { text: '农历初一', color: '#409EFF' }
+      ], 
       marks: new Map([
         ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
         ['2023-10-7', { rwtype: 'work' }], // 工作日，正常

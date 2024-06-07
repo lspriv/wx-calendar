@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-05-28 15:30:44
+ * @LastEditTime: 2024-06-07 23:16:14
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -103,7 +103,7 @@ export class PanelTool extends CalendarHandler {
     await this.update();
   }
 
-  public async refreshView(view: View, fixed?: boolean) {
+  public async refreshView(view: View) {
     const instance = this._instance_;
     const { current, checked } = instance.data;
     instance._view_ = view;
@@ -113,8 +113,6 @@ export class PanelTool extends CalendarHandler {
 
     const sets: RefreshFields = { currView, info: getDateInfo(checked!, isWeekView), checked, current };
     this.refreshPanels(sets);
-
-    if (nonNullable(fixed)) sets.viewFixed = fixed;
 
     instance.setData(sets);
     await this.update();

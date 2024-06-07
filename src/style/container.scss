@@ -23,34 +23,4 @@ $fixed-view-sub: 20rpx;
   flex-direction: column;
   z-index: 1024;
   overflow: hidden;
-
-  // @include if (view-fixed) {
-  //   .wc__panel {
-  //     transition: all .28s ease !important;
-  //   }
-  // }
-  @include if (view-fixed, week) {
-    padding-bottom: $fixed-view-sub;
-  }
-  @include if (view-fixed, month) {
-    padding-bottom: $fixed-view-sub;
-  }
-}
-
-.wcc--webview {
-  .wc.wc--view-fixed {
-    .wc__panel {
-      transition: all .28s ease !important;
-    }
-  }
-  .wc.wc--view-fixed.wc--week {
-    .wc__panel {
-      height: calc($wc-calendar-panel-height / 5) !important;
-    }
-  }
-  .wc.wc--view-fixed.wc--month {
-    .wc__panel {
-      height: $wc-calendar-panel-height !important;
-    }
-  }
 }

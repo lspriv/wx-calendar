@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 17:49:53
+ * @LastEditTime: 2024-06-07 23:21:16
  */
 export type * from './basic/tools';
 export type * from './interface/component';
@@ -16,7 +16,6 @@ export {
   severalTicks,
   viewFlag,
   flagView,
-  isViewFixed,
   isSkyline,
   layoutHideCls,
   addLayoutHideCls,
