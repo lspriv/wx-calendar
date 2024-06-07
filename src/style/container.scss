@@ -13,6 +13,8 @@ swiper {
   box-sizing: border-box;
 }
 
+$fixed-view-sub: 20rpx;
+
 .wc {
   position: relative;
   width: 100%;
@@ -21,20 +23,32 @@ swiper {
   flex-direction: column;
   z-index: 1024;
   overflow: hidden;
-  $fixed-view-sub: 20rpx;
-  @include if (view-fixed) {
+
+  // @include if (view-fixed) {
+  //   .wc__panel {
+  //     transition: all .28s ease !important;
+  //   }
+  // }
+  @include if (view-fixed, week) {
+    padding-bottom: $fixed-view-sub;
+  }
+  @include if (view-fixed, month) {
+    padding-bottom: $fixed-view-sub;
+  }
+}
+
+.wcc--webview {
+  .wc.wc--view-fixed {
     .wc__panel {
       transition: all .28s ease !important;
     }
   }
-  @include if (view-fixed, week) {
-    padding-bottom: $fixed-view-sub;
+  .wc.wc--view-fixed.wc--week {
     .wc__panel {
       height: calc($wc-calendar-panel-height / 5) !important;
     }
   }
-  @include if (view-fixed, month) {
-    padding-bottom: $fixed-view-sub;
+  .wc.wc--view-fixed.wc--month {
     .wc__panel {
       height: $wc-calendar-panel-height !important;
     }

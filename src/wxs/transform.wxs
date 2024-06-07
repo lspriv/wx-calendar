@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 18:41:26
+ * @LastEditTime: 2024-06-07 12:52:35
  */
 
 var nonNullable = function (value) {
@@ -302,6 +302,7 @@ var updateViewCls = function (view, instance) {
  * @param {'week' | 'month' | 'schedule'} view 视图
  */
 var viewChange = function (view, old, owner) {
+  console.log('viewChange');
   if (view && view !== old) {
     var panel = owner.selectComponent('.wc');
     var cls = 'wc--' + view;
@@ -353,8 +354,8 @@ var transViewChange = function (view, old, owner, instance) {
   if (view) {
     const dataset = instance.getDataset();
     toView(view, dataset, owner);
-    updateViewCls(view, instance);
-    instance.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
+    viewChange(view, old, owner);
+    owner.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
   }
 };
 

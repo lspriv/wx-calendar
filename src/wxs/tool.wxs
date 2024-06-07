@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wxs工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 16:36:57
+ * @LastEditTime: 2024-06-07 14:35:52
  */
 
 var isSkyline = function (renderer) {
@@ -13,6 +13,7 @@ var isSkyline = function (renderer) {
 
 var isChecked = function (pointer, date, checked, pdx, curr) {
   if (pointer && !pointer.show) return false;
+  if (!checked || !date) return false;
   return pdx === curr && date.year === checked.year && date.month === checked.month && date.day === checked.day;
 };
 
