@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 19:53:23
+ * @LastEditTime: 2024-06-07 22:17:07
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS } from './constants';
@@ -21,7 +21,8 @@ import {
   styleStringify,
   timestamp,
   normalDate,
-  sameAnnualSubs
+  sameAnnualSubs,
+  fillAnnualSubs
 } from '../interface/calendar';
 
 import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
@@ -72,6 +73,7 @@ interface PluginInterception {
   /**
    * 捕获日期点击动作
    * @param service PliginService实例
+   * @param event 事件
    * @param intercept 拦截
    */
   PLUGIN_CATCH_TAP?(
@@ -232,11 +234,19 @@ export type PluginInterceptNames = SnakeToLowerCamel<PluginInterceptName<keyof P
 type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
 type PluginEventInterceptName<T extends PluginInterceptNames> = `${PEI_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
 
+type PluginInterceptDetail<T extends PluginInterceptNames> = Parameters<
+  Required<PluginInterception>[PluginEventInterceptName<T>]
+>[1];
+
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
 export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
 
 class PluginInterceptError extends Error {}
+
+export const intercept = (): never => {
+  throw new PluginInterceptError();
+};
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -287,10 +297,11 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
 
   private walkForYear(year: WcYear) {
     const record: TrackYearResult = {};
-    this.traversePlugins(plugin => {
+    this.traversePlugins((plugin, key) => {
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
-        if (result.subinfo) record.subinfo = [...(record.subinfo || []), ...result.subinfo];
+        if (result.subinfo)
+          record.subinfo = [...(record.subinfo || []), ...(fillAnnualSubs(key, year.year, result.subinfo) || [])];
         if (result.marks?.size) record.marks = mergeAnnualMarks(record.marks, result.marks);
       }
     });
@@ -532,32 +543,23 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    */
   public interceptEvent<K extends PluginInterceptNames>(
     name: K,
-    event: WechatMiniprogram.BaseEvent,
-    action: (...args: any[]) => any
+    detail: PluginInterceptDetail<K>,
+    action?: (...args: any[]) => any
   ) {
     const handler: PluginEventInterceptName<K> = `${PLUGIN_EVENT_INTERCEPT_PREFIX}${
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
 
-    function intercept(): never {
-      throw new PluginInterceptError();
-    }
-
-    const tasks: Array<(...args: any[]) => any> = [];
-
-    this.traversePlugins(plugin => {
-      if (plugin[handler]) tasks.push(plugin[handler]!.bind(plugin, this, event, intercept));
-    });
-
-    tasks.push(action);
-
-    while (tasks.length) {
+    for (let i = this._plugins_.length; i--; ) {
+      const plugin = this._plugins_[i].instance;
       try {
-        tasks.shift()!();
+        plugin[handler]!.call(plugin, this, detail, intercept);
       } catch (e) {
-        if (e instanceof PluginInterceptError) break;
+        if (e instanceof PluginInterceptError) return;
       }
     }
+
+    action?.();
   }
 
   /**

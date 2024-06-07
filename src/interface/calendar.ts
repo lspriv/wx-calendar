@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 19:52:11
+ * @LastEditTime: 2024-06-07 22:13:19
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
@@ -98,6 +98,7 @@ export interface WcAnnualMark {
 export type WcAnnualMarks = Map<string, WcAnnualMark>;
 
 export interface WcAnnualSub {
+  key?: string;
   color: string;
   text: string;
 }
@@ -505,6 +506,12 @@ export const sameAnnualSubs = (m1?: Array<WcAnnualSub>, m2?: Array<WcAnnualSub>)
   }
   return true;
 };
+
+export const fillAnnualSubs = (uk: string, year: number, subinfos?: Array<WcAnnualSub>) =>
+  subinfos?.map((item, i) => {
+    item.key = item.key || `AS_${uk}_${year}_${i}`;
+    return item;
+  });
 
 export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
 

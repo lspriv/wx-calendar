@@ -10,7 +10,7 @@
       <view 
         wx:for="{{ years[annualCurr].subinfo }}"
         wx:for-item="sub" 
-        wx:key="*this"
+        wx:key="key"
         class="wc__annual-header-tip" 
         style="--annual-tip-color: {{ sub.color }};">{{ sub.text }}</view>
     </view>
