@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 19:46:28
+ * @LastEditTime: 2024-06-07 12:40:19
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -27,7 +27,8 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  isViewFixed
+  isViewFixed,
+  onceEmiter
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
@@ -229,6 +230,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     async toggleView(view, fixed) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
+      console.log('_view', _view);
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
       await this._panel_.refreshView(_view, fixed);
       this.trigger('viewchange', { view: flagView(this._view_) });
@@ -240,25 +242,27 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       await this._panel_.refreshView(this._view_);
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
-    async selDate(e) {
-      const { wdx, ddx } = e.mark!;
-      const panel = this.data.panels[this.data.current];
-      const date = panel.weeks[wdx].days[ddx];
-      if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
-      const checked = normalDate(date);
-      const isWeekView = this._view_ & View.week;
-      if (date.kind === 'current') {
-        const sets = { info: getDateInfo(checked, isWeekView), checked };
-        if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
-        this._pointer_.update(sets, true);
-        this.setData(sets);
-        await this._panel_.update();
-      } else {
-        if (isWeekView) await this._panel_.toWeekAdjoin(date);
-        else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
-      }
-      this.trigger('click', { checked });
-      this.trigger('change', { checked });
+    selDate(e) {
+      this._calendar_.service.interceptEvent('click', e, async () => {
+        const { wdx, ddx } = e.mark!;
+        const panel = this.data.panels[this.data.current];
+        const date = panel.weeks[wdx].days[ddx];
+        if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
+        const checked = normalDate(date);
+        const isWeekView = this._view_ & View.week;
+        if (date.kind === 'current') {
+          const sets = { info: getDateInfo(checked, isWeekView), checked };
+          if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
+          this._pointer_.update(sets, true);
+          this.setData(sets);
+          await this._panel_.update();
+        } else {
+          if (isWeekView) await this._panel_.toWeekAdjoin(date);
+          else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
+        }
+        this.trigger('click', { checked });
+        this.trigger('change', { checked });
+      });
     },
     handlePointerAnimated() {
       this._pointer_.animationEnd();
@@ -409,8 +413,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail);
-      this.triggerEvent(event, detail);
+      const emiter = onceEmiter(this, event);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
+      emiter[0](detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;

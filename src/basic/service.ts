@@ -4,9 +4,9 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 00:55:40
+ * @LastEditTime: 2024-06-07 03:45:45
  */
-import { nextTick } from './tools';
+import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS } from './constants';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
 import {
@@ -40,7 +40,9 @@ import type {
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
+const PLUGIN_EVENT_INTERCEPT_PREFIX = 'PLUGIN_CATCH_';
 type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
+type PEI_PRE = typeof PLUGIN_EVENT_INTERCEPT_PREFIX;
 
 type Schedules = Array<WcScheduleMark>;
 
@@ -61,6 +63,22 @@ export type TrackYearResult = {
   marks?: WcAnnualMarks;
 };
 
+interface EventIntercept {
+  (): never;
+}
+interface PluginInterception {
+  /**
+   * 捕获日期点击
+   * @param service PliginService实例
+   * @param intercept 拦截
+   */
+  PLUGIN_CATCH_CLICK?(
+    service: PluginService,
+    event: WechatMiniprogram.TouchEvent<{}, { wdx: number; ddx: number }>,
+    intercept: EventIntercept
+  ): void;
+}
+
 interface PluginEventHandler {
   /**
    * 日历组件attche阶段
@@ -73,25 +91,25 @@ interface PluginEventHandler {
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail): void;
+  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
   /**
    * 日期点击触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail): void;
+  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
   /**
    * 日期变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail): void;
+  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail): void;
+  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
@@ -99,7 +117,7 @@ interface PluginEventHandler {
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
-export interface Plugin extends PluginEventHandler {
+export interface Plugin extends PluginEventHandler, PluginInterception {
   /**
    * PliginService初始化完成
    * @param service PliginService实例
@@ -204,14 +222,19 @@ export type ServicePluginMap<T extends Array<PluginConstructor>> = {
 };
 
 type PluginEventName<T> = T extends `${PEH_PRE}${infer R}` ? R : never;
+type PluginInterceptName<T> = T extends `${PEI_PRE}${infer R}` ? R : never;
 
 export type PluginEventNames = SnakeToLowerCamel<PluginEventName<keyof PluginEventHandler>>;
+export type PluginInterceptNames = SnakeToLowerCamel<PluginInterceptName<keyof PluginInterception>>;
 
 type PluginEventHandlerName<T extends PluginEventNames> = `${PEH_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
+type PluginEventInterceptName<T extends PluginInterceptNames> = `${PEI_PRE}${Uppercase<LowerCamelToSnake<T>>}`;
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
 export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
+
+class PluginInterceptError extends Error {}
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -381,6 +404,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     return this.setDates([...map.values()]);
   }
 
+  /**
+   * 范围更新
+   */
   public async updateRange(range: DateRange) {
     const panels = this.component.data.panels;
     const current = this.component.data.current;
@@ -484,7 +510,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param event 事件名
    * @param detail 事件详情数据
    */
-  public dispatchEvent<K extends PluginEventNames>(event: K, ...detail: any[]): void {
+  public dispatchEvent<K extends PluginEventNames>(event: K, ...detail: any[]) {
     const handler: PluginEventHandlerName<K> = `${PLUGIN_EVENT_HANDLE_PREFIX}${
       camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
@@ -494,6 +520,41 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       });
     } catch (e) {
       return;
+    }
+  }
+
+  /**
+   * 事件拦截
+   * @param event 事件名
+   * @param action 默认行为
+   */
+  public interceptEvent<K extends PluginInterceptNames>(
+    name: K,
+    event: WechatMiniprogram.BaseEvent,
+    action: (...args: any[]) => any
+  ) {
+    const handler: PluginEventInterceptName<K> = `${PLUGIN_EVENT_INTERCEPT_PREFIX}${
+      camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
+    }`;
+
+    function intercept(): never {
+      throw new PluginInterceptError();
+    }
+
+    const tasks: Array<(...args: any[]) => any> = [];
+
+    this.traversePlugins(plugin => {
+      if (plugin[handler]) tasks.push(plugin[handler]!.bind(plugin, this, event, intercept));
+    });
+
+    tasks.push(action);
+
+    while (tasks.length) {
+      try {
+        tasks.shift()!();
+      } catch (e) {
+        if (e instanceof PluginInterceptError) break;
+      }
     }
   }
 

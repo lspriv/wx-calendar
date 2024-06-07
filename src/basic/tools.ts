@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-02-17 18:45:02
+ * @LastEditTime: 2024-06-07 03:00:43
  */
 
 import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
@@ -141,4 +141,20 @@ export const viewportOffset = (component: ComponentInstance) => {
  */
 export const mergeStr = (strs: Array<string>, separator: string = ',') => {
   return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
+};
+
+export type OnceEmiter = [emit: (...detail: any[]) => void, cancel: () => void];
+/** 触发一次 */
+export const onceEmiter = (instance: ComponentInstance, event: string): OnceEmiter => {
+  let emits = 0;
+  return [
+    function emit(...detail: any[]) {
+      if (emits) return;
+      instance.triggerEvent(event, ...detail);
+      emits++;
+    },
+    function cancel() {
+      emits++;
+    }
+  ];
 };
