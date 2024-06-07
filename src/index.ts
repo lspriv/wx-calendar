@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 18:14:11
+ * @LastEditTime: 2024-06-07 18:40:33
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -237,7 +237,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     async toggleView(view, fixed) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
-      console.log('_view', _view);
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
       await this._panel_.refreshView(_view, fixed);
       this.trigger('viewchange', { view: flagView(this._view_) });

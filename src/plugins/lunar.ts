@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-02-20 14:08:21
+ * @LastEditTime: 2024-06-07 19:55:17
  */
 import { getAnnualMarkKey, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
 
@@ -431,7 +431,13 @@ export class LunarPlugin implements Plugin {
       }
     }
 
-    return { subinfo: lunarYear, marks };
+    return {
+      subinfo: [
+        { text: lunarYear, color: '#F56C6C' },
+        { text: '农历初一', color: '#409EFF' }
+      ],
+      marks
+    };
   }
 }
 

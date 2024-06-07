@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 18:13:59
+ * @LastEditTime: 2024-06-07 19:53:23
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS } from './constants';
@@ -20,7 +20,8 @@ import {
   styleParse,
   styleStringify,
   timestamp,
-  normalDate
+  normalDate,
+  sameAnnualSubs
 } from '../interface/calendar';
 
 import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
@@ -36,7 +37,8 @@ import type {
   WcScheduleMark,
   WcMark,
   WcAnnualMarks,
-  WcScheduleInfo
+  WcScheduleInfo,
+  WcAnnualSub
 } from '../interface/calendar';
 
 const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
@@ -59,7 +61,7 @@ type WalkDateRecord = {
 };
 
 export type TrackYearResult = {
-  subinfo?: string;
+  subinfo?: Array<WcAnnualSub>;
   marks?: WcAnnualMarks;
 };
 
@@ -286,10 +288,9 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   private walkForYear(year: WcYear) {
     const record: TrackYearResult = {};
     this.traversePlugins(plugin => {
-      if (record.subinfo && record.marks) return;
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
-        if (result.subinfo) record.subinfo = result.subinfo;
+        if (result.subinfo) record.subinfo = [...(record.subinfo || []), ...result.subinfo];
         if (result.marks?.size) record.marks = mergeAnnualMarks(record.marks, result.marks);
       }
     });
@@ -350,7 +351,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
-        if (year.result.subinfo !== years[ydx].subinfo) sets[`years[${ydx}].subinfo`] = year.result.subinfo || null;
+        if (!sameAnnualSubs(year.result.subinfo, years[ydx].subinfo))
+          sets[`years[${ydx}].subinfo`] = year.result.subinfo || null;
         if (!sameAnnualMarks(this.component._years_[ydx].marks, year.result.marks)) {
           this.component._years_[ydx].marks = year.result.marks || new Map();
           this.component._printer_.update([ydx]);
@@ -470,7 +472,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         const year = years[ydx];
         const result = this.walkForYear(year);
         if (result) {
-          if (result.subinfo !== year.subinfo) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
+          if (!sameAnnualSubs(result.subinfo, year.subinfo)) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
           if (!sameAnnualMarks(this.component._years_[ydx].marks, result.marks)) {
             this.component._years_[ydx].marks = result.marks || new Map();
             ydxs.push(ydx);
@@ -571,7 +573,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * 遍历插件
    * @param callback 执行
    */
-  private traversePlugins(callback: TraverseCallback): void {
+  public traversePlugins(callback: TraverseCallback): void {
     for (let i = this._plugins_.length; i--; ) {
       const plugin = this._plugins_[i];
       callback(plugin.instance, plugin.key);

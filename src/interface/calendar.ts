@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 20:02:11
+ * @LastEditTime: 2024-06-07 19:52:11
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
@@ -97,10 +97,15 @@ export interface WcAnnualMark {
 
 export type WcAnnualMarks = Map<string, WcAnnualMark>;
 
+export interface WcAnnualSub {
+  color: string;
+  text: string;
+}
+
 export interface WcYear {
   key: string;
   year: number;
-  subinfo: string;
+  subinfo?: Array<WcAnnualSub>;
 }
 
 export interface WcSubYear {
@@ -490,6 +495,17 @@ export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
   return true;
 };
 
+export const sameAnnualSubs = (m1?: Array<WcAnnualSub>, m2?: Array<WcAnnualSub>) => {
+  if (!m1?.length && !m2?.length) return true;
+  if (m1?.length !== m2?.length) return false;
+  for (let i = 0; i < m1!.length; i++) {
+    const m1s = m1![i];
+    const m2s = m2![i];
+    if (m1s.color !== m2s.color || m1s.text !== m2s.text) return false;
+  }
+  return true;
+};
+
 export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
 
 export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -537,7 +553,7 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     const months: Array<WcAnnualMonth> = Array.from({ length: 12 }, (_, i) =>
       createYearMonth({ year, month: i + 1 }, weekstart)
     );
-    const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WcFullYear;
+    const y = { key: `Y_${year}`, year, subinfo: [], months, marks: new Map() } as WcFullYear;
     this.service.catchYear(y);
     return y;
   }

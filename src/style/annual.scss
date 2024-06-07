@@ -61,18 +61,21 @@
     color: theme(annual-title-color);
   }
   &-tips {
-    margin-left: 16rpx;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: start;
+    height: 42rpx;
   }
   &-tip {
     position: relative;
     padding-left: 26rpx;
+    margin-left: 16rpx;
     font-size: theme(annual-title-sub-size);
     line-height: 1;
     min-height: theme(annual-title-sub-size);
     color: theme(annual-title-sub-color);
-    &:first-child {
-      margin-bottom: 6rpx;
-    }
     &::before {
       content: "";
       position: absolute;
@@ -80,12 +83,9 @@
       width: 14rpx;
       left: 0;
       top: 50%;
-      background-color: $wc-primary-1;
+      background-color: var(--annual-tip-color);
       border-radius: 2rpx;
       transform: translateY(-50%);
-    }
-    &:first-child::before {
-      background-color: $wc-error;
     }
   }
 }
