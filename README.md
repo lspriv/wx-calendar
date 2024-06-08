@@ -452,7 +452,9 @@ import {
   PluginService,
   WcScheduleInfo,
   CalendarEventDetail,
-  getMarkKey
+  DateRange,
+  getMarkKey,
+  getAnnualMarkKey
 } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
@@ -492,16 +494,17 @@ class MyPlugin implements Plugin {
    */
   PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
+
     return {
       subinfo: [
         { text: '乙巳蛇年', color: '#F56C6C' },
         { text: '农历初一', color: '#409EFF' }
       ], 
       marks: new Map([
-        ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
-        ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
-        ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
-        ['2024-6-7', { 
+        [getAnnualMarkKey({ month: 10, day: 6 }), { rwtype: 'rest' }], // 休息日，置灰
+        [getAnnualMarkKey({ month: 10, day: 7 }), { rwtype: 'work' }], // 工作日，正常
+        [getAnnualMarkKey({ month: 10, day: 12 }), { sub: '#F56C6C' }] // 自定义颜色下标
+        [getAnnualMarkKey({ month: 10, day: 20 }), { 
           style: {
             color: { light: '#fff', dark: '#000' }, // 日期字体颜色
             bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
@@ -601,7 +604,7 @@ class MyPlugin implements Plugin {
    * @param dates 待过滤的日期数组
    * @param type range范围  multi多点
    */
-  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<Calendar | Calendar[]> {
+  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<Calendar | DateRange> {
      // 获取日历组件实例
     const component = service.component;
 
