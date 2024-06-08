@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 23:43:41
+ * @LastEditTime: 2024-06-09 00:20:20
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -187,7 +187,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;
       const initView = flagView(this._view_);
-      // this.$_gesture.value = this.data.viewGesture;
+      this.$_gesture.value = this.data.viewGesture;
       const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
       const areaHideCls = layoutHideCls(this.data.areas);
 
