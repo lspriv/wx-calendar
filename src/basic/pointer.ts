@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2024-02-12 22:20:07
+ * @LastEditTime: 2024-06-06 12:26:20
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
@@ -32,7 +32,20 @@ export interface CalendarPointer {
 }
 
 export const createPointer = (opts?: Partial<CalendarPointer>) =>
-  ({ x: 0, y: 0, show: true, animate: true, transition: true, ...opts }) as CalendarPointer;
+  ({ x: 0, y: 0, show: false, animate: true, transition: true, ...opts }) as CalendarPointer;
+
+const calcCurrIdx = (mon: WcMonth, checked: CalendarDay): PointerIndexLocation => {
+  const { month, day } = checked;
+  const idx = findDateIndex(mon.weeks, date => date.month == month && date.day == day);
+  return { ddx: idx % 7, wdx: Math.floor(idx / 7), len: mon.weeks.length };
+};
+
+const calcPosition = (mon: WcMonth, checked: CalendarDay, centres: number[]): PointerLocation => {
+  const { ddx, wdx, len } = calcCurrIdx(mon, checked);
+  const x = `${centres[ddx]}px`;
+  const y = `calc(100% / ${len} * ${wdx})`;
+  return { x, y };
+};
 
 /**
  * 这个最开始是分skyline和webview渲染的，
@@ -41,9 +54,17 @@ export const createPointer = (opts?: Partial<CalendarPointer>) =>
  * TODO: skyline和worklet分开?
  */
 export class Pointer extends CalendarHandler {
+  /** 控制显隐 */
+  public show: boolean = true;
+
   private _vibrate_: boolean;
 
-  public update(sets?: Partial<CalendarData>, vibrate: boolean = false, checked?: CalendarDay, flush: boolean = false) {
+  public update(
+    sets?: Partial<CalendarData>,
+    vibrate: boolean = false,
+    checked?: CalendarDay,
+    flush: boolean = false
+  ): void {
     const instance = this._instance_;
     checked = checked || sets?.checked || instance.data.checked!;
     const current = sets?.current ?? instance.data.current;
@@ -51,20 +72,20 @@ export class Pointer extends CalendarHandler {
 
     this._vibrate_ = vibrate;
 
-    const { x, y } = Pointer.calcPosition(panel, checked, instance._centres_);
+    const { x, y } = calcPosition(panel, checked, instance._centres_);
 
     if (sets?.pointer) {
-      sets.pointer = { ...sets.pointer, x, y, show: true, animate: true };
+      sets.pointer = { ...sets.pointer, x, y, show: this.show, animate: true };
     } else if (sets) {
       sets[`pointer.x`] = x;
       sets[`pointer.y`] = y;
-      sets[`pointer.show`] = true;
+      sets[`pointer.show`] = this.show;
       sets[`pointer.animate`] = !flush;
     } else {
       instance.setData({
         [`pointer.x`]: x,
         [`pointer.y`]: y,
-        [`pointer.show`]: true,
+        [`pointer.show`]: this.show,
         [`pointer.animate`]: !flush
       });
     }
@@ -75,23 +96,8 @@ export class Pointer extends CalendarHandler {
     instance.setData({
       ['pointer.animate']: false
     });
-    if (instance.data.vibrate && this._vibrate_) {
+    if (instance.data.vibrate && this._vibrate_ && this.show) {
       wx.vibrateShort({ type: 'light' });
     }
-  }
-
-  public static calcCurrIdx(mon: WcMonth, checked: CalendarDay): PointerIndexLocation {
-    const { month, day } = checked;
-    const idx = findDateIndex(mon.weeks, date => date.month == month && date.day == day);
-    return { ddx: idx % 7, wdx: Math.floor(idx / 7), len: mon.weeks.length };
-  }
-
-  public static calcPosition(mon: WcMonth, checked: CalendarDay, centres: number[]): PointerLocation {
-    const { ddx, wdx, len } = this.calcCurrIdx(mon, checked);
-
-    const x = `${centres[ddx]}px`;
-    const y = `calc(100% / ${len} * ${wdx})`;
-
-    return { x, y };
   }
 }

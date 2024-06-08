@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 12:42:30
+ * @LastEditTime: 2024-06-07 16:30:13
  */
 import { View } from './constants';
 
@@ -34,7 +34,7 @@ export class Layout {
   public static theme?: Theme;
   /** 设备像素比 */
   public static dpr: number = 1;
-  /** 常规状态下（月视图）的日历总高度，单位rpx */
+  /** 常规状态下（月视图）的日历主面板高度，单位rpx */
   public static CalendarMainHeight: number = 600;
   /** 日历头部高度，单位rpx */
   public static CalendarHeaderHeight: number = 100;

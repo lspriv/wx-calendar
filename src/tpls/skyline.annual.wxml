@@ -7,8 +7,12 @@
   <view class="wc__annual-header">
     <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
     <view class="wc__annual-header-tips">
-      <view class="wc__annual-header-tip">{{ years[annualCurr].subinfo }}</view>
-      <view class="wc__annual-header-tip">农历初一</view>
+      <view 
+        wx:for="{{ years[annualCurr].subinfo }}"
+        wx:for-item="sub" 
+        wx:key="key"
+        class="wc__annual-header-tip" 
+        style="--annual-tip-color: {{ sub.color }};">{{ sub.text }}</view>
     </view>
   </view>
   <view class="wc__annual-panel-container">

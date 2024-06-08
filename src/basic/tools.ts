@@ -4,14 +4,14 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-02-17 18:45:02
+ * @LastEditTime: 2024-06-07 23:21:38
  */
 
-import { WEEKS, VIEWS, CALENDAR_PANELS, View } from './constants';
+import { WEEKS, VIEWS, CALENDAR_PANELS, FULL_LAYOUT, View } from './constants';
 import { values } from '../utils/shared';
 
 import type { Voidable } from '../utils/shared';
-import type { CalendarWeek } from '../interface/component';
+import type { CalendarWeek, LayoutArea } from '../interface/component';
 
 export type BoundingClientRects = Array<WechatMiniprogram.BoundingClientRectCallbackResult>;
 
@@ -26,10 +26,6 @@ export type CalendarView = (typeof VIEWS)[keyof typeof VIEWS];
 export const viewFlag = (view: string, defaultView = VIEWS.MONTH): View => {
   const inputView = view.match(/^(\w+)(?:-fixed)?$/)?.[1] || defaultView;
   return Math.max(0, 1 << values(VIEWS).indexOf(inputView as CalendarView));
-};
-
-export const isViewFixed = (view: string): boolean => {
-  return new RegExp(`^(${Object.values(VIEWS).join('|')})-fixed$`).test(view);
 };
 
 export const isView = (view: unknown): view is View =>
@@ -142,3 +138,36 @@ export const viewportOffset = (component: ComponentInstance) => {
 export const mergeStr = (strs: Array<string>, separator: string = ',') => {
   return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
 };
+
+export interface OnceEmiter {
+  emit: (...detail: any[]) => void;
+  cancel: () => void;
+}
+/** 触发一次 */
+export const onceEmiter = (instance: ComponentInstance, event: string): OnceEmiter => {
+  let emits = 0;
+  return {
+    emit: function (...detail: any[]) {
+      if (emits) return;
+      instance.triggerEvent(event, ...detail);
+      emits++;
+    },
+    cancel: function () {
+      emits++;
+    }
+  };
+};
+
+export const layoutHideCls = (layout?: Array<LayoutArea>): string => {
+  if (!layout?.length) return '';
+  const hideAreas = FULL_LAYOUT.filter(item => !layout.includes(item));
+  return hideAreas.map(item => `wc--hide-${item}`).join(' ');
+};
+
+export const addLayoutHideCls = (cls: string, area: LayoutArea): string => {
+  const reg = new RegExp(`wc--hide-${area}\\s*`);
+  if (reg.test(cls)) return cls;
+  return `${cls} wc--hide-${area}`;
+};
+
+export const hasLayoutArea = (cls: string, area: LayoutArea) => !new RegExp(`wc--hide-${area}\\s*`).test(cls);

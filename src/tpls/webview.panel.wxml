@@ -67,10 +67,10 @@
               wc__panel-date
               wc__panel-date--{{ day.kind }} 
               {{ day.today ? 'wc__panel-date--today' : '' }}
-              {{ tool_wxs.isChecked(day, checked) ? 'wc__panel-date--checked' : '' }}
+              {{ tool_wxs.isChecked(pointer, day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
             ">
-            <view class="wc__panel-day" catchtap="selDate">
+            <view class="wc__panel-day" style="{{ day.style }}" catchtap="selDate">
               <view class="wc__panel-solar">{{ day.day }}<view 
                 wx:if="{{ day.corner }}"
                 class="wc__panel-corner"

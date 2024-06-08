@@ -25,16 +25,16 @@
 ### 使用
 小程序基础库 `SDKVersion` >= 3.0.0
 
-#### 安装
+#### 1.安装
 ```bash
 npm i @lspriv/wx-calendar -S
 ```
 
-#### 构建
+#### 2.构建
 微信小程序开发工具菜单栏：`工具` --> `构建 npm`
 [*官方文档*](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html#_2-%E6%9E%84%E5%BB%BA-npm)
 
-#### 引入配置
+#### 3.引入配置
 在页面或全局配置文件中配置
 ```json
 {
@@ -44,7 +44,7 @@ npm i @lspriv/wx-calendar -S
 }
 ```
 
-#### 页面使用
+#### 4.页面使用
 在页面wxml文件中使用
 ```html
 <calendar id="calendar" bindload="handleLoad" />
@@ -103,8 +103,8 @@ type CalendarDay = {
     <tr>
         <td>view</td>
         <td>string</td>
-        <td>视图，加后缀fixed可固定视图</td>
-        <td>month[week|schedule][-fixed]</td>
+        <td>视图</td>
+        <td>month[week|schedule]</td>
     </tr>
     <tr>
         <td>marks</td>
@@ -160,7 +160,35 @@ type CalendarDay = {
         <td>组件所在页面是否自定义导航栏</td>
         <td>true</td>
     </tr>
+    <tr>
+        <td>areas</td>
+        <td>array</td>
+        <td>自定义布局区域</td>
+        <td>['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar']</td>
+    </tr>
+    <tr>
+        <td>viewGesture</td>
+        <td>boolean</td>
+        <td>是否滑动手势控制视图</td>
+        <td>true</td>
+    </tr>
 </table>
+
+> [!TIP] 
+> 1.7.0+版本已经移除了固定视图，新增手势控制属性 `viewGesture` ，用一下方式实现固定视图，有更高的自由度
+
+固定视图的新方式
+```html
+<!-- 固定为周视图 -->
+<!-- view 默认初始视图 -->
+<!-- view-gesture 取消手势控制 -->
+<!-- areas 只保留四个区域，将viewbar和dragbar移除 -->
+<calendar 
+  view="week"
+  view-gesture="{{ false }}"
+  areas="{{ ['header', 'title', 'subinfo', 'today'] }}"
+/>
+```
 
 > [!TIP] 
 > 关于属性 `marks`
@@ -175,6 +203,14 @@ type CalendarDay = {
 >   text: string; // 内容
 >   color: string; // 文本色
 >   bgColor?: string; // 背景色，type为schedule时可选
+> }
+> // 样式标记
+> type StyleMark = {
+>   year?: number; // 年
+>   month?: number; // 月 
+>   day?: number; // 日
+>   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | 
+>   style: string | Record<string, string | number>;
 > }
 > ```
 > 角标内容最好一个字符长度，只对一个字符校正了位置，多出的请自行调整位置
@@ -445,7 +481,8 @@ class MyPlugin implements Plugin {
     return {
       schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', MyPlugin.KEY) }], // 设置日程数组，可选
       corner: { text: '', color: '' }, // 设置角标，可选
-      festival: { text: '', color: '' } // 设置节假日，可选
+      festival: { text: '', color: '' }, // 设置节假日，可选
+      style: { backgroundColor: '', color: '' } // 设置日期样式，也可传字符串形式（如 'background-color: #409EFF;color: #fff;'），可选
     };
   };
   
@@ -456,11 +493,25 @@ class MyPlugin implements Plugin {
   PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
     return {
-      subinfo: '', // 设置年份描述信息，可选
+      subinfo: [
+        { text: '乙巳蛇年', color: '#F56C6C' },
+        { text: '农历初一', color: '#409EFF' }
+      ], 
       marks: new Map([
         ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
         ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
         ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
+        ['2024-6-7', { 
+          style: {
+            color: { light: '#fff', dark: '#000' }, // 日期字体颜色
+            bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
+            bgTLRadius: { light: 50, dark: 50 }, // 日期背景左上圆角半径
+            bgTRRadius: { light: 0, dark: 0 }, // 日期背景右上圆角半径
+            bgBLRadius: { light: 0, dark: 0 }, // 日期背景左下圆角半径
+            bgBRRadius: { light: 50, dark: 50 }, // 日期背景右下圆角半径
+            bgWidth: { light: 'dateCol', dark: 'dateCol' } // 日期背景宽度，deteCol为列宽
+          } 
+        }]
       ])
     }
   };
@@ -471,6 +522,16 @@ class MyPlugin implements Plugin {
    * @param id 插件内标记, 由 getMarkKey 生成 key 时传入的 id，详见 PLUGIN_TRACK_DATE
    */
   PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {}
+
+  /**
+   * 注册日历组件attach阶段处理方法，可选择实现该方法
+   * 此时组件内部工具类初始化完成
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_ATTACH(service: PluginService) {
+    // 获取日历组件实例
+    const component = service.component;
+  }
 
   /**
    * 注册日历加载完成事件处理方法，可选择实现该方法
@@ -519,6 +580,35 @@ class MyPlugin implements Plugin {
   PLUGIN_ON_DETACHED(service: PluginService) {
     // 获取日历组件实例
     const component = service.component;
+  }
+
+  /**
+   * 拦截日期点击动作，可选择实现该方法
+   * @param service PliginService实例
+   * @param event 事件参数
+   * @param intercept 拦截器
+   */
+  PLUGIN_CATCH_TAP(service: PluginService, event: TouchEvent, intercept: EventIntercept) {
+     // 获取日历组件实例
+    const component = service.component;
+    // 若不想事件继续传播
+    if (...) intercept();
+  }
+
+  /**
+   * 日期过滤器（提供给其他组件调用的），可选择实现该方法
+   * @param service PliginService实例
+   * @param dates 待过滤的日期数组
+   * @param type range范围  multi多点
+   */
+  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<Calendar | Calendar[]> {
+     // 获取日历组件实例
+    const component = service.component;
+
+    return [
+      [{ year: 2024, month: 6, day: 1 } , { year: 2024, month: 6, day: 28 }], // 日期范围
+      { year: 2024, month: 7, day: 1 } // 单点日期
+    ]
   }
 }
 ```
