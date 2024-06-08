@@ -601,9 +601,14 @@ class MyPlugin implements Plugin {
    * @param dates 待过滤的日期数组
    * @param type range范围  multi多点
    */
-  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi') {
+  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<Calendar | Calendar[]> {
      // 获取日历组件实例
     const component = service.component;
+
+    return [
+      [{ year: 2024, month: 6, day: 1 } , { year: 2024, month: 6, day: 28 }], // 日期范围
+      { year: 2024, month: 7, day: 1 } // 单点日期
+    ]
   }
 }
 ```

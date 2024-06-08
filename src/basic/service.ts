@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 18:20:27
+ * @LastEditTime: 2024-06-08 18:41:10
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -147,7 +147,11 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
    * @param service PliginService实例
    * @param dates 日期数组
    */
-  PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<CalendarDay>;
+  PLUGIN_DATES_FILTER?(
+    service: PluginService,
+    dates: Array<CalendarDay>,
+    type?: 'range' | 'multi'
+  ): Array<CalendarDay | CalendarDay[]>;
 }
 
 export interface PluginConstructor {

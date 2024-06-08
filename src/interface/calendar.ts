@@ -4,8 +4,9 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 16:53:25
+ * @LastEditTime: 2024-06-08 20:06:04
  */
+import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
 import { PluginService } from '../basic/service';
@@ -153,6 +154,8 @@ export const styleStringify = (style: DateStyle) => {
     .join('');
 };
 
+export const themeStyle = (style?: WcDateStyle): string | number | undefined => style?.[Layout.theme!] || style?.light;
+
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
 
 /**
@@ -237,6 +240,12 @@ export const formDateByStrKey = (key: string): CalendarDay => {
 export const getMonthDays = (mon: CalendarMonth) => {
   return new Date(mon.year, mon.month, 0).getDate();
 };
+
+/**
+ * 是否闰年
+ * @param y 年
+ */
+export const isLeapYear = (y: number) => (y % 100 != 0 && y % 4 === 0) || y % 400 === 0;
 
 /**
  * 创建CalendarDay

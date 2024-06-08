@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 13:56:51
+ * @LastEditTime: 2024-06-08 18:49:25
  */
 
 import type { LayoutArea } from '../interface/component';
@@ -25,9 +25,9 @@ export const FONT = 'ui-sans-serif';
 
 export const WEEKS = '日一二三四五六';
 
-export const FULL_LAYOUT: Array<LayoutArea> = ['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar'];
+export const FULL_LAYOUT = ['header', 'title', 'subinfo', 'today', 'viewbar', 'dragbar'] as const;
 
-export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const;
 
 export const MS_ONE_DAY = 86400000;
 

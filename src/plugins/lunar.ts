@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 17:56:47
+ * @LastEditTime: 2024-06-08 18:48:28
  */
 import { GREGORIAN_MONTH_DAYS } from '../basic/constants';
-import { getAnnualMarkKey } from '../interface/calendar';
+import { getAnnualMarkKey, isLeapYear } from '../interface/calendar';
 
 import type { Plugin, TrackDateResult, TrackYearResult } from '../basic/service';
 import type { CalendarDay, WcYear, WcAnnualMark, WcAnnualMarks } from '../interface/calendar';
@@ -166,8 +166,6 @@ const SOLAR_TERM_REVISES: Array<LunarRevise> = [
   { solar: PRINCIPLE_TERM_NAMES[2], year: 2084, month: 3, wrong: 20, correct: 19 },
   { solar: SECTIONAL_TERM_NAMES[5], year: 2094, month: 6, wrong: 6, correct: 5 }
 ];
-
-const isLeapYear = (y: number) => (y % 100 != 0 && y % 4 === 0) || y % 400 === 0;
 
 const absFloor = (number: number) => {
   if (number < 0) {
