@@ -4,16 +4,16 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-03-04 16:02:11
+ * @LastEditTime: 2024-06-08 21:46:06
  */
 import { CalendarHandler } from '../interface/component';
-import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
+import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
-import { nodeRect, viewportOffset } from './tools';
+import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
 
-import type { CalendarDay, CalendarMonth, WcAnnualMonth, WcFullYear } from '../interface/calendar';
+import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
 
 const ANIMATE_FRAMES = 20;
@@ -191,6 +191,8 @@ export class YearPrinter extends CalendarHandler {
   /** 处理系统深色模式的监听 */
   private _theme_listener_?: ThemeListener;
 
+  public renderCheckedBg: boolean;
+
   public async initialize() {
     const { fonts, weekstart, darkside } = this._instance_.data;
     this._font_ = fonts;
@@ -244,6 +246,8 @@ export class YearPrinter extends CalendarHandler {
     if (!this._instance_.data.customNavBar) {
       this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
     }
+    const hasHeader = hasLayoutArea(this._instance_.data.areaHideCls, 'header');
+    this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
   }
 
   private initializeCanvas(id: string) {
@@ -435,7 +439,8 @@ export class YearPrinter extends CalendarHandler {
     const checked = this._instance_.data.checked!;
     frame.checked = isMax || !month ? null : inMonthDate(year, month, checked.day);
     frame.todayIsChecked = !!frame.checked && isToday(frame.checked);
-    frame.todayCheckedColor = frame.todayIsChecked || isMax || !canvas.frame ? color('checked') : PrimaryColor;
+    frame.todayCheckedColor =
+      this.renderCheckedBg && (frame.todayIsChecked || isMax || !canvas.frame) ? color('checked') : PrimaryColor;
   }
 
   public render(canvas: Canvas, year: WcFullYear, month?: number) {
@@ -475,7 +480,7 @@ export class YearPrinter extends CalendarHandler {
     this.renderWeek(canvas, { x, y: y + frame.titleHeight }, frame);
     const _y = y + frame.titleHeight + frame.weekHeight;
     frame.dateOuterHeight = this.calcDateOuterHeight(canvas, mon, frame);
-    this.renderChecked(canvas, mon, { x, y: _y }, frame);
+    if (this.renderCheckedBg) this.renderChecked(canvas, mon, { x, y: _y }, frame);
     this.renderDates(canvas, mon, year.marks, { x, y: _y }, frame, alpha);
   }
 
@@ -580,24 +585,27 @@ export class YearPrinter extends CalendarHandler {
 
       const _x = x + frame.monthPaddingX + w * frame.dateCol + frame.dateCol / 2;
       const _y = y + rdx * height + frame.dateHeight / 2;
+      const locate = { x: _x, y: _y };
 
       const day = i - month.start + 1;
       const date = { year: month.year, month: month.month, day };
+      const mark = marks.get(getAnnualMarkKey(date));
 
-      ctx!.fillStyle = isToday(date)
-        ? frame.todayCheckedColor!
-        : showRest
-          ? (() => {
-              const mark = marks.get(getAnnualMarkKey(date));
-              if (mark?.rwtype === 'work') return frame.dateColor;
-              if (mark?.rwtype === 'rest' || this.isWeekend(w)) return frame.restColor;
-              return frame.dateColor;
-            })()
-          : frame.dateColor;
+      if (mark?.style?.bgColor) {
+        this.renderDateBg(canvas, mark.style, locate, frame);
+      }
+
+      ctx!.fillStyle =
+        <string>themeStyle(mark?.style?.color) ||
+        (isToday(date)
+          ? frame.todayCheckedColor!
+          : showRest && (mark?.rwtype === 'rest' || (this.isWeekend(w) && mark?.rwtype !== 'work'))
+            ? frame.restColor
+            : frame.dateColor);
 
       ctx!.fillText(`${day}`, _x, _y);
 
-      this.renderMark(canvas, date, marks, { x: _x, y: _y }, frame, alpha);
+      this.renderMark(canvas, date, marks, locate, frame, alpha);
     }
   }
 
@@ -630,6 +638,51 @@ export class YearPrinter extends CalendarHandler {
 
       ctx.globalAlpha = alpha;
     }
+  }
+
+  private renderDateBg(canvas: Canvas, style: WcAnnualDateStyle, locate: Location, frame: AnnualFrames) {
+    const ctx = canvas.ctx!;
+    const { x, y } = locate;
+    const bgTLRadius = this.dateBgRadius(frame.checkedRadius, <number>themeStyle(style.bgTLRadius));
+    const bgTRRadius = this.dateBgRadius(frame.checkedRadius, <number>themeStyle(style.bgTRRadius));
+    const bgBLRadius = this.dateBgRadius(frame.checkedRadius, <number>themeStyle(style.bgBLRadius));
+    const bgBRRadius = this.dateBgRadius(frame.checkedRadius, <number>themeStyle(style.bgBRRadius));
+
+    const ws = themeStyle(style.bgWidth);
+    const hw = ws ? frame[ws] / 2 + 1 : frame.checkedRadius;
+    const hh = frame.checkedRadius;
+    const cy = y + frame.checkedOffset;
+
+    ctx.fillStyle = <string>themeStyle(style.bgColor) || 'rgba(0,0,0,0)';
+
+    ctx.save();
+    ctx.beginPath();
+    // top-left
+    if (bgTLRadius) ctx.arc(x - hw + bgTLRadius, cy - hh + bgTLRadius, bgTLRadius, 1 * Math.PI, 1.5 * Math.PI);
+    else ctx.moveTo(x - hw, cy - hh);
+
+    // top-right
+    if (bgTRRadius) ctx.arc(x + hw - bgTRRadius, cy - hh + bgTRRadius, bgTRRadius, 1.5 * Math.PI, 2 * Math.PI);
+    else ctx.lineTo(x + hw, cy - hh);
+
+    // bottom-right
+    if (bgBRRadius) ctx.arc(x + hw - bgBRRadius, cy + hh - bgBRRadius, bgBRRadius, 0, 0.5 * Math.PI);
+    else ctx.lineTo(x + hw, cy + hh);
+
+    // bottom-left
+    if (bgBLRadius) ctx.arc(x - hw + bgBLRadius, cy + hh - bgBLRadius, bgBLRadius, 0.5 * Math.PI, 1 * Math.PI);
+    else ctx.lineTo(x - hw, cy + hh);
+
+    ctx.closePath();
+    ctx.clip();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  private dateBgRadius(checkedRadius: number, radius?: number): number {
+    if (!radius) return 0;
+    if (radius > 50) return checkedRadius;
+    return Math.floor((radius * checkedRadius * 2) / 100);
   }
 
   /**

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-02-23 21:00:51
+ * @LastEditTime: 2024-06-05 19:41:20
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -45,8 +45,8 @@ export type LowerCamelToSnake<T extends string> = T extends `${infer R}${infer P
     : `_${Lowercase<R>}${LowerCamelToSnake<P>}`
   : T;
 
-export const camelToSnake = <T extends string>(str: T) =>
-  str.replace(/([A-Z])/g, '_$1').toLowerCase() as LowerCamelToSnake<T>;
+export const camelToSnake = <T extends string>(str: T, separator: string = '_') =>
+  str.replace(/([A-Z])/g, `${separator}$1`).toLowerCase() as LowerCamelToSnake<T>;
 
 type AllAwaited<T> = T extends [infer R, ...infer P]
   ? [Awaited<R>, ...AllAwaited<P>]
@@ -73,3 +73,16 @@ export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, k
     },
     {} as Pick<T, Exclude<keyof T, K>>
   );
+
+export const strToStyle = (str: string) => {
+  return str.split(';').reduce(
+    (acc, item) => {
+      if (item) {
+        const [k, v] = item.split(':').map(s => s.trim());
+        if (k) acc[k] = v.trim();
+      }
+      return acc;
+    },
+    {} as Record<string, string | number>
+  );
+};

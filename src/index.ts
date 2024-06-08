@@ -4,11 +4,11 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-03-18 17:35:35
+ * @LastEditTime: 2024-06-07 23:43:41
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
-import { VERSION, CALENDAR_PANELS, PURE_PROPS, View, VIEWS, SELECTOR, FONT } from './basic/constants';
+import { VERSION, CALENDAR_PANELS, View, PURE_PROPS, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
 import { Layout } from './basic/layout';
@@ -27,12 +27,13 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  isViewFixed
+  onceEmiter,
+  layoutHideCls
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
-import type { WcYear, CalendarMark } from './interface/calendar';
+import type { WcYear, CalendarMark, CalendarStyleMark } from './interface/calendar';
 import type { CalendarView } from './basic/tools';
 import type {
   CalendarData,
@@ -93,6 +94,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     customNavBar: {
       type: Boolean,
       value: true
+    },
+    viewGesture: {
+      type: Boolean,
+      value: true
+    },
+    areas: {
+      type: Array
     }
   },
   data: {
@@ -105,13 +113,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     currView: VIEWS.MONTH,
     initView: VIEWS.MONTH,
     transView: null,
-    viewFixed: false,
+    gesture: false,
     annualCurr: null,
     annualTop: '-150vh',
     annualOpacity: 0,
     annualDuration: 300,
     offsetChange: false,
     darkside: true,
+    areaHideCls: '',
     layout: null,
     pointer: null,
     fonts: FONT,
@@ -129,7 +138,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     detached() {
       this._printer_?.cancelThemeChange();
-      this._calendar_.service.dispatchEventHandle('detached');
+      this._calendar_.service.dispatchEvent('detached');
     }
   },
   methods: {
@@ -137,7 +146,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const { shared } = wx.worklet;
       this.$_swiper_trans = shared(0);
       this.$_annual_trans = shared(0);
-      this.$_view_fixed = shared(false);
+      this.$_gesture = shared(false);
       this.$_calendar_width = shared(0);
     },
     initializeView() {
@@ -148,7 +157,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       /**
        * 实例化拖拽控制器
        */
-      this._dragger_ = new Dragger(this);
+      isSkyline(this.renderer) && (this._dragger_ = new Dragger(this));
       /**
        * 实例化WxCalendar处理数据和插件
        */
@@ -163,8 +172,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this._printer_ = new YearPrinter(this);
 
       if (!isSkylineRender) {
-        this._dragger_?.clear();
-        this._annual_.clearSkyline();
         this._swiper_accumulator_ = 0;
         this._swiper_flag_ = false;
       }
@@ -180,8 +187,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       const fonts = this.data.font ? mergeStr([this.data.font, FONT]) : FONT;
       const initView = flagView(this._view_);
-      this.$_view_fixed.value = isViewFixed(this.data.view);
+      // this.$_gesture.value = this.data.viewGesture;
       const layout = omit(Layout.layout!, ['windowWidth', 'windowHeight']);
+      const areaHideCls = layoutHideCls(this.data.areas);
 
       const sets: Partial<CalendarData> = {
         renderer: this.renderer!,
@@ -195,14 +203,19 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         annualCurr: isSkylineRender ? null : initCurrent,
         currView: initView,
         initView,
-        viewFixed: this.$_view_fixed.value,
+        gesture: this.data.viewGesture,
         info: getDateInfo(checked, isWeekView),
         pointer: createPointer(),
-        darkside: this.data.darkmode && Layout.darkmode
+        darkside: this.data.darkmode && Layout.darkmode,
+        areaHideCls
       };
+
       this._pointer_.update(sets);
+      this._calendar_.service.dispatchEvent('attach', sets);
+
       this.setData(sets);
       this._loaded_ = true;
+
       wx.nextTick(async () => {
         if (isSkylineRender) this._dragger_!.bindAnimations();
         await this._printer_.initialize();
@@ -225,10 +238,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     toToday() {
       this._panel_.toDate(WxCalendar.today);
     },
-    async toggleView(view, fixed) {
+    async toggleView(view) {
       const _view = isView(view) ? view : this._view_ & View.week ? View.month : View.week;
       if (isSkyline(this.renderer)) await this._dragger_!.toView(_view, true);
-      await this._panel_.refreshView(_view, fixed);
+      await this._panel_.refreshView(_view);
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
     async calendarTransitionEnd() {
@@ -238,26 +251,27 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       await this._panel_.refreshView(this._view_);
       this.trigger('viewchange', { view: flagView(this._view_) });
     },
-    async selDate(e) {
-      const { wdx, ddx } = e.mark!;
-      const panel = this.data.panels[this.data.current];
-      const date = panel.weeks[wdx].days[ddx];
-      if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
-      const checked = normalDate(date);
-      // this.trigger('click', { checked });
-      const isWeekView = this._view_ & View.week;
-      if (date.kind === 'current') {
-        const sets = { info: getDateInfo(checked, isWeekView), checked };
-        if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
-        this._pointer_.update(sets, true);
-        this.setData(sets);
-        await this._panel_.update();
-      } else {
-        if (isWeekView) await this._panel_.toWeekAdjoin(date);
-        else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
-      }
-      this.trigger('click', { checked });
-      this.trigger('change', { checked });
+    selDate(e) {
+      this._calendar_.service.interceptEvent('tap', e, async () => {
+        const { wdx, ddx } = e.mark!;
+        const panel = this.data.panels[this.data.current];
+        const date = panel.weeks[wdx].days[ddx];
+        if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
+        const checked = normalDate(date);
+        const isWeekView = this._view_ & View.week;
+        if (date.kind === 'current') {
+          const sets = { info: getDateInfo(checked, isWeekView), checked };
+          if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
+          this._pointer_.update(sets, true);
+          this.setData(sets);
+          await this._panel_.update();
+        } else {
+          if (isWeekView) await this._panel_.toWeekAdjoin(date);
+          else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
+        }
+        this.trigger('click', { checked });
+        this.trigger('change', { checked });
+      });
     },
     handlePointerAnimated() {
       this._pointer_.animationEnd();
@@ -337,7 +351,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     workletDragGesture(e) {
       'worklet';
-      if (this.$_view_fixed.value || e.state === 0) return;
+      if (!this.$_gesture.value || e.state === 0) return;
       if (e.state === 1) {
         wx.worklet.runOnJS(this.dragGestureStart.bind(this))();
         this.$_drag_state!.value = 1;
@@ -379,17 +393,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const view = await this._dragger_!.dragout(e.velocityY * 0.6);
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
-    selYear() {
-      if (this.$_view_fixed.value && this._view_ & View.week) return;
+    async selYear() {
+      if (!this.$_gesture.value && this._view_ & View.week) return;
       const { year, month } = this.data.panels[this.data.current];
       const mon = { year, month };
-      this._annual_.switch(true, mon);
+      return this._annual_.switch(true, mon);
     },
     async selMonth(e) {
       const { ydx } = e.currentTarget.dataset;
       const { x, y } = e.detail;
       const mon = await this._printer_.getTapMonth(ydx, x, y);
-      this._annual_.switch(false, mon);
+      return this._annual_.switch(false, mon);
     },
     trigger(event, detail, dispatchPlugin = true) {
       detail = detail || <CalendarEventDetail>{};
@@ -408,8 +422,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      dispatchPlugin && this._calendar_.service.dispatchEventHandle(event, detail);
-      this.triggerEvent(event, detail);
+      const emiter = onceEmiter(this, event);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
+      emiter.emit(detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
@@ -440,7 +455,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       if (this._loaded_) this._panel_.toDate(date);
       else this._dragger_!.update();
     },
-    marks: function (marks: Array<CalendarMark>) {
+    marks: function (marks: Array<CalendarMark | CalendarStyleMark>) {
       const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
       mark?.update(this, marks);
     },
@@ -449,12 +464,19 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const currView = flagView(_view);
       const isSkylineRender = isSkyline(this.renderer);
       if (this._loaded_) {
-        this.$_view_fixed.value = isViewFixed(view);
-        if (isSkylineRender) this.toggleView(_view, this.$_view_fixed.value);
-        else this.setData({ transView: currView, viewFixed: this.$_view_fixed.value });
+        if (isSkylineRender) this.toggleView(_view);
+        else this.setData({ transView: currView });
       } else {
         if (isSkylineRender) this._dragger_!.toView(_view, false);
         this._view_ = _view;
+      }
+    },
+    viewGesture: function (gesture: boolean) {
+      if (this._loaded_) {
+        if (gesture !== this.$_gesture.value) {
+          this.$_gesture.value = gesture;
+          this.setData({ gesture });
+        }
       }
     },
     darkmode: function (darkmode: boolean) {
@@ -487,6 +509,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
             transView: flagView(_view)
           });
         }
+      },
+      openAnuual() {
+        return instance.selYear();
       },
       getMarks(date) {
         return instance._calendar_.service.getEntireMarks(date);

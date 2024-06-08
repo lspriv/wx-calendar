@@ -4,13 +4,20 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-04-24 16:31:09
+ * @LastEditTime: 2024-06-05 19:51:14
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
 import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
-import type { CalendarMark, CalendarDay, WcMarkDict, WcMarkMap, WcScheduleInfo } from '../interface/calendar';
+import type {
+  CalendarMark,
+  CalendarStyleMark,
+  CalendarDay,
+  WcMarkDict,
+  WcMarkMap,
+  WcScheduleInfo
+} from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
 
 export class MarkPlugin implements Plugin {
@@ -18,7 +25,7 @@ export class MarkPlugin implements Plugin {
 
   private _marks_: WcMarkMap;
 
-  public update(instance: CalendarInstance, marks: Array<CalendarMark>) {
+  public update(instance: CalendarInstance, marks: Array<CalendarMark | CalendarStyleMark>) {
     const map: WcMarkMap = new Map();
 
     for (let i = 0; i < marks.length; i++) {
@@ -31,7 +38,7 @@ export class MarkPlugin implements Plugin {
           if (_mark.schedule) _mark.schedule.push(mark);
           else _mark.schedule = [mark];
         } else {
-          _mark[mark.type] = mark;
+          _mark[mark.type] = mark as any;
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };
@@ -60,6 +67,7 @@ export class MarkPlugin implements Plugin {
     if (mark) {
       const result: TrackDateResult = {};
 
+      if (mark.style) result.style = mark.style.style;
       if (mark.corner) result.corner = { text: mark.corner.text, color: mark.corner.color };
       if (mark.festival) result.festival = { text: mark.festival.text, color: mark.festival.color };
       if (mark.schedule) {

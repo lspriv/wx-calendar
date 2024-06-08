@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-02-21 18:41:26
+ * @LastEditTime: 2024-06-07 23:19:30
  */
 
 var nonNullable = function (value) {
@@ -77,7 +77,7 @@ var TOUCH_CHECK_FAIL = 1 << 1;
 var touchStart = function (e, instance) {
   var mark = e.mark;
   var state = instance.getState();
-  if (mark.fixed) return;
+  if (!mark.gesture) return;
   /** 起始位置 */
   state.y = e.changedTouches[0].pageY;
   /** 日历底部 bar 的转角 */
@@ -96,7 +96,7 @@ var touchStart = function (e, instance) {
 /** 手指触摸面板后移动 */
 var touchMove = function (e, instance) {
   var mark = e.mark;
-  if (mark.fixed) return;
+  if (!mark.gesture) return;
   var state = instance.getState();
   if (state.check & TOUCH_CHECK_FAIL) return;
 
@@ -193,7 +193,7 @@ var touchMove = function (e, instance) {
 /** 手指触摸面板动作结束 */
 var touchEnd = function (e, instance) {
   var mark = e.mark;
-  if (mark.fixed) return;
+  if (!mark.gesture) return;
   var state = instance.getState();
   if (!state.check || state.check & TOUCH_CHECK_FAIL) return;
   const deltaY = e.changedTouches[0].pageY - state.y;
@@ -353,8 +353,8 @@ var transViewChange = function (view, old, owner, instance) {
   if (view) {
     const dataset = instance.getDataset();
     toView(view, dataset, owner);
-    updateViewCls(view, instance);
-    instance.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
+    viewChange(view, old, owner);
+    owner.callMethod('refreshView', { view: view === 'week' ? 1 : view === 'month' ? 2 : 4 });
   }
 };
 

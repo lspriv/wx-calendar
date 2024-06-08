@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-04 02:38:08
+ * @LastEditTime: 2024-06-07 23:15:54
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -19,7 +19,6 @@ import type { Nullable, Voidable } from '../utils/shared';
 import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
 import type {
-  Plugin,
   PluginConstructor,
   PluginEntireMarks,
   PluginKeys,
@@ -41,6 +40,8 @@ export interface CalendarWeek {
 export type CalendarSwiperType = 'panel' | 'annual';
 
 type FullProperty<T extends WechatMiniprogram.Component.PropertyType> = WechatMiniprogram.Component.FullProperty<T>;
+
+export type LayoutArea = 'header' | 'title' | 'subinfo' | 'today' | 'viewbar' | 'dragbar';
 
 export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   /** 渲染模式 */
@@ -69,8 +70,8 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   initView: CalendarView;
   /** [webview] 手动控制视图（过渡效果） */
   transView: Nullable<CalendarView>;
-  /** 是否固定视图 */
-  viewFixed: boolean;
+  /** 是否滑动手势控制视图 */
+  gesture: boolean;
   /** [webview] 周视图下强制更新各面板的垂直偏移量 */
   offsetChange: boolean;
   /** 布局数据 */
@@ -83,6 +84,8 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   fonts: string;
   /** 暗黑模式 */
   darkside: boolean;
+  /** 属性 layout 的翻版 */
+  areaHideCls: string;
 }
 
 export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption {
@@ -106,6 +109,10 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   vibrate: FullProperty<BooleanConstructor>;
   /** 是否自定义导航栏，用以调整年面板的布局 */
   customNavBar: FullProperty<BooleanConstructor>;
+  /** 布局区域 */
+  areas: FullProperty<ArrayConstructor>;
+  /** 是否滑动手势控制视图 */
+  viewGesture: FullProperty<BooleanConstructor>;
 }
 
 interface CalendarInitialize {
@@ -161,11 +168,11 @@ interface CalendarEventHandlers {
   /**
    * 点击周/月面板标题打开年面板选择年
    */
-  selYear(event: TouchEvent<{}>): void;
+  selYear(event?: TouchEvent<{}>): Promise<void>;
   /**
    * 年面板中选择月
    */
-  selMonth(event: TouchEvent<{ ydx: number }, { x: number; y: number }>): void;
+  selMonth(event: TouchEvent<{ ydx: number }, { x: number; y: number }>): Promise<void>;
   /**
    * 选择日程
    */
@@ -173,7 +180,7 @@ interface CalendarEventHandlers {
   /**
    * 切换视图，周/月视图切换
    */
-  toggleView(event: TouchEvent<{}> | View, fixed?: boolean): void;
+  toggleView(event: TouchEvent<{}> | View): void;
   /**
    * [WebView] 处理周/月面板的swiper滑块位置变动
    */
@@ -280,8 +287,8 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   $_swiper_trans: Shared<number>;
   /** 年面板保存连续滑动中累积的偏移量 */
   $_annual_trans: Shared<number>;
-  /** 是否固定视图 */
-  $_view_fixed: Shared<boolean>;
+  /** 是否滑动手势控制视图 */
+  $_gesture: Shared<boolean>;
   /** [Skyline] 当前周/月面板所在滑块，worklet函数中使用 */
   $_current?: Shared<number>;
   /** [Skyline] 周/月面板手势拖动状态 */
@@ -298,12 +305,16 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   $_drag_view_bar_translate_?: Shared<number>;
 }
 
-export type CalendarInstance = WechatMiniprogram.Component.Instance<
+type DataSet = Record<string, any>;
+
+export type CalendarInstance<T extends DataSet = {}> = WechatMiniprogram.Component.Instance<
   CalendarData,
   CalendarProp,
   CalendarMethod,
   CalendarCustomProp
->;
+> & {
+  dataset: T;
+};
 
 export interface CalendarExport<T extends PluginConstructor[] = []> extends WechatMiniprogram.IAnyObject {
   /** 版本号 */
@@ -317,6 +328,11 @@ export interface CalendarExport<T extends PluginConstructor[] = []> extends Wech
    * 若果view未指定，会在周月视图之间切换
    */
   toggleView(view?: CalendarView): void;
+  /**
+   * 打开年度面板
+   * @param mon 指定月
+   */
+  openAnuual(): Promise<void>;
   /**
    * 获取日期标记
    */

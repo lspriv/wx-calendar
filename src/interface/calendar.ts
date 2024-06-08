@@ -4,10 +4,11 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-02-25 08:28:27
+ * @LastEditTime: 2024-06-08 20:06:04
  */
+import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
-import { Nullable, isDate, isFunction, isNumber, isString } from '../utils/shared';
+import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
@@ -27,27 +28,44 @@ export interface CalendarMonth {
   month: number;
 }
 
-export interface CalendarMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
+interface DateMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> {
   date?: string | number | Date | CalendarDay;
+}
+
+export interface CalendarMark extends DateMark {
   type: 'schedule' | 'corner' | 'festival';
   text: string;
   color?: Nullable<string>;
   bgColor?: Nullable<string>;
 }
 
-export interface WcMark {
-  key?: string;
-  color?: Nullable<string>;
-  text: string;
+export type DateStyle = Record<string, string | number>;
+
+export interface CalendarStyleMark extends DateMark {
+  type: 'style';
+  style: string | DateStyle;
 }
 
-export interface WcScheduleMark extends WcMark {
-  bgColor?: Nullable<string>;
-}
+export type CalendarMarkTypes = CalendarMark['type'] | CalendarStyleMark['type'];
+
+export type WcMark = Pick<CalendarMark, 'text' | 'color'> & {
+  key?: string;
+};
+
+export type WcScheduleMark = WcMark & Pick<CalendarMark, 'bgColor'>;
+
+export type WcStyleMark = CalendarStyleMark['style'];
+
+export type MarkDict<T extends CalendarMarkTypes, Style, Schedule, CF> = T extends 'style'
+  ? Style
+  : T extends 'schedule'
+    ? Schedule
+    : CF;
 
 export interface WcDate extends Required<CalendarDay> {
   key: string;
   kind: 'last' | 'current' | 'next';
+  style: Nullable<string>;
   mark: Nullable<WcMark>;
   corner: Nullable<WcMark>;
   schedules: Array<WcScheduleMark>;
@@ -73,17 +91,30 @@ export interface WcAnnualMonth {
   start: number;
 }
 
+export interface WcDateStyle {
+  light: string | number;
+  dark: string | number;
+}
+
+export type WcAnnualDateStyle = Record<string, WcDateStyle>;
 export interface WcAnnualMark {
   rwtype?: 'rest' | 'work';
   sub?: string;
+  style?: WcAnnualDateStyle;
 }
 
 export type WcAnnualMarks = Map<string, WcAnnualMark>;
 
+export interface WcAnnualSub {
+  key?: string;
+  color: string;
+  text: string;
+}
+
 export interface WcYear {
   key: string;
   year: number;
-  subinfo: string;
+  subinfo?: Array<WcAnnualSub>;
 }
 
 export interface WcSubYear {
@@ -95,7 +126,12 @@ export interface WcSubYear {
 export type WcFullYear = WcYear & WcSubYear;
 
 export type WcMarkDict = {
-  [P in CalendarMark['type']]?: P extends 'schedule' ? Nullable<Array<CalendarMark>> : Nullable<CalendarMark>;
+  [P in CalendarMarkTypes]?: MarkDict<
+    P,
+    Nullable<CalendarStyleMark>,
+    Nullable<Array<CalendarMark>>,
+    Nullable<CalendarMark>
+  >;
 };
 export type WcMarkMap = Map<string, WcMarkDict>;
 
@@ -107,6 +143,18 @@ export interface WcScheduleInfo {
   summary?: string;
   description?: string;
 }
+
+export const styleParse = (style: string | DateStyle | null) =>
+  typeof style === 'string' ? strToStyle(style) : style || {};
+
+export const styleStringify = (style: DateStyle) => {
+  return Object.keys(style)
+    .sort()
+    .map(key => `${camelToSnake(key, '-')}:${style[key]};`)
+    .join('');
+};
+
+export const themeStyle = (style?: WcDateStyle): string | number | undefined => style?.[Layout.theme!] || style?.light;
 
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
 
@@ -151,6 +199,18 @@ export const getScheduleDetail = (
   };
 };
 
+export const mergeAnnualDateStyle = (s1?: WcAnnualDateStyle, s2?: WcAnnualDateStyle): WcAnnualDateStyle | undefined => {
+  if (s1 && s2) {
+    const keys = [...new Set([...Object.keys(s1), ...Object.keys(s2)])];
+    return keys.reduce((style, key) => {
+      style[key] = { ...s1[key], ...s2[key] };
+      return style;
+    }, {} as WcAnnualDateStyle);
+  } else if (s1 || s2) {
+    return { ...s1, ...s2 };
+  }
+};
+
 /**
  * 合并两个年面板标记
  */
@@ -159,9 +219,10 @@ export const mergeAnnualMarks = (m1?: WcAnnualMarks, m2?: WcAnnualMarks) => {
   m1 = m1 || new Map();
   const entries = m2.entries();
   for (const [key, mark] of entries) {
-    const m = m1.get(key) || {};
+    const m = m1.get(key) || ({} as WcAnnualMark);
     mark.rwtype && (m.rwtype = mark.rwtype);
     mark.sub && (m.sub = mark.sub);
+    mark.style && (m.style = mergeAnnualDateStyle(m.style, mark.style));
     m1.set(key, m);
   }
   return m1;
@@ -181,6 +242,12 @@ export const getMonthDays = (mon: CalendarMonth) => {
 };
 
 /**
+ * 是否闰年
+ * @param y 年
+ */
+export const isLeapYear = (y: number) => (y % 100 != 0 && y % 4 === 0) || y % 400 === 0;
+
+/**
  * 创建CalendarDay
  * @param date 日期，可以是模糊的，比如「2024-01-01」可以表示为 { year: 2023, month: 13, day: 1 }
  * @param kind 日期类型 'last' | 'current' | 'next' | 'today'，对应 上个月 ｜ 当前月 ｜ 下个月 ｜ 今天
@@ -197,6 +264,7 @@ const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
     week: week!,
     kind,
     today,
+    style: '',
     mark: null,
     corner: null,
     schedules: []
@@ -446,18 +514,54 @@ export const sameSchedules = (as1?: Array<WcScheduleMark>, as2?: Array<WcSchedul
   return true;
 };
 
+export const sameAnnualMarkStyle = (s1?: WcAnnualDateStyle, s2?: WcAnnualDateStyle): boolean => {
+  if (!s1 && !s2) return true;
+  if (s1 && s2) {
+    const k1 = Object.keys(s1);
+    const k2 = Object.keys(s2);
+    if (k1.length !== k2.length) return false;
+    const ks = new Set([...k1, ...k2]);
+    if (ks.size !== k1.length) return false;
+    for (const k of ks) {
+      const t1 = s1[k],
+        t2 = s2[k];
+      if (t1.light !== t2.light || t1.dark !== t2.dark) return false;
+    }
+    return true;
+  }
+  return false;
+};
+
 export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
   if (!m1.size && !m2?.size) return true;
   if (m1.size !== m2?.size) return false;
   const entries = m1.entries();
   for (const [key, mk1] of entries) {
     const mk2 = m2.get(key);
-    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub) return false;
+    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub || !sameAnnualMarkStyle(mk1.style, mk2.style))
+      return false;
   }
   return true;
 };
 
-export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+export const sameAnnualSubs = (m1?: Array<WcAnnualSub>, m2?: Array<WcAnnualSub>) => {
+  if (!m1?.length && !m2?.length) return true;
+  if (m1?.length !== m2?.length) return false;
+  for (let i = 0; i < m1!.length; i++) {
+    const m1s = m1![i];
+    const m2s = m2![i];
+    if (m1s.color !== m2s.color || m1s.text !== m2s.text) return false;
+  }
+  return true;
+};
+
+export const fillAnnualSubs = (uk: string, year: number, subinfos?: Array<WcAnnualSub>) =>
+  subinfos?.map((item, i) => {
+    item.key = item.key || `AS_${uk}_${year}_${i}`;
+    return item;
+  });
+
+export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
 
 export type WxCalendarPlugins<T extends WxCalendar<any>> = T extends WxCalendar<infer R> ? R : never;
 
@@ -502,7 +606,7 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     const months: Array<WcAnnualMonth> = Array.from({ length: 12 }, (_, i) =>
       createYearMonth({ year, month: i + 1 }, weekstart)
     );
-    const y = { key: `Y_${year}`, year, subinfo: '', months, marks: new Map() } as WcFullYear;
+    const y = { key: `Y_${year}`, year, subinfo: [], months, marks: new Map() } as WcFullYear;
     this.service.catchYear(y);
     return y;
   }
