@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 20:45:48
+ * @LastEditTime: 2024-06-08 21:09:20
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -649,7 +649,7 @@ export class YearPrinter extends CalendarHandler {
     const bgBRRadius = this.dateBgRadius(frame.checkedRadius, <number>themeStyle(style.bgBRRadius));
 
     const ws = themeStyle(style.bgWidth);
-    const hw = ws ? frame[ws] / 2 : frame.checkedRadius;
+    const hw = ws ? frame[ws] / 2 + 1 : frame.checkedRadius;
     const hh = frame.checkedRadius;
     const cy = y + frame.checkedOffset;
 
