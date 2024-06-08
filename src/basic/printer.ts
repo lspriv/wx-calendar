@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 21:09:20
+ * @LastEditTime: 2024-06-08 21:23:12
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -193,11 +193,10 @@ export class YearPrinter extends CalendarHandler {
 
   public renderCheckedBg: boolean;
 
-  public async initialize(renderChecked: boolean = true) {
+  public async initialize() {
     const { fonts, weekstart, darkside } = this._instance_.data;
     this._font_ = fonts;
     this._weeks_ = sortWeeks(weekstart);
-    this.renderCheckedBg = renderChecked;
     if (darkside) this.bindThemeChange();
     this.initializeSize();
     return this.initializeRender();
