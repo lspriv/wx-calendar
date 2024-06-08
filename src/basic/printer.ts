@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 21:23:12
+ * @LastEditTime: 2024-06-08 21:46:06
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -439,7 +439,8 @@ export class YearPrinter extends CalendarHandler {
     const checked = this._instance_.data.checked!;
     frame.checked = isMax || !month ? null : inMonthDate(year, month, checked.day);
     frame.todayIsChecked = !!frame.checked && isToday(frame.checked);
-    frame.todayCheckedColor = frame.todayIsChecked || isMax || !canvas.frame ? color('checked') : PrimaryColor;
+    frame.todayCheckedColor =
+      this.renderCheckedBg && (frame.todayIsChecked || isMax || !canvas.frame) ? color('checked') : PrimaryColor;
   }
 
   public render(canvas: Canvas, year: WcFullYear, month?: number) {
@@ -657,29 +658,21 @@ export class YearPrinter extends CalendarHandler {
     ctx.save();
     ctx.beginPath();
     // top-left
-    if (bgTLRadius) {
-      ctx.arc(x - hw + bgTLRadius, cy - hh + bgTLRadius, bgTLRadius, 1 * Math.PI, 1.5 * Math.PI);
-    } else {
-      ctx.moveTo(x - hw, cy - hh);
-    }
+    if (bgTLRadius) ctx.arc(x - hw + bgTLRadius, cy - hh + bgTLRadius, bgTLRadius, 1 * Math.PI, 1.5 * Math.PI);
+    else ctx.moveTo(x - hw, cy - hh);
+
     // top-right
-    if (bgTRRadius) {
-      ctx.arc(x + hw - bgTRRadius, cy - hh + bgTRRadius, bgTRRadius, 1.5 * Math.PI, 2 * Math.PI);
-    } else {
-      ctx.lineTo(x + hw, cy - hh);
-    }
+    if (bgTRRadius) ctx.arc(x + hw - bgTRRadius, cy - hh + bgTRRadius, bgTRRadius, 1.5 * Math.PI, 2 * Math.PI);
+    else ctx.lineTo(x + hw, cy - hh);
+
     // bottom-right
-    if (bgBRRadius) {
-      ctx.arc(x + hw - bgBRRadius, cy + hh - bgBRRadius, bgBRRadius, 0, 0.5 * Math.PI);
-    } else {
-      ctx.lineTo(x + hw, cy + hh);
-    }
+    if (bgBRRadius) ctx.arc(x + hw - bgBRRadius, cy + hh - bgBRRadius, bgBRRadius, 0, 0.5 * Math.PI);
+    else ctx.lineTo(x + hw, cy + hh);
+
     // bottom-left
-    if (bgBLRadius) {
-      ctx.arc(x - hw + bgBLRadius, cy + hh - bgBLRadius, bgBLRadius, 0.5 * Math.PI, 1 * Math.PI);
-    } else {
-      ctx.lineTo(x - hw, cy + hh);
-    }
+    if (bgBLRadius) ctx.arc(x - hw + bgBLRadius, cy + hh - bgBLRadius, bgBLRadius, 0.5 * Math.PI, 1 * Math.PI);
+    else ctx.lineTo(x - hw, cy + hh);
+
     ctx.closePath();
     ctx.clip();
     ctx.fill();
