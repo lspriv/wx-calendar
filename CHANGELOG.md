@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.7.0](https://github.com/lspriv/wx-calendar/compare/v1.6.2...v1.7.0) (2024-06-08)
+
+
+### Features
+
+* 1. 新增日期样式标记 ([bc0f57e](https://github.com/lspriv/wx-calendar/commit/bc0f57e21f2ce0e303cc7705e2dd791392e3cd86))
+* 新增年度面板日期渲染样式mark ([ba0ffcb](https://github.com/lspriv/wx-calendar/commit/ba0ffcb429b9ce2f5e9a11ea68876d4634339529))
+* 新增手势控制属性viewGesture,移除固定视图 ([0a5cd45](https://github.com/lspriv/wx-calendar/commit/0a5cd451d3db0558b5f6bd3f5d54cd9d0d97dfe5))
+* 新增自定义布局区域属性[areas] ([0b3f2ad](https://github.com/lspriv/wx-calendar/commit/0b3f2adbab8846918589273e72ef95ccb66e1189))
+* 新增触发器和拦截器 ([d69a327](https://github.com/lspriv/wx-calendar/commit/d69a327db060fdf42f79d31ba17a38d5390b849d))
+
+
+### Bug Fixes
+
+* 修复固定视图下切换视图出现的bug ([bdc2c54](https://github.com/lspriv/wx-calendar/commit/bdc2c5445d76d34fb92befab83301fdeac6a79c0))
+* 修复年面板subinfo的key值 ([63923bf](https://github.com/lspriv/wx-calendar/commit/63923bf0de6ce07312623a3f4e4d986c640ca7c8))
+* 调整TrackYearResult字段subinfo的数据结构 ([6a8cbf3](https://github.com/lspriv/wx-calendar/commit/6a8cbf3e1ac457f6fb9321df77dce6c585170394))
+
 ## [1.6.2](https://github.com/lspriv/wx-calendar/compare/v1.6.1...v1.6.2) (2024-06-03)
 
 
