@@ -301,6 +301,13 @@ type ScheduleEventDetail = {
 }
 ```
 
+[***`openAnuual`***](#openAnuual) 打开年度面板
+```typescript
+{
+  (): Promise<void>;
+}
+```
+
 [***`getMarks`***](#getMarks) 获取完整的日期标记
 ```typescript
 {

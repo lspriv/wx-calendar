@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-07 23:15:54
+ * @LastEditTime: 2024-06-08 22:36:15
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -330,7 +330,6 @@ export interface CalendarExport<T extends PluginConstructor[] = []> extends Wech
   toggleView(view?: CalendarView): void;
   /**
    * 打开年度面板
-   * @param mon 指定月
    */
   openAnuual(): Promise<void>;
   /**
