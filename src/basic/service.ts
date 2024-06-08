@@ -4,10 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 22:17:07
+ * @LastEditTime: 2024-06-08 18:20:27
  */
 import { nextTick, OnceEmiter } from './tools';
-import { CALENDAR_PANELS } from './constants';
+import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
 import { camelToSnake, notEmptyObject } from '../utils/shared';
 import {
   monthDiff,
@@ -16,7 +16,6 @@ import {
   sameAnnualMarks,
   getWeekDateIdx,
   mergeAnnualMarks,
-  GREGORIAN_MONTH_DAYS,
   styleParse,
   styleStringify,
   timestamp,
@@ -143,6 +142,12 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
    * @param id plugin内部id
    */
   PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
+  /**
+   * 对已提供的有效日期进行过滤
+   * @param service PliginService实例
+   * @param dates 日期数组
+   */
+  PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<CalendarDay>;
 }
 
 export interface PluginConstructor {
@@ -449,7 +454,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         while (st <= ed) {
           const date = normalDate(st);
           this.setUpdateRecord(map, date);
-          st += 86400000;
+          st += MS_ONE_DAY;
         }
       }
     }

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 22:13:19
+ * @LastEditTime: 2024-06-08 16:53:25
  */
 import { WEEKS } from '../basic/constants';
 import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
@@ -90,9 +90,16 @@ export interface WcAnnualMonth {
   start: number;
 }
 
+export interface WcDateStyle {
+  light: string | number;
+  dark: string | number;
+}
+
+export type WcAnnualDateStyle = Record<string, WcDateStyle>;
 export interface WcAnnualMark {
   rwtype?: 'rest' | 'work';
   sub?: string;
+  style?: WcAnnualDateStyle;
 }
 
 export type WcAnnualMarks = Map<string, WcAnnualMark>;
@@ -189,6 +196,18 @@ export const getScheduleDetail = (
   };
 };
 
+export const mergeAnnualDateStyle = (s1?: WcAnnualDateStyle, s2?: WcAnnualDateStyle): WcAnnualDateStyle | undefined => {
+  if (s1 && s2) {
+    const keys = [...new Set([...Object.keys(s1), ...Object.keys(s2)])];
+    return keys.reduce((style, key) => {
+      style[key] = { ...s1[key], ...s2[key] };
+      return style;
+    }, {} as WcAnnualDateStyle);
+  } else if (s1 || s2) {
+    return { ...s1, ...s2 };
+  }
+};
+
 /**
  * 合并两个年面板标记
  */
@@ -197,9 +216,10 @@ export const mergeAnnualMarks = (m1?: WcAnnualMarks, m2?: WcAnnualMarks) => {
   m1 = m1 || new Map();
   const entries = m2.entries();
   for (const [key, mark] of entries) {
-    const m = m1.get(key) || {};
+    const m = m1.get(key) || ({} as WcAnnualMark);
     mark.rwtype && (m.rwtype = mark.rwtype);
     mark.sub && (m.sub = mark.sub);
+    mark.style && (m.style = mergeAnnualDateStyle(m.style, mark.style));
     m1.set(key, m);
   }
   return m1;
@@ -485,13 +505,32 @@ export const sameSchedules = (as1?: Array<WcScheduleMark>, as2?: Array<WcSchedul
   return true;
 };
 
+export const sameAnnualMarkStyle = (s1?: WcAnnualDateStyle, s2?: WcAnnualDateStyle): boolean => {
+  if (!s1 && !s2) return true;
+  if (s1 && s2) {
+    const k1 = Object.keys(s1);
+    const k2 = Object.keys(s2);
+    if (k1.length !== k2.length) return false;
+    const ks = new Set([...k1, ...k2]);
+    if (ks.size !== k1.length) return false;
+    for (const k of ks) {
+      const t1 = s1[k],
+        t2 = s2[k];
+      if (t1.light !== t2.light || t1.dark !== t2.dark) return false;
+    }
+    return true;
+  }
+  return false;
+};
+
 export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
   if (!m1.size && !m2?.size) return true;
   if (m1.size !== m2?.size) return false;
   const entries = m1.entries();
   for (const [key, mk1] of entries) {
     const mk2 = m2.get(key);
-    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub) return false;
+    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub || !sameAnnualMarkStyle(mk1.style, mk2.style))
+      return false;
   }
   return true;
 };
@@ -514,8 +553,6 @@ export const fillAnnualSubs = (uk: string, year: number, subinfos?: Array<WcAnnu
   });
 
 export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
-
-export const GREGORIAN_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 export type WxCalendarPlugins<T extends WxCalendar<any>> = T extends WxCalendar<infer R> ? R : never;
 

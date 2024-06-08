@@ -4,9 +4,10 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 19:55:17
+ * @LastEditTime: 2024-06-08 17:56:47
  */
-import { getAnnualMarkKey, GREGORIAN_MONTH_DAYS } from '../interface/calendar';
+import { GREGORIAN_MONTH_DAYS } from '../basic/constants';
+import { getAnnualMarkKey } from '../interface/calendar';
 
 import type { Plugin, TrackDateResult, TrackYearResult } from '../basic/service';
 import type { CalendarDay, WcYear, WcAnnualMark, WcAnnualMarks } from '../interface/calendar';

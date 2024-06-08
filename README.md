@@ -481,7 +481,8 @@ class MyPlugin implements Plugin {
     return {
       schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', MyPlugin.KEY) }], // 设置日程数组，可选
       corner: { text: '', color: '' }, // 设置角标，可选
-      festival: { text: '', color: '' } // 设置节假日，可选
+      festival: { text: '', color: '' }, // 设置节假日，可选
+      style: { backgroundColor: '', color: '' } // 设置日期样式，也可传字符串形式（如 'background-color: #409EFF;color: #fff;'），可选
     };
   };
   
@@ -500,6 +501,17 @@ class MyPlugin implements Plugin {
         ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
         ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
         ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
+        ['2024-6-7', { 
+          style: {
+            color: { light: '#fff', dark: '#000' }, // 日期字体颜色
+            bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
+            bgTLRadius: { light: 50, dark: 50 }, // 日期背景左上圆角半径
+            bgTRRadius: { light: 0, dark: 0 }, // 日期背景右上圆角半径
+            bgBLRadius: { light: 0, dark: 0 }, // 日期背景左下圆角半径
+            bgBRRadius: { light: 50, dark: 50 }, // 日期背景右下圆角半径
+            bgWidth: { light: 'dateCol', dark: 'dateCol' } // 日期背景宽度，deteCol为列宽
+          } 
+        }]
       ])
     }
   };
@@ -571,7 +583,7 @@ class MyPlugin implements Plugin {
   }
 
   /**
-   * 拦截日期点击动作
+   * 拦截日期点击动作，可选择实现该方法
    * @param service PliginService实例
    * @param event 事件参数
    * @param intercept 拦截器
@@ -581,6 +593,17 @@ class MyPlugin implements Plugin {
     const component = service.component;
     // 若不想事件继续传播
     if (...) intercept();
+  }
+
+  /**
+   * 日期过滤器（提供给其他组件调用的），可选择实现该方法
+   * @param service PliginService实例
+   * @param dates 待过滤的日期数组
+   * @param type range范围  multi多点
+   */
+  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi') {
+     // 获取日历组件实例
+    const component = service.component;
   }
 }
 ```

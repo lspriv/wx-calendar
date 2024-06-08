@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 17:55:18
+ * @LastEditTime: 2024-06-08 18:18:33
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks } from '../interface/calendar';
@@ -13,7 +13,14 @@ import { CALENDAR_PANELS, SELECTOR } from './constants';
 import { Nullable, promises } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
 
-import type { CalendarDay, CalendarMonth, WcAnnualMonth, WcFullYear } from '../interface/calendar';
+import type {
+  CalendarDay,
+  CalendarMonth,
+  WcDateStyle,
+  WcAnnualDateStyle,
+  WcAnnualMonth,
+  WcFullYear
+} from '../interface/calendar';
 import type { Theme } from './layout';
 
 const ANIMATE_FRAMES = 20;
@@ -144,6 +151,7 @@ const PrinterTheme = {
 type PrinterThemeMode = (typeof PrinterTheme)['dark' | 'light'];
 type PrinterThemeKey = keyof PrinterThemeMode;
 const color = <K extends PrinterThemeKey>(key: K): PrinterThemeMode[K] => PrinterTheme[Layout.theme!][key];
+const markStyle = (style?: WcDateStyle): string | number | undefined => style?.[Layout.theme!] || style?.light;
 
 interface ThemeListener {
   (res: { theme?: Theme }): void;
@@ -582,24 +590,27 @@ export class YearPrinter extends CalendarHandler {
 
       const _x = x + frame.monthPaddingX + w * frame.dateCol + frame.dateCol / 2;
       const _y = y + rdx * height + frame.dateHeight / 2;
+      const locate = { x: _x, y: _y };
 
       const day = i - month.start + 1;
       const date = { year: month.year, month: month.month, day };
+      const mark = marks.get(getAnnualMarkKey(date));
 
-      ctx!.fillStyle = isToday(date)
-        ? frame.todayCheckedColor!
-        : showRest
-          ? (() => {
-              const mark = marks.get(getAnnualMarkKey(date));
-              if (mark?.rwtype === 'work') return frame.dateColor;
-              if (mark?.rwtype === 'rest' || this.isWeekend(w)) return frame.restColor;
-              return frame.dateColor;
-            })()
-          : frame.dateColor;
+      if (mark?.style?.bgColor) {
+        this.renderDateBg(canvas, mark.style, locate, frame);
+      }
+
+      ctx!.fillStyle =
+        <string>markStyle(mark?.style?.color) ||
+        (isToday(date)
+          ? frame.todayCheckedColor!
+          : showRest && (mark?.rwtype === 'rest' || (this.isWeekend(w) && mark?.rwtype !== 'work'))
+            ? frame.restColor
+            : frame.dateColor);
 
       ctx!.fillText(`${day}`, _x, _y);
 
-      this.renderMark(canvas, date, marks, { x: _x, y: _y }, frame, alpha);
+      this.renderMark(canvas, date, marks, locate, frame, alpha);
     }
   }
 
@@ -632,6 +643,59 @@ export class YearPrinter extends CalendarHandler {
 
       ctx.globalAlpha = alpha;
     }
+  }
+
+  private renderDateBg(canvas: Canvas, style: WcAnnualDateStyle, locate: Location, frame: AnnualFrames) {
+    const ctx = canvas.ctx!;
+    const { x, y } = locate;
+    const bgTLRadius = this.dateBgRadius(frame.checkedRadius, <number>markStyle(style.bgTLRadius));
+    const bgTRRadius = this.dateBgRadius(frame.checkedRadius, <number>markStyle(style.bgTRRadius));
+    const bgBLRadius = this.dateBgRadius(frame.checkedRadius, <number>markStyle(style.bgBLRadius));
+    const bgBRRadius = this.dateBgRadius(frame.checkedRadius, <number>markStyle(style.bgBRRadius));
+
+    const widthStyle = markStyle(style.bgWidth) || frame.checkedRadius * 2;
+    const halfWidth = frame[widthStyle] / 2;
+    const halfHeight = frame.checkedRadius;
+    const cy = y + frame.checkedOffset;
+
+    ctx.fillStyle = <string>markStyle(style.bgColor) || 'rgba(0,0,0,0)';
+
+    ctx.save();
+    ctx.beginPath();
+    // top-left
+    if (bgTLRadius) {
+      ctx.arc(x - halfWidth + bgTLRadius, cy - halfHeight + bgTLRadius, bgTLRadius, 1 * Math.PI, 1.5 * Math.PI);
+    } else {
+      ctx.moveTo(x - halfWidth, cy - halfHeight);
+    }
+    // top-right
+    if (bgTRRadius) {
+      ctx.arc(x + halfWidth - bgTRRadius, cy - halfHeight + bgTRRadius, bgTRRadius, 1.5 * Math.PI, 2 * Math.PI);
+    } else {
+      ctx.lineTo(x + halfWidth, cy - halfHeight);
+    }
+    // bottom-right
+    if (bgBRRadius) {
+      ctx.arc(x + halfWidth - bgBRRadius, cy + halfHeight - bgBRRadius, bgBRRadius, 0, 0.5 * Math.PI);
+    } else {
+      ctx.lineTo(x + halfWidth, cy + halfHeight);
+    }
+    // bottom-left
+    if (bgBLRadius) {
+      ctx.arc(x - halfWidth + bgBLRadius, cy + halfHeight - bgBLRadius, bgBLRadius, 0.5 * Math.PI, 1 * Math.PI);
+    } else {
+      ctx.lineTo(x - halfWidth, cy + halfHeight);
+    }
+    ctx.closePath();
+    ctx.clip();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  private dateBgRadius(checkedRadius: number, radius?: number): number {
+    if (!radius) return 0;
+    if (radius > 50) return checkedRadius;
+    return Math.floor((radius * checkedRadius * 2) / 100);
   }
 
   /**
