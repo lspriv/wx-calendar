@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 22:12:30
+ * @LastEditTime: 2024-06-10 04:21:16
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -65,7 +65,7 @@ export type TrackYearResult = {
   marks?: WcAnnualMarks;
 };
 
-interface EventIntercept {
+export interface EventIntercept {
   (): never;
 }
 interface PluginInterception {
