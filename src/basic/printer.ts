@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 21:46:06
+ * @LastEditTime: 2024-06-10 05:35:51
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -595,8 +595,10 @@ export class YearPrinter extends CalendarHandler {
         this.renderDateBg(canvas, mark.style, locate, frame);
       }
 
+      const color = <string>themeStyle(mark?.style?.color);
+
       ctx!.fillStyle =
-        <string>themeStyle(mark?.style?.color) ||
+        (color !== 'initial' && color) ||
         (isToday(date)
           ? frame.todayCheckedColor!
           : showRest && (mark?.rwtype === 'rest' || (this.isWeekend(w) && mark?.rwtype !== 'work'))
