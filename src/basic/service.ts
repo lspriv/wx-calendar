@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 04:39:30
+ * @LastEditTime: 2024-06-10 04:56:26
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -247,10 +247,20 @@ export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
 export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
 
-class PluginInterceptError extends Error {}
+class PluginInterceptError extends Error {
+  public code: number;
+  constructor(message?: string, code: number = 0) {
+    super(message);
+    this.code = code;
+  }
+}
 
-export const intercept = (): never => {
-  throw new PluginInterceptError();
+/**
+ * 拦截器
+ * @param signal 0直接退出循环，1继续循环但不执行默认行为
+ */
+export const intercept = (signal: number): never => {
+  throw new PluginInterceptError(void 0, signal);
 };
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
@@ -556,16 +566,21 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
 
-    for (let i = 0; i < this._plugins_.length; i++) {
+    let execAction = true;
+
+    for (let i = this._plugins_.length; i--; ) {
       const plugin = this._plugins_[i].instance;
       try {
         plugin[handler]!.call(plugin, this, detail, intercept);
       } catch (e) {
-        if (e instanceof PluginInterceptError) return;
+        if (e instanceof PluginInterceptError) {
+          if (!e.code) return;
+          execAction = false;
+        }
       }
     }
 
-    action?.();
+    execAction && action?.();
   }
 
   /**
