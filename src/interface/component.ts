@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-10 03:56:03
+ * @LastEditTime: 2024-06-10 03:59:20
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -215,7 +215,7 @@ export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
   range?: [startDate: CalendarDay, endDate: CalendarDay];
-  source?: 'click' | 'gesture' | 'annual' | 'control';
+  source?: 'click' | 'gesture' | 'annual' | 'control'; // 点击 ｜ 手势滑动 ｜ 年面板点击 ｜ 方法控制
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
