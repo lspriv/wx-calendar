@@ -515,6 +515,7 @@ class MyPlugin implements Plugin {
           style: {
             color: { light: '#fff', dark: '#000' }, // 日期字体颜色
             bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
+            opacity: { light: 1, dark: 1 }, // 不支持 0
             bgTLRadius: { light: 50, dark: 50 }, // 日期背景左上圆角半径
             bgTRRadius: { light: 0, dark: 0 }, // 日期背景右上圆角半径
             bgBLRadius: { light: 0, dark: 0 }, // 日期背景左下圆角半径
