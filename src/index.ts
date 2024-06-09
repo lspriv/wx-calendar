@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 03:54:53
+ * @LastEditTime: 2024-06-10 05:02:31
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -256,7 +256,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const { wdx, ddx } = e.mark!;
         const panel = this.data.panels[this.data.current];
         const date = panel.weeks[wdx].days[ddx];
-        if (isSameDate(date, this.data.checked!)) return void this.trigger('click');
+        this.trigger('click', { checked: date });
+        if (isSameDate(date, this.data.checked!)) return;
         const checked = normalDate(date);
         const isWeekView = this._view_ & View.week;
         if (date.kind === 'current') {
@@ -269,7 +270,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
           if (isWeekView) await this._panel_.toWeekAdjoin(date);
           else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
         }
-        this.trigger('click', { checked });
         this.trigger('change', { checked, source: 'click' });
       });
     },
