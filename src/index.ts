@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-09 18:20:09
+ * @LastEditTime: 2024-06-10 03:54:53
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -270,7 +270,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
           else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
         }
         this.trigger('click', { checked });
-        this.trigger('change', { checked });
+        this.trigger('change', { checked, source: 'click' });
       });
     },
     handlePointerAnimated() {
@@ -278,7 +278,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     async refreshPanels(...args) {
       await this._panel_.refresh(...args);
-      this.trigger('change');
+      this.trigger('change', { source: 'gesture' });
     },
     refreshAnnualPanels(...args) {
       this._panel_.refreshAnnualPanels(...args);
@@ -415,7 +415,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const current = this.data.current;
         const half = Math.floor(CALENDAR_PANELS / 2);
         const first = (current - half + CALENDAR_PANELS) % CALENDAR_PANELS;
-        const last= (current + half) % CALENDAR_PANELS;
+        const last = (current + half) % CALENDAR_PANELS;
         const { year: sy, month: sm, day: sd } = panels[first].weeks[0].days[0];
         const lastWeeks = panels[last].weeks;
         const lastDays = lastWeeks[lastWeeks.length - 1].days;
