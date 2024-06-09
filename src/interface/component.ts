@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-07 23:15:54
+ * @LastEditTime: 2024-06-10 03:59:20
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -215,6 +215,7 @@ export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
   range?: [startDate: CalendarDay, endDate: CalendarDay];
+  source?: 'click' | 'gesture' | 'annual' | 'control'; // 点击 ｜ 手势滑动 ｜ 年面板点击 ｜ 方法控制
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
@@ -330,7 +331,6 @@ export interface CalendarExport<T extends PluginConstructor[] = []> extends Wech
   toggleView(view?: CalendarView): void;
   /**
    * 打开年度面板
-   * @param mon 指定月
    */
   openAnuual(): Promise<void>;
   /**

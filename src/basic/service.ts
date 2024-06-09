@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 18:41:10
+ * @LastEditTime: 2024-06-10 06:27:08
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -65,8 +65,8 @@ export type TrackYearResult = {
   marks?: WcAnnualMarks;
 };
 
-interface EventIntercept {
-  (): never;
+export interface EventIntercept {
+  (signal?: number): never;
 }
 interface PluginInterception {
   /**
@@ -147,11 +147,7 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
    * @param service PliginService实例
    * @param dates 日期数组
    */
-  PLUGIN_DATES_FILTER?(
-    service: PluginService,
-    dates: Array<CalendarDay>,
-    type?: 'range' | 'multi'
-  ): Array<CalendarDay | CalendarDay[]>;
+  PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<CalendarDay | DateRange>;
 }
 
 export interface PluginConstructor {
@@ -249,12 +245,23 @@ type PluginInterceptDetail<T extends PluginInterceptNames> = Parameters<
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
-export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
+export type DateRange = [start: CalendarDay, end?: CalendarDay];
+export type DateRanges = Array<DateRange>;
 
-class PluginInterceptError extends Error {}
+class PluginInterceptError extends Error {
+  public code: number;
+  constructor(message?: string, code: number = 0) {
+    super(message);
+    this.code = code;
+  }
+}
 
-export const intercept = (): never => {
-  throw new PluginInterceptError();
+/**
+ * 拦截器
+ * @param signal 0直接退出循环，1继续循环但不执行默认行为
+ */
+export const intercept = (signal?: number): never => {
+  throw new PluginInterceptError(void 0, signal);
 };
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
@@ -310,8 +317,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo)
-          record.subinfo = [...(record.subinfo || []), ...(fillAnnualSubs(key, year.year, result.subinfo) || [])];
-        if (result.marks?.size) record.marks = mergeAnnualMarks(record.marks, result.marks);
+          record.subinfo = [...(fillAnnualSubs(key, year.year, result.subinfo) || []), ...(record.subinfo || [])];
+        if (result.marks?.size) record.marks = mergeAnnualMarks(result.marks, record.marks);
       }
     });
     return notEmptyObject(record) ? record : null;
@@ -429,7 +436,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   /**
    * 范围更新
    */
-  public async updateRange(range: DateRange) {
+  public async updateRange(range: DateRanges) {
     const panels = this.component.data.panels;
     const current = this.component.data.current;
 
@@ -537,9 +544,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
     try {
-      this.traversePlugins(plugin => {
-        plugin[handler]?.call(plugin, this, ...detail);
-      });
+      for (let i = 0; i < this._plugins_.length; i++) {
+        const plugin = this._plugins_[i];
+        plugin.instance[handler]?.call(plugin.instance, this, ...detail);
+      }
     } catch (e) {
       return;
     }
@@ -559,16 +567,21 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
 
+    let execAction = true;
+
     for (let i = this._plugins_.length; i--; ) {
       const plugin = this._plugins_[i].instance;
       try {
         plugin[handler]!.call(plugin, this, detail, intercept);
       } catch (e) {
-        if (e instanceof PluginInterceptError) return;
+        if (e instanceof PluginInterceptError) {
+          if (!e.code) return;
+          execAction = false;
+        }
       }
     }
 
-    action?.();
+    execAction && action?.();
   }
 
   /**
@@ -581,7 +594,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   }
 
   /**
-   * 遍历插件
+   * 倒序遍历插件
    * @param callback 执行
    */
   public traversePlugins(callback: TraverseCallback): void {

@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 21:46:06
+ * @LastEditTime: 2024-06-10 06:14:35
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises } from '../utils/shared';
+import { nonNullable, Nullable, promises } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
@@ -591,12 +591,17 @@ export class YearPrinter extends CalendarHandler {
       const date = { year: month.year, month: month.month, day };
       const mark = marks.get(getAnnualMarkKey(date));
 
+      const opacity = <number>themeStyle(mark?.style?.opacity);
+      if (opacity) ctx!.globalAlpha = opacity;
+
       if (mark?.style?.bgColor) {
         this.renderDateBg(canvas, mark.style, locate, frame);
       }
 
+      const color = <string>themeStyle(mark?.style?.color);
+
       ctx!.fillStyle =
-        <string>themeStyle(mark?.style?.color) ||
+        (color !== 'initial' && color) ||
         (isToday(date)
           ? frame.todayCheckedColor!
           : showRest && (mark?.rwtype === 'rest' || (this.isWeekend(w) && mark?.rwtype !== 'work'))
@@ -604,6 +609,7 @@ export class YearPrinter extends CalendarHandler {
             : frame.dateColor);
 
       ctx!.fillText(`${day}`, _x, _y);
+      ctx!.globalAlpha = alpha;
 
       this.renderMark(canvas, date, marks, locate, frame, alpha);
     }
