@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.7.1](https://github.com/lspriv/wx-calendar/compare/v1.7.0...v1.7.1) (2024-06-09)
+
+
+### Bug Fixes
+
+* change事件完善来源 ([be1f495](https://github.com/lspriv/wx-calendar/commit/be1f495f06ac35240c1b05381703b0da4c1204fe))
+* 修复viewGesture初始赋值 ([5a6964b](https://github.com/lspriv/wx-calendar/commit/5a6964b74be1b7098d6c104fa5d11775c8c441f4))
+* 修复事件中日期范围的参数 ([da14a47](https://github.com/lspriv/wx-calendar/commit/da14a4766b318993c490b0e5faf802befdab8ca7))
+* 完善拦截器参数 ([76888df](https://github.com/lspriv/wx-calendar/commit/76888df20b658e1e3609682fcad85a4720b89949))
+* 导出拦截器类型 ([4d84897](https://github.com/lspriv/wx-calendar/commit/4d84897821dcf38f486247e32536288a9848e0f3))
+* 规范插件执行顺序 ([675507e](https://github.com/lspriv/wx-calendar/commit/675507e5b1e94d669e118d3b09237273fa3f29f1))
+* 调整click事件触发时机 ([aae3d4c](https://github.com/lspriv/wx-calendar/commit/aae3d4c4c10eb15d91761eae46494b6ec50594bf))
+* 调整年面板日期样式标记color ([292c0a9](https://github.com/lspriv/wx-calendar/commit/292c0a942c3c9c5f9a746748158bb0aee04c77fc))
+* 调整拦截器参数 ([267ad7e](https://github.com/lspriv/wx-calendar/commit/267ad7ec3f2efa8aefbd04d3185fc57d8805b186))
+* 调整类型DateRange ([0f870de](https://github.com/lspriv/wx-calendar/commit/0f870de973cdb2333e9616d34061f2a84bbe76f7))
+
 ## [1.7.0](https://github.com/lspriv/wx-calendar/compare/v1.6.2...v1.7.0) (2024-06-08)
 
 
