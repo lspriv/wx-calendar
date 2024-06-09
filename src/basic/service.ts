@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 05:47:19
+ * @LastEditTime: 2024-06-10 06:27:08
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -245,7 +245,8 @@ type PluginInterceptDetail<T extends PluginInterceptNames> = Parameters<
 
 export type ServicePlugins<T> = T extends PluginService<infer R> ? R : never;
 
-export type DateRange = Array<[start: CalendarDay, end?: CalendarDay]>;
+export type DateRange = [start: CalendarDay, end?: CalendarDay];
+export type DateRanges = Array<DateRange>;
 
 class PluginInterceptError extends Error {
   public code: number;
@@ -435,7 +436,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   /**
    * 范围更新
    */
-  public async updateRange(range: DateRange) {
+  public async updateRange(range: DateRanges) {
     const panels = this.component.data.panels;
     const current = this.component.data.current;
 
