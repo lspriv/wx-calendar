@@ -301,6 +301,13 @@ type ScheduleEventDetail = {
 }
 ```
 
+[***`openAnuual`***](#openAnuual) 打开年度面板
+```typescript
+{
+  (): Promise<void>;
+}
+```
+
 [***`getMarks`***](#getMarks) 获取完整的日期标记
 ```typescript
 {
@@ -452,7 +459,9 @@ import {
   PluginService,
   WcScheduleInfo,
   CalendarEventDetail,
-  getMarkKey
+  DateRange,
+  getMarkKey,
+  getAnnualMarkKey
 } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
@@ -492,19 +501,21 @@ class MyPlugin implements Plugin {
    */
   PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
     // do something...
+
     return {
       subinfo: [
         { text: '乙巳蛇年', color: '#F56C6C' },
         { text: '农历初一', color: '#409EFF' }
       ], 
       marks: new Map([
-        ['2023-10-1', { rwtype: 'rest' }], // 休息日，置灰
-        ['2023-10-7', { rwtype: 'work' }], // 工作日，正常
-        ['2023-10-9', { sub: '#F56C6C' }] // 自定义颜色下标
-        ['2024-6-7', { 
+        [getAnnualMarkKey({ month: 10, day: 6 }), { rwtype: 'rest' }], // 休息日，置灰
+        [getAnnualMarkKey({ month: 10, day: 7 }), { rwtype: 'work' }], // 工作日，正常
+        [getAnnualMarkKey({ month: 10, day: 12 }), { sub: '#F56C6C' }] // 自定义颜色下标
+        [getAnnualMarkKey({ month: 10, day: 20 }), { 
           style: {
             color: { light: '#fff', dark: '#000' }, // 日期字体颜色
             bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
+            opacity: { light: 1, dark: 1 }, // 不支持 0
             bgTLRadius: { light: 50, dark: 50 }, // 日期背景左上圆角半径
             bgTRRadius: { light: 0, dark: 0 }, // 日期背景右上圆角半径
             bgBLRadius: { light: 0, dark: 0 }, // 日期背景左下圆角半径
@@ -601,7 +612,7 @@ class MyPlugin implements Plugin {
    * @param dates 待过滤的日期数组
    * @param type range范围  multi多点
    */
-  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay>, type?: 'range' | 'multi'): Array<Calendar | Calendar[]> {
+  PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<Calendar | DateRange> {
      // 获取日历组件实例
     const component = service.component;
 
@@ -640,8 +651,8 @@ type LunarDate = {
 #### 插件说明
 组件使用多个插件，后引入（use）的先执行，并且每个日期角标和节假日只有一个地方可用，所以先执行的插件捕获该日期有返回角标或节假日数据，则不再使用后续插件的角标和节假日数据，日程则是合并所有插件的日程数据
 
-#### 插件画饼
-有计划做的插件
+#### 已完成插件
+- [x] <a href="https://github.com/lspriv/wc-plugin-multiple" target="_blank">***日历多选插件*** 查看</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">***ICS日历订阅插件*** 查看</a>
 - [ ] *日历快照插件*
 - [ ] *Locale本地化插件*

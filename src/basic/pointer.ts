@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2024-06-06 12:26:20
+ * @LastEditTime: 2024-06-09 14:48:04
  */
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
 
 import type { CalendarDay, WcMonth } from '../interface/calendar';
-import type { CalendarData } from '../interface/component';
+import type { CalendarData, CalendarPanel } from '../interface/component';
 
 interface PointerLocation {
   x: string | number;
@@ -68,7 +68,9 @@ export class Pointer extends CalendarHandler {
     const instance = this._instance_;
     checked = checked || sets?.checked || instance.data.checked!;
     const current = sets?.current ?? instance.data.current;
-    const panel = sets?.panels ? sets.panels[current] : sets?.[`panels[${current}]`] || instance.data.panels[current];
+    const panel: CalendarPanel = sets?.panels
+      ? sets.panels[current]
+      : sets?.[`panels[${current}]`] || instance.data.panels[current];
 
     this._vibrate_ = vibrate;
 

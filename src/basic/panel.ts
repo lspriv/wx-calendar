@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 23:16:14
+ * @LastEditTime: 2024-06-10 03:56:58
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -238,7 +238,7 @@ export class PanelTool extends CalendarHandler {
       const offset = monthDiff(pannel, { year: d.year, month: d.month });
       await this.refresh(offset, d, idx >= 0 ? idx : current);
     }
-    instance.trigger('change', { checked: d });
+    instance.trigger('change', { checked: d, source: 'control' });
   }
 
   public async toWeekAdjoin(checked: CalendarDay, vibrate: boolean = true) {
@@ -283,7 +283,7 @@ export class PanelTool extends CalendarHandler {
     instance.setData(sets);
     await this.update();
 
-    if (!isSameDate(date, checked!)) instance.trigger('change', { checked: date });
+    if (!isSameDate(date, checked!)) instance.trigger('change', { checked: date, source: 'annual' });
   }
 
   public toYear(year: number) {
