@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-09 00:20:20
+ * @LastEditTime: 2024-06-09 18:20:09
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -412,8 +412,12 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
 
       if (event === 'change' || event === 'load') {
         const panels = this.data.panels;
-        const { year: sy, month: sm, day: sd } = panels[0].weeks[0].days[0];
-        const lastWeeks = panels[panels.length - 1].weeks;
+        const current = this.data.current;
+        const half = Math.floor(CALENDAR_PANELS / 2);
+        const first = (current - half + CALENDAR_PANELS) % CALENDAR_PANELS;
+        const last= (current + half) % CALENDAR_PANELS;
+        const { year: sy, month: sm, day: sd } = panels[first].weeks[0].days[0];
+        const lastWeeks = panels[last].weeks;
         const lastDays = lastWeeks[lastWeeks.length - 1].days;
         const { year: ey, month: em, day: ed } = lastDays[lastDays.length - 1];
         detail.range = [
