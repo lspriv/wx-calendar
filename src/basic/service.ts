@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 04:21:16
+ * @LastEditTime: 2024-06-10 04:39:30
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -306,8 +306,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const result = plugin.PLUGIN_TRACK_YEAR?.(year);
       if (result) {
         if (result.subinfo)
-          record.subinfo = [...(record.subinfo || []), ...(fillAnnualSubs(key, year.year, result.subinfo) || [])];
-        if (result.marks?.size) record.marks = mergeAnnualMarks(record.marks, result.marks);
+          record.subinfo = [...(fillAnnualSubs(key, year.year, result.subinfo) || []), ...(record.subinfo || [])];
+        if (result.marks?.size) record.marks = mergeAnnualMarks(result.marks, record.marks);
       }
     });
     return notEmptyObject(record) ? record : null;
@@ -533,9 +533,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       camelToSnake(event).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
     try {
-      this.traversePlugins(plugin => {
-        plugin[handler]?.call(plugin, this, ...detail);
-      });
+      for (let i = 0; i < this._plugins_.length; i++) {
+        const plugin = this._plugins_[i];
+        plugin.instance[handler]?.call(plugin.instance, this, ...detail);
+      }
     } catch (e) {
       return;
     }
@@ -555,7 +556,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
 
-    for (let i = this._plugins_.length; i--; ) {
+    for (let i = 0; i < this._plugins_.length; i++) {
       const plugin = this._plugins_[i].instance;
       try {
         plugin[handler]!.call(plugin, this, detail, intercept);
@@ -577,7 +578,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   }
 
   /**
-   * 遍历插件
+   * 倒序遍历插件
    * @param callback 执行
    */
   public traversePlugins(callback: TraverseCallback): void {
