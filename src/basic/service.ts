@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 04:56:26
+ * @LastEditTime: 2024-06-10 05:47:19
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -66,7 +66,7 @@ export type TrackYearResult = {
 };
 
 export interface EventIntercept {
-  (): never;
+  (signal?: number): never;
 }
 interface PluginInterception {
   /**
@@ -259,7 +259,7 @@ class PluginInterceptError extends Error {
  * 拦截器
  * @param signal 0直接退出循环，1继续循环但不执行默认行为
  */
-export const intercept = (signal: number): never => {
+export const intercept = (signal?: number): never => {
   throw new PluginInterceptError(void 0, signal);
 };
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
