@@ -440,8 +440,6 @@ const { YourPlugin } = require('anywhere');
 
 WxCalendar.use(YourPlugin, options); // options 插件选项
 
-// 或 WxCalendar.use([YourPlugin]); 这种适合多个无配置选项的
-
 Component({
     ...
 })
