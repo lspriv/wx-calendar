@@ -651,12 +651,14 @@ type LunarDate = {
 ```
 
 #### 插件说明
-组件使用多个插件，后引入（use）的先执行，并且每个日期角标和节假日只有一个地方可用，所以先执行的插件捕获该日期有返回角标或节假日数据，则不再使用后续插件的角标和节假日数据，日程则是合并所有插件的日程数据
+- `标记数据` 后引入的插件数据覆盖先引入的插件数据
+- `响应事件` 按插件的引入顺序响应事件，先引入的先响应
+- `动作捕获` 后引入的先执行
 
 #### 已完成插件
-- [x] <a href="https://github.com/lspriv/wc-plugin-disabled" target="_blank">***日历禁用插件*** 查看</a>
-- [x] <a href="https://github.com/lspriv/wc-plugin-multiple" target="_blank">***日历多选插件*** 查看</a>
-- [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">***ICS日历订阅插件*** 查看</a>
+- [x] <a href="https://github.com/lspriv/wc-plugin-disabled" target="_blank">**@lspriv/wc-plugin-disabled 日历禁用插件**</a>
+- [x] <a href="https://github.com/lspriv/wc-plugin-multiple" target="_blank">**@lspriv/wc-plugin-multiple 日历多选插件**</a>
+- [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">**@lspriv/wc-plugin-ics ICS日历订阅插件**</a>
 - [ ] *Locale本地化插件*
 
 ### 关于
