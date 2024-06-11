@@ -279,11 +279,11 @@ type ScheduleEventDetail = {
 
 ### Methods 方法
 
-[***`toDate`***](#toDate) 跳转到指定日期
+[***`checked`***](#toDate) 选中日期
 ```typescript
 {
   /**
-   * @param date 跳转日期
+   * @param date 选中日期
    * yyyy-mm-dd | timestamp | Date | CalendarDay
    */
   (date: string | number | Date | CalendarDay): Promise<void>;
