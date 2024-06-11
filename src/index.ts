@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 05:02:31
+ * @LastEditTime: 2024-06-11 17:58:01
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -500,7 +500,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     const instance = this;
     return {
       version: VERSION,
-      toDate(date) {
+      checked(date) {
         return instance._panel_.toDate(date);
       },
       toggleView(view) {
