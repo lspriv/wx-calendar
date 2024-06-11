@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.2](https://github.com/lspriv/wx-calendar/compare/v1.7.1...v1.7.2) (2024-06-11)
+
+
+### Bug Fixes
+
+* 初始化年面板变量renderCheckedBg ([5c08178](https://github.com/lspriv/wx-calendar/commit/5c08178cd95f34c4ddad42f4a6f51e82f0d7321e))
+* 调整toDate方法为checked ([e841039](https://github.com/lspriv/wx-calendar/commit/e841039257496a80580c0f64c48aedaa2a7aabda))
+* 调整年面板渲染 ([f1cd71a](https://github.com/lspriv/wx-calendar/commit/f1cd71a684145f3d7438fe6b2d91bf50eb1ad64f))
+
 ## [1.7.1](https://github.com/lspriv/wx-calendar/compare/v1.7.0...v1.7.1) (2024-06-09)
 
 
