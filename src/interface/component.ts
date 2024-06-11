@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-10 03:59:20
+ * @LastEditTime: 2024-06-11 17:57:50
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -321,9 +321,9 @@ export interface CalendarExport<T extends PluginConstructor[] = []> extends Wech
   /** 版本号 */
   version: string;
   /**
-   * 周/月面板跳转到指定日期
+   * 选中日期
    */
-  toDate(date: string | number | Date | CalendarDay): Promise<void>;
+  checked(date: string | number | Date | CalendarDay): Promise<void>;
   /**
    * 周/月面板切换到视图
    * 若果view未指定，会在周月视图之间切换
