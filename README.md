@@ -279,11 +279,11 @@ type ScheduleEventDetail = {
 
 ### Methods 方法
 
-[***`toDate`***](#toDate) 跳转到指定日期
+[***`checked`***](#toDate) 选中日期
 ```typescript
 {
   /**
-   * @param date 跳转日期
+   * @param date 选中日期
    * yyyy-mm-dd | timestamp | Date | CalendarDay
    */
   (date: string | number | Date | CalendarDay): Promise<void>;
@@ -439,8 +439,6 @@ const { YourPlugin } = require('anywhere');
 // WxCalendar.clearPlugin(); 清理预设插件
 
 WxCalendar.use(YourPlugin, options); // options 插件选项
-
-// 或 WxCalendar.use([YourPlugin]); 这种适合多个无配置选项的
 
 Component({
     ...
