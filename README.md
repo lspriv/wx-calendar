@@ -168,22 +168,10 @@ type CalendarDay = {
         <td>''</td>
     </tr>
     <tr>
-        <td>sameChecked</td>
-        <td>boolean</td>
-        <td>保持选中日期样式一致</td>
-        <td>false</td>
-    </tr>
-    <tr>
         <td>font</td>
         <td>string</td>
         <td>设置字体</td>
         <td>''</td>
-    </tr>
-    <tr>
-        <td>customNavBar</td>
-        <td>boolean</td>
-        <td>组件所在页面是否自定义导航栏</td>
-        <td>true</td>
     </tr>
     <tr>
         <td>areas</td>
@@ -195,6 +183,18 @@ type CalendarDay = {
         <td>viewGesture</td>
         <td>boolean</td>
         <td>是否滑动手势控制视图</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>sameChecked</td>
+        <td>boolean</td>
+        <td>保持选中日期样式一致</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>customNavBar</td>
+        <td>boolean</td>
+        <td>组件所在页面是否自定义导航栏</td>
         <td>true</td>
     </tr>
 </table>
@@ -240,6 +240,8 @@ type CalendarDay = {
 > ```
 > 角标内容最好一个字符长度，只对一个字符校正了位置，多出的请自行调整位置
 
+> [!IMPORTANT]
+> 如果组件所在页面未开启自定义导航栏，请设置属性 `customNavBar` 为 `false`
 ### Events 事件
 
 [***`bindload`***](#bindload)  日历加载完成
