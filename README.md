@@ -446,44 +446,91 @@ Component({
 ```
 
 #### 插件开发
-自定义插件需要实现Plugin接口
-```typescript
-import { 
-  Plugin, 
-  WcYear,
-  CalendarDay,  
-  TrackDateResult, 
-  TrackYearResult, 
-  PluginService,
-  WcScheduleInfo,
-  CalendarEventDetail,
-  DateRange,
-  getMarkKey,
-  getAnnualMarkKey
-} from '@lspriv/wx-calendar/lib';
+
+##### 基础部分
+
+```typescript 
+import { Plugin } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
-  /** 需要定义插件的key，必填 */
+  /**
+   * 插件的 KEY 是必须的，没有此插件会被过滤掉
+   */
   static KEY = 'my-plugin' as const;
 
+  /**
+   * 构造函数，参数为用户传入的插件选项。
+   * 此构造器可选择实现，如果没有提供选项配置或是其他初始化过程的话。
+   */
   constructor(options?: Record<string, any>) {
     // options 引入时的插件选项
   }
+}
+
+```
+
+##### 生命周期
+注册日历组件的三个生命周期钩子 `created` `attached` `detacched`。
+```typescript 
+
+import { Plugin, PluginService, CalendarData } from '@lspriv/wx-calendar/lib';
+
+class MyPlugin implements Plugin {
 
   /**
-   * PliginService初始化完成，可选择实现该方法
+   * 插件初始化，可选择实现该方法
+   * 在日历组件 created 阶段最后，在插件实例化后
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE(service: PluginService) {
+  PLUGIN_INITIALIZE(service: PluginService): void {
     // 获取日历组件实例
     const component = service.component;
   }
 
   /**
+   * 组件挂载，可选择实现该方法
+   * 在日历组件 attached 阶段中，此时组件的所有工具类已完成实例化，视图数据即将更新。
+   * 你可以在此方法里修改视图更新数据 sets，还可以调整一些工具实例的初始值。
+   * @param service PliginService实例
+   * @param sets 视图数据
+   */
+  PLUGIN_ON_ATTACH(service: PluginService, sets: Partial<CalendarData>): void {
+
+  }
+
+  /**
+   * 组件销毁，可选择实现该方法
+   * 在日历组件 detacched 阶段中
+   * @param service PliginService实例
+   */
+  PLUGIN_ON_DETACHED(service: PluginService): void {
+
+  }
+}
+
+```
+
+##### 数据标记
+添加修改和删除日期标记，以及完善补充日程数据。
+```typescript 
+import { 
+  Plugin, 
+  WcYear, 
+  CalendarDay, 
+  TrackDateResult, 
+  TrackYearResult, 
+  WcScheduleInfo,
+  getMarkKey, 
+  getAnnualMarkKey 
+} from '@lspriv/wx-calendar/lib';
+
+class MyPlugin implements Plugin {
+  /**
    * 捕获日期，可选择实现该方法
+   * 在此添加修改和删除【周/月/日程视图面板】的日期标记
    * @param date 日期
    */
-  PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult {
+  PLUGIN_TRACK_DATE(date: CalendarDay): TrackDateResult | null {
     // do something...
     return {
       schedule: [{ text: '', color: '', bgColor: '', key: getMarkKey('id', MyPlugin.KEY) }], // 设置日程数组，可选
@@ -492,12 +539,13 @@ class MyPlugin implements Plugin {
       style: { backgroundColor: '', color: '' } // 设置日期样式，也可传字符串形式（如 'background-color: #409EFF;color: #fff;'），可选
     };
   };
-  
+
   /**
    * 捕获年份，可选择实现该方法
+   * 在此添加修改和删除【年面板】的日期标记
    * @param year 年
    */
-  PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult {
+  PLUGIN_TRACK_YEAR(year: WcYear): TrackYearResult | null {
     // do something...
 
     return {
@@ -511,7 +559,7 @@ class MyPlugin implements Plugin {
         [getAnnualMarkKey({ month: 10, day: 12 }), { sub: '#F56C6C' }] // 自定义颜色下标
         [getAnnualMarkKey({ month: 10, day: 20 }), { 
           style: {
-            color: { light: '#fff', dark: '#000' }, // 日期字体颜色
+            color: { light: '#fff', dark: '#000' }, // 日期字体颜色, light浅色模式下，dark深色模式下
             bgColor: { light: '#409EFF', dark: '#409EFF' }, // 日期背景颜色
             opacity: { light: 1, dark: 1 }, // 不支持 0
             bgTLRadius: { light: 50, dark: 50 }, // 日期背景左上圆角半径
@@ -526,70 +574,23 @@ class MyPlugin implements Plugin {
   };
 
   /**
-   * 获取日程信息（点击日程时执行）
+   * 捕获日程信息（点击日程时执行），可选择实现该方法
    * @param date 日期
    * @param id 插件内标记, 由 getMarkKey 生成 key 时传入的 id，详见 PLUGIN_TRACK_DATE
    */
-  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {}
+  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id:? string): WcScheduleInfo {
 
-  /**
-   * 注册日历组件attach阶段处理方法，可选择实现该方法
-   * 此时组件内部工具类初始化完成
-   * @param service PliginService实例
-   */
-  PLUGIN_ON_ATTACH(service: PluginService) {
-    // 获取日历组件实例
-    const component = service.component;
   }
+}
 
-  /**
-   * 注册日历加载完成事件处理方法，可选择实现该方法
-   * @param service PliginService实例
-   * @param detail 事件数据
-   */
-  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail) {
-    // 获取日历组件实例
-    const component = service.component;
-  }
+```
 
-  /**
-   * 注册日期点击事件处理方法，可选择实现该方法
-   * @param service PliginService实例
-   * @param detail 事件数据
-   */
-  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail) {
-    // 获取日历组件实例
-    const component = service.component;
-  }
+##### 动作捕捉
+捕获用户的手势动作，此时动作已完成，但在日历组件默认行为之前。
+```typescript 
+import { Plugin, PluginService, EventIntercept } from '@lspriv/wx-calendar/lib';
 
-  /**
-   * 注册日期变化事件处理方法，可选择实现该方法
-   * @param service PliginService实例
-   * @param detail 事件数据
-   */
-  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail) {
-    // 获取日历组件实例
-    const component = service.component;
-  }
-  
-  /**
-   * 注册视图变化事件处理方法，可选择实现该方法
-   * @param service PliginService实例
-   * @param detail 事件数据
-   */
-  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail) {
-    // 获取日历组件实例
-    const component = service.component;
-  }
-
-  /**
-   * 注册日历组件实例销毁事件处理方法，可选择实现该方法
-   * @param service PliginService实例
-   */
-  PLUGIN_ON_DETACHED(service: PluginService) {
-    // 获取日历组件实例
-    const component = service.component;
-  }
+class MyPlugin implements Plugin {
 
   /**
    * 拦截日期点击动作，可选择实现该方法
@@ -597,20 +598,91 @@ class MyPlugin implements Plugin {
    * @param event 事件参数
    * @param intercept 拦截器
    */
-  PLUGIN_CATCH_TAP(service: PluginService, event: TouchEvent, intercept: EventIntercept) {
+  PLUGIN_CATCH_TAP(service: PluginService, event: TouchEvent, intercept: EventIntercept): void {
      // 获取日历组件实例
     const component = service.component;
     // 若不想事件继续传播
     if (...) intercept();
+    // intercept(0) 直接退出 
+    // intercept(1) 继续向其他插件传播，但不会执行日历组件默认行为
+  }
+}
 
-    // intercept(0) 直接退出 intercept(1) 继续向自身和其他插件传播，但不会执行默认行为
+```
+> [!NOTE] 
+> 本日历统计共有七个主要的动作，当前仅提供日期点击动作的捕获，七个动作分别是
+> - 日期点击
+> - 头部标题点击（打开年面板）
+> - 今日按钮点击（跳转到今日）
+> - 视图按钮点击（按钮切换视图）
+> - 垂直手势滑动（手势切换视图）
+> - 水平手势滑动（swiper滑动滑块）
+> - 年面板点击月份（主面板跳转到某月）
+
+
+##### 事件响应
+响应日历组件事件 `load` `click` `change` `viewChange`。
+```typescript 
+import { Plugin, PluginService, CalendarEventDetail, OnceEmiter } from '@lspriv/wx-calendar/lib';
+
+class MyPlugin implements Plugin {
+
+  /**
+   * 日历加载完成，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 响应数据
+   * @param emiter 事件触发器
+   */
+  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+    // 获取日历组件实例
+    const component = service.component;
+
+    emiter.cancel(); // 取消日历组件触发 bindload 事件。
+    // emiter.emit(detail); 劫持触发 bindload 事件，和 emiter.cancel 只能二选一。
   }
 
+   /**
+   * 日期点击事件，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 响应数据
+   * @param emiter 事件触发器
+   */
+  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+    
+  }
+
+   /**
+   * 日期选中变化，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 响应数据
+   * @param emiter 事件触发器
+   */
+  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+    
+  }
+
+  /**
+   * 视图变化，可选择实现该方法
+   * @param service PliginService实例
+   * @param detail 响应数据
+   * @param emiter 事件触发器
+   */
+  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+
+  }
+}
+
+```
+
+##### 其他
+```typescript
+import { Plugin, CalendarDay, PluginService, DateRange } from '@lspriv/wx-calendar/lib';
+
+class MyPlugin implements Plugin {
   /**
    * 日期过滤器（提供给其他组件调用的），可选择实现该方法
    * @param service PliginService实例
    * @param dates 待过滤的日期数组
-   * @param type range范围  multi多点
    */
   PLUGIN_DATES_FILTER(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<Calendar | DateRange> {
      // 获取日历组件实例
@@ -624,8 +696,7 @@ class MyPlugin implements Plugin {
 }
 ```
 
-
-#### 农历插件
+#### 内置农历插件
 wx-calendar自带农历插件
 ```javascript
 const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar/lib');
@@ -649,9 +720,10 @@ type LunarDate = {
 ```
 
 #### 插件说明
-- `标记数据` 后引入的插件数据覆盖先引入的插件数据
+- `数据标记` 后引入的插件数据覆盖先引入的插件数据
+- `动作捕捉` 后引入的先执行
 - `响应事件` 按插件的引入顺序响应事件，先引入的先响应
-- `动作捕获` 后引入的先执行
+
 
 #### 已完成插件
 - [x] <a href="https://github.com/lspriv/wc-plugin-disabled" target="_blank">**@lspriv/wc-plugin-disabled 日历禁用插件**</a>
