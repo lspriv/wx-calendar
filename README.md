@@ -81,14 +81,14 @@ npm run package
 
 测试尚未写完，等我抽空就写 :rofl:
 
-#### 多端支持
-##### Donut
+### 多端支持
+#### Donut
 需要开启以下选项，开发工具右上角 -> 详情 -> 本地设置
 - 使用 SWC 编译脚本文件
 - 编译 worklet 代码
 - Android XWeb SDK，在 project.miniapp.json中开启
 
-##### UniApp
+#### UniApp
 1. 项目根目录下创建 wxcomponents 文件夹，将打包后dist里的文件拷贝过来放到单独的一个文件夹，比如 wxcomponents/wx-calendar/**
 2. 在 `pages.json` 的 `globalStyle` 中配置 `usingComponents`
    ```json
@@ -100,7 +100,7 @@ npm run package
    ```
 注意事项请参考 [UniApp小程序自定义组件支持](https://uniapp.dcloud.net.cn/tutorial/miniprogram-subject.html)
 
-##### Taro
+#### Taro
 参考 `Taro 使用原生模块`
 > [!NOTE]
 > 如果在 Taro 项目引用了小程序原生的组件，那么该项目将不再具备多端转换的能力。
