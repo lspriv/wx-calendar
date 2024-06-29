@@ -54,7 +54,7 @@ npm i @lspriv/wx-calendar -S
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
-alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
+alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当SIT，发pr到master打tag，拉取哪个分支自行考量
 
 #### 启动
 ```bash
@@ -200,7 +200,7 @@ type CalendarDay = {
 </table>
 
 > [!TIP] 
-> 1.7.0+版本已经移除了固定视图，新增手势控制属性 `viewGesture` ，用一下方式实现固定视图，有更高的自由度
+> 1.7.0+版本已经移除了固定视图属性，新增手势控制属性 `viewGesture` ，用以下方式实现固定视图，有更高的自由度
 
 固定视图的新方式
 ```html

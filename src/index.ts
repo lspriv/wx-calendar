@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-11 17:58:01
+ * @LastEditTime: 2024-06-29 13:51:12
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -457,7 +457,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   observers: {
     date: function (date: string | number) {
       if (this._loaded_) this._panel_.toDate(date);
-      else this._dragger_!.update();
+      else this._dragger_?.update();
     },
     marks: function (marks: Array<CalendarMark | CalendarStyleMark>) {
       const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
