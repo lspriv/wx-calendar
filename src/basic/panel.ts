@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 03:56:58
+ * @LastEditTime: 2024-07-09 16:13:58
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -214,31 +214,34 @@ export class PanelTool extends CalendarHandler {
 
   public async toDate(date: string | number | Date | CalendarDay) {
     const instance = this._instance_;
-    const { current, panels, checked } = instance.data;
     const d = normalDate(date);
-    if (isSameDate(d, checked!)) return;
-    const isWeekView = instance._view_ & View.week;
-    const idx = isWeekView
-      ? this.findWeekPanelIdx(d)
-      : panels.findIndex(mon => mon.year === d.year && mon.month === d.month);
 
-    if (idx === current) {
-      if (isWeekView) {
-        const find = findInWeeks(panels[idx].weeks, _d => isSameDate(_d, d));
-        find && (await this.toWeekAdjoin(find, false));
+    return instance._calendar_.service.interceptEvent('manual', d, async () => {
+      const { current, panels, checked } = instance.data;
+      if (isSameDate(d, checked!)) return;
+      const isWeekView = instance._view_ & View.week;
+      const idx = isWeekView
+        ? this.findWeekPanelIdx(d)
+        : panels.findIndex(mon => mon.year === d.year && mon.month === d.month);
+
+      if (idx === current) {
+        if (isWeekView) {
+          const find = findInWeeks(panels[idx].weeks, _d => isSameDate(_d, d));
+          find && (await this.toWeekAdjoin(find, false));
+        } else {
+          const sets: Partial<CalendarData> = { info: getDateInfo(d, isWeekView), checked: d };
+          this.refreshOffsets(sets, current, d);
+          instance._pointer_.update(sets);
+          instance.setData(sets);
+          await this.update();
+        }
       } else {
-        const sets: Partial<CalendarData> = { info: getDateInfo(d, isWeekView), checked: d };
-        this.refreshOffsets(sets, current, d);
-        instance._pointer_.update(sets);
-        instance.setData(sets);
-        await this.update();
+        const pannel = instance.data.panels[current];
+        const offset = monthDiff(pannel, { year: d.year, month: d.month });
+        await this.refresh(offset, d, idx >= 0 ? idx : current);
       }
-    } else {
-      const pannel = instance.data.panels[current];
-      const offset = monthDiff(pannel, { year: d.year, month: d.month });
-      await this.refresh(offset, d, idx >= 0 ? idx : current);
-    }
-    instance.trigger('change', { checked: d, source: 'control' });
+      instance.trigger('change', { checked: d, source: 'manual' });
+    });
   }
 
   public async toWeekAdjoin(checked: CalendarDay, vibrate: boolean = true) {

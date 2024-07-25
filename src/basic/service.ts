@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 06:27:08
+ * @LastEditTime: 2024-06-29 14:53:35
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -80,6 +80,14 @@ interface PluginInterception {
     event: WechatMiniprogram.TouchEvent<{}, { wdx: number; ddx: number }>,
     intercept: EventIntercept
   ): void;
+
+  /**
+   * 捕获手动日期选中
+   * @param service PliginService实例
+   * @param date 日期
+   * @param intercept 拦截
+   */
+  PLUGIN_CATCH_MANUAL?(service: PluginService, date: CalendarDay, intercept: EventIntercept): void;
 }
 
 interface PluginEventHandler {
@@ -558,11 +566,11 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param event 事件名
    * @param action 默认行为
    */
-  public interceptEvent<K extends PluginInterceptNames>(
+  public interceptEvent<K extends PluginInterceptNames, R extends any = any>(
     name: K,
     detail: PluginInterceptDetail<K>,
-    action?: (...args: any[]) => any
-  ) {
+    action?: (...args: any[]) => R
+  ): R | void {
     const handler: PluginEventInterceptName<K> = `${PLUGIN_EVENT_INTERCEPT_PREFIX}${
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
@@ -581,7 +589,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       }
     }
 
-    execAction && action?.();
+    return execAction ? action?.() : void 0;
   }
 
   /**
