@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-29 13:51:12
+ * @LastEditTime: 2024-07-26 02:53:48
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -226,7 +226,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const query = nodeRect(this);
       const [calendar, rects] = await promises([query(SELECTOR.CALENDAR), query(SELECTOR.WEEK_ITEM)]);
       const x = calendar[0].left.toFixed(1);
-      this.$_calendar_width.value = calendar[0].width;
+      this.$_calendar_width.value = Math.floor(calendar[0].width);
       this._centres_ = rects.map(({ left, width }) => sub(add(left.toFixed(1), div(width.toFixed(1), 2)), x));
     },
     async refreshView({ view }) {
@@ -288,9 +288,6 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         this._swiper_flag_ = true;
         const calendarWidth = this.$_calendar_width.value;
         this._swiper_accumulator_ = e.detail.dx > calendarWidth / 2 ? -initCurrent * calendarWidth : 0;
-        if (e.detail.dx > calendarWidth / 2) {
-          this._swiper_accumulator_ = -initCurrent * calendarWidth;
-        }
       }
       this.$_swiper_trans.value = e.detail.dx;
     },
@@ -306,7 +303,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        * 部分安卓设备 webview 渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
        * 测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
        */
-      if (mod === 0 || this.$_calendar_width.value - Math.abs(mod) < Math.abs(offset)) {
+      if (mod === 0 || this.$_calendar_width.value - Math.abs(mod) <= Math.abs(offset)) {
         this._swiper_accumulator_ = 0;
         if (offset) {
           const type = e.currentTarget.dataset.type;
@@ -327,7 +324,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        * 安卓skyline渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
        * 我的设备有限，测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
        */
-      if (mod === 0 || calendarWidth - Math.abs(mod) < Math.abs(offset)) {
+      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
         this.$_swiper_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshPanels.bind(this))(offset);
       } else {
@@ -342,7 +339,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const mod = accumulation % calendarWidth;
       const _offset = accumulation / calendarWidth;
       const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      if (mod === 0 || calendarWidth - Math.abs(mod) < Math.abs(offset)) {
+      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
         this.$_annual_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshAnnualPanels.bind(this))(offset);
       } else {
