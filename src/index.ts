@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-26 02:53:48
+ * @LastEditTime: 2024-07-26 07:48:32
  */
 
 import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
@@ -256,10 +256,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const { wdx, ddx } = e.mark!;
         const panel = this.data.panels[this.data.current];
         const date = panel.weeks[wdx].days[ddx];
+        const isWeekView = this._view_ & View.week;
+        if (isWeekView) {
+          const weekstart = this.data.weekstart;
+          if (PanelTool.calcPanelOffset(date, weekstart) != PanelTool.calcPanelOffset(this.data.checked!, weekstart))
+            return;
+        }
         this.trigger('click', { checked: date });
         if (isSameDate(date, this.data.checked!)) return;
         const checked = normalDate(date);
-        const isWeekView = this._view_ & View.week;
         if (date.kind === 'current') {
           const sets = { info: getDateInfo(checked, isWeekView), checked };
           if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
