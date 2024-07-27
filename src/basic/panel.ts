@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-27 23:52:37
+ * @LastEditTime: 2024-07-28 03:53:38
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -96,7 +96,11 @@ export class PanelTool extends CalendarHandler {
       checked = isWeekView ? normalDate(year, month, day + offset * 7) : inMonthDate(year, month + offset, day);
     }
 
-    const sets: RefreshFields = { current, info: getDateInfo(checked, isWeekView), checked };
+    const sets: RefreshFields = {
+      current,
+      info: getDateInfo(checked, instance.data.weekstart, isWeekView),
+      checked
+    };
 
     this.refreshPanels(sets);
 
@@ -107,13 +111,13 @@ export class PanelTool extends CalendarHandler {
 
   public async refreshView(view: View) {
     const instance = this._instance_;
-    const { current, checked } = instance.data;
+    const { current, checked, weekstart } = instance.data;
     instance._view_ = view;
 
     const currView = flagView(view);
     const isWeekView = view & View.week;
 
-    const sets: RefreshFields = { currView, info: getDateInfo(checked!, isWeekView), checked, current };
+    const sets: RefreshFields = { currView, info: getDateInfo(checked!, weekstart, isWeekView), checked, current };
     this.refreshPanels(sets);
 
     instance.setData(sets);
@@ -226,7 +230,7 @@ export class PanelTool extends CalendarHandler {
     const d = normalDate(date);
 
     return instance._calendar_.service.interceptEvent('manual', d, async () => {
-      const { current, panels, checked } = instance.data;
+      const { current, panels, checked, weekstart } = instance.data;
       if (isSameDate(d, checked!)) return;
       const isWeekView = instance._view_ & View.week;
       const idx = isWeekView
@@ -238,7 +242,7 @@ export class PanelTool extends CalendarHandler {
           const find = findInWeeks(panels[idx].weeks, _d => isSameDate(_d, d));
           find && (await this.toWeekAdjoin(find, false));
         } else {
-          const sets: Partial<CalendarData> = { info: getDateInfo(d, isWeekView), checked: d };
+          const sets: Partial<CalendarData> = { info: getDateInfo(d, weekstart, isWeekView), checked: d };
           this.refreshOffsets(sets, current, d);
           instance._pointer_.update(sets);
           instance.setData(sets);
@@ -256,7 +260,7 @@ export class PanelTool extends CalendarHandler {
   public async toWeekAdjoin(checked: CalendarDay, vibrate: boolean = true) {
     const instance = this._instance_;
     const current = instance.data.current;
-    const sets: Partial<CalendarData> = { info: getDateInfo(checked, true), checked };
+    const sets: Partial<CalendarData> = { info: getDateInfo(checked, instance.data.weekstart, true), checked };
     const offsets = this.calcWeekOffset(checked);
     sets[`panels[${current}]`] = this.createPanel(checked, current, offsets);
     instance._pointer_.update(sets, false, instance.data.checked!, true);
@@ -269,7 +273,7 @@ export class PanelTool extends CalendarHandler {
 
   public async toAnnualMonth(mon: CalendarMonth, toMonthView: boolean = true) {
     const instance = this._instance_;
-    const { checked, current, panels } = instance.data;
+    const { checked, current, panels, weekstart } = instance.data;
 
     const currPanel = panels[current];
     const isCurrMonth = currPanel.year === mon.year && currPanel.month === mon.month;
@@ -284,7 +288,7 @@ export class PanelTool extends CalendarHandler {
     if (toMonthView && !(instance._view_ & View.month)) {
       const currView = flagView(View.month);
       sets.currView = currView;
-      sets.info = getDateInfo(date, false);
+      sets.info = getDateInfo(date, weekstart, false);
       if (this.skyline) instance._dragger_?.toView(View.month, false);
       else sets.initView = VIEWS.MONTH;
       instance._view_ = View.month;

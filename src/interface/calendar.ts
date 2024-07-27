@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 01:43:25
+ * @LastEditTime: 2024-07-28 04:15:13
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
@@ -399,7 +399,7 @@ export const sortWeeks = (weekstart: number) => {
  */
 export const weekRange = (date: CalendarDay, weekstart: number = 0): [start: Date, end: Date] => {
   const { year, month, day, week } = normalDate(date);
-  const first = new Date(year, month - 1, day - (Math.abs(week! + 7 - weekstart) % 7));
+  const first = new Date(year, month - 1, day - ((week! + 7 - weekstart) % 7));
   const last = new Date(first.getFullYear(), first.getMonth(), first.getDate() + 6);
   return [first, last];
 };
@@ -449,14 +449,23 @@ export const getWeekDateIdx = (date: CalendarDay, weeks: Array<WcWeek>): { wdx: 
 
 /**
  * 获取指定日期所在第几周
+ * 每年的第一个日历星期有以下等效说法
+ * 1. 本年度第一个星期四所在的星期
+ * 2. 1月4日所在的星期
+ * 3. 本年度第一个至少有4天在同一星期内的星期
  * @param date 指定日期
  */
-const weekOrder = (date: CalendarDay) => {
+const weekOrder = (date: CalendarDay, weekstart = 0) => {
   const { year, month, day } = date;
   const curr = new Date(year, month - 1, day);
-  const first = new Date(year, 0, 1);
-  const diff = Math.round((+curr - +first) / 86400000);
-  return Math.ceil((diff + 1) / 7);
+  /** 以1月4号所在周的周首日作为起始日 */
+  const start = new Date(year, 0, 4);
+  start.setDate(start.getDate() - ((start.getDay() + 7 - weekstart) % 7));
+  // 作为上一年的最后一周
+  if (curr < start) return weekOrder({ year, month: 1, day: 0 }, weekstart);
+  /** 计算相隔天数 */
+  const days = Math.floor((+curr - +start) / 86400000) + 1;
+  return Math.ceil(days / 7);
 };
 
 /**
@@ -488,12 +497,12 @@ const createYearMonth = (mon: CalendarMonth, weekstart: number = 0): WcAnnualMon
  * @param date 指定日期
  * @param withWeek 周首日
  */
-export const getDateInfo = (date: CalendarDay, withWeek: boolean | number = false) => {
+export const getDateInfo = (date: CalendarDay, weekstart: number, withWeek: boolean | number = false) => {
   const start = new Date(WxCalendar.today.year, WxCalendar.today.month - 1, WxCalendar.today.day);
   const end = new Date(date.year, date.month - 1, date.day);
   const diff = Math.floor((end.getTime() - start.getTime()) / 86400000);
   const postfix = isToday(date) ? `周${WEEKS[date.week!]}` : `${Math.abs(diff)}天${diff < 0 ? '前' : '后'}`;
-  if (withWeek) return `第${weekOrder(date)}周 ${postfix}`;
+  if (withWeek) return `第${weekOrder(date, weekstart)}周 ${postfix}`;
   return postfix;
 };
 

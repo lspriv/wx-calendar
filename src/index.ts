@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 01:45:40
+ * @LastEditTime: 2024-07-28 03:50:56
  */
 
 import {
@@ -212,7 +212,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         currView: initView,
         initView,
         gesture: this.data.viewGesture,
-        info: getDateInfo(checked, isWeekView),
+        info: getDateInfo(checked, this.data.weekstart, isWeekView),
         pointer: createPointer(),
         darkside: this.data.darkmode && Layout.darkmode,
         areaHideCls
@@ -270,7 +270,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         if (isSameDate(date, this.data.checked!)) return;
         const checked = normalDate(date);
         if (date.kind === 'current') {
-          const sets = { info: getDateInfo(checked, isWeekView), checked };
+          const sets = { info: getDateInfo(checked, this.data.weekstart, isWeekView), checked };
           if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
           this._pointer_.update(sets, true);
           this.setData(sets);
