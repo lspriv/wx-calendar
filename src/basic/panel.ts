@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-09 16:13:58
+ * @LastEditTime: 2024-07-27 23:52:37
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -30,6 +30,7 @@ import type { CalendarDay, CalendarMonth, WcFullYear } from '../interface/calend
 
 type RefreshFields = PartRequired<CalendarData, 'current' | 'checked'>;
 
+type Offsets = [wdx: number, offset: number];
 export class PanelTool extends CalendarHandler {
   public createMonthPanels(checked: CalendarDay) {
     const current = this._instance_.data.current;
@@ -64,15 +65,16 @@ export class PanelTool extends CalendarHandler {
       const panel = this._instance_.data.panels[i];
       const diff = circularDiff(i, current);
       const weekdate = offsetDate(checked!, diff * 7);
-      const offset = this.calcWeekOffset(weekdate);
+      const [wdx, offset] = this.calcWeekOffset(weekdate);
       const date = isWeekView ? weekdate : inMonthDate(checked!.year, checked!.month + diff, checked!.day);
       if (panel.year !== date.year || panel.month !== date.month) {
-        const _panel = this.createPanel(date, i, offset, panels);
+        const _panel = this.createPanel(date, i, [wdx, offset], panels);
         sets[`panels[${i}]`] = _panel;
         panels.push(_panel);
         if (offsetChange) sets.offsetChange = true;
       } else if (panel.offset !== offset) {
         sets[`panels[${i}].offset`] = offset;
+        sets[`panels[${i}].wdx`] = wdx;
         if (offsetChange) sets.offsetChange = true;
       }
     }
@@ -140,9 +142,10 @@ export class PanelTool extends CalendarHandler {
       if (_exclude.includes(i)) continue;
       const panel = this._instance_.data.panels[i];
       const diff = circularDiff(i, _current);
-      const offset = this.calcWeekOffset(offsetDate(_checked, diff * 7));
+      const [wdx, offset] = this.calcWeekOffset(offsetDate(_checked, diff * 7));
       if (panel.offset !== offset) {
         sets[`panels[${i}].offset`] = offset;
+        sets[`panels[${i}].wdx`] = wdx;
         if (offsetChange) sets.offsetChange = true;
       }
     }
@@ -178,20 +181,26 @@ export class PanelTool extends CalendarHandler {
    * 创建单个月/周面板
    * @param date
    */
-  public createPanel(date: CalendarDay, key: number, offset: number, panels: Array<CalendarPanel> = []): CalendarPanel {
+  public createPanel(
+    date: CalendarDay,
+    key: number,
+    offsets: Offsets,
+    panels: Array<CalendarPanel> = []
+  ): CalendarPanel {
     const instance = this._instance_;
     const panelKey = `panel_${key}`;
+    const [wdx, offset] = offsets;
     const panel = [...instance.data.panels, ...panels].find(p => p.year === date.year && p.month === date.month);
 
     if (panel) {
       const { year, month, weeks, count } = panel;
-      return { year, month, weeks, count, key: panelKey, offset };
+      return { year, month, weeks, count, key: panelKey, offset, wdx };
     }
 
     const weekstart = instance.data.weekstart;
     const month = instance._calendar_.createMonth({ year: date.year, month: date.month }, weekstart);
 
-    return { ...month, key: panelKey, offset };
+    return { ...month, key: panelKey, offset, wdx };
   }
 
   public createYearPanel(year: number, key: number) {
@@ -248,8 +257,8 @@ export class PanelTool extends CalendarHandler {
     const instance = this._instance_;
     const current = instance.data.current;
     const sets: Partial<CalendarData> = { info: getDateInfo(checked, true), checked };
-    const offset = this.calcWeekOffset(checked);
-    sets[`panels[${current}]`] = this.createPanel(checked, current, offset);
+    const offsets = this.calcWeekOffset(checked);
+    sets[`panels[${current}]`] = this.createPanel(checked, current, offsets);
     instance._pointer_.update(sets, false, instance.data.checked!, true);
     if (!this.skyline) sets.offsetChange = true;
     instance.setData(sets);
@@ -309,18 +318,18 @@ export class PanelTool extends CalendarHandler {
     if (this.skyline) this._instance_._dragger_!.update();
   }
 
-  private calcWeekOffset(date: CalendarDay) {
-    if (this.skyline) return 0;
+  private calcWeekOffset(date: CalendarDay): Offsets {
+    if (this.skyline) return [0, 0];
     return PanelTool.calcPanelOffset(date, this._instance_.data.weekstart);
   }
 
-  public static calcPanelOffset(date: CalendarDay, weekstart: number): number {
+  public static calcPanelOffset(date: CalendarDay, weekstart: number): Offsets {
     const { year, month, day } = date;
     const first = new Date(year, month - 1, 1);
     const lastLen = Math.abs(first.getDay() + 7 - weekstart) % 7;
     const len = getMonthDays({ year, month });
     const weeksLen = Math.ceil((lastLen + len) / 7);
     const idx = Math.ceil((day + lastLen) / 7) - 1;
-    return mul(idx, div(Layout.layout!.mainHeight, weeksLen));
+    return [idx, mul(idx, div(Layout.layout!.mainHeight, weeksLen))];
   }
 }

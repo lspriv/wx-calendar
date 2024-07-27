@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-29 14:37:57
+ * @LastEditTime: 2024-07-27 23:16:27
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -30,6 +30,8 @@ import type {
 export interface CalendarPanel extends WcMonth {
   /** 面板垂直偏移量 */
   offset: number;
+  /** 周视图下当前所在周索引 */
+  wdx: number;
 }
 
 export interface CalendarWeek {

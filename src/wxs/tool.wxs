@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wxs工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 14:35:52
+ * @LastEditTime: 2024-07-28 01:08:48
  */
 
 var isSkyline = function (renderer) {
@@ -36,10 +36,16 @@ var scheduleRest = function (schedules, rows, maxSize) {
   return schedules.length - _maxSize;
 };
 
+var isNextWeekRow = function (panel, wdx) {
+  if (!panel || panel.weeks.length < 6) return false;
+  if (wdx === panel.wdx + 1) return true;
+};
+
 module.exports = {
   isSkyline,
   isChecked,
   cutSchedules,
   scheduleShowRest,
-  scheduleRest
+  scheduleRest,
+  isNextWeekRow
 };

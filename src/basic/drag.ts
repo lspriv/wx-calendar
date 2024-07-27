@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板拖拽控制
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 14:45:28
+ * @LastEditTime: 2024-07-27 23:53:34
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { applyAnimated, clearAnimated, circularDiff } from './tools';
@@ -220,7 +220,11 @@ export class Dragger extends CalendarHandler {
    */
   private calcPanelOffset(idx: number, checked: CalendarDay): number {
     const data = this._instance_.data;
-    return PanelTool.calcPanelOffset(offsetDate(checked, circularDiff(idx, data.current) * 7), data.weekstart);
+    const [_, offset] = PanelTool.calcPanelOffset(
+      offsetDate(checked, circularDiff(idx, data.current) * 7),
+      data.weekstart
+    );
+    return offset;
   }
 
   /**

@@ -44,6 +44,7 @@
     width: 100%;
     position: relative;
     z-index: 1024;
+    transition: opacity .28s ease;
     @include column-rect;
   }
   &-date {
@@ -205,6 +206,19 @@
 
 .wcc {
   .wc.wc--week {
+    .wc__panel-container {
+      @include if(wl-6) {
+        .wc__panel-week {
+          @include month-week-rows(6);
+          @include if(next) {
+            opacity: 0;
+          }
+          @include if(show) {
+            opacity: 1 !important;
+          }
+        }
+      }
+    }
     .wc__panel-schedules {
       opacity: 0;
     }
