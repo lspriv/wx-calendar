@@ -633,14 +633,22 @@ class MyPlugin implements Plugin {
     // intercept(0) 直接退出 
     // intercept(1) 继续向其他插件传播，但不会执行日历组件默认行为
   }
+
+  /**
+   * 拦截日期跳转动作（如跳转到今日或者调用toDate方法），可选择实现该方法
+   * @param service PliginService实例
+   * @param date 要跳转的日期
+   * @param intercept 拦截器
+   */
+  PLUGIN_CATCH_MANUAL(service: PluginService, date: CalendarDay, intercept: EventIntercept): void {}
 }
 
 ```
 > [!NOTE] 
-> 本日历统计共有七个主要的动作，当前仅提供日期点击动作的捕获，七个动作分别是
+> 本日历统计共有七个主要的动作，当前仅提供日期点击动作和日期跳转动作的捕获，七个动作分别是
 > - 日期点击
+> - 日期跳转（今日按钮点击跳转到今日或者调用toDate方法）
 > - 头部标题点击（打开年面板）
-> - 今日按钮点击（跳转到今日）
 > - 视图按钮点击（按钮切换视图）
 > - 垂直手势滑动（手势切换视图）
 > - 水平手势滑动（swiper滑动滑块）
