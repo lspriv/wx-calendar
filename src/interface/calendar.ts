@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-06-11 02:21:51
+ * @LastEditTime: 2024-07-28 01:43:25
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
@@ -323,6 +323,15 @@ const createMonthWeeks = (mon: CalendarMonth, days: Array<WcDate>): Array<WcWeek
  */
 export const isSameDate = (d1: CalendarDay, d2: CalendarDay) => {
   return d1.year === d2.year && d1.month === d2.month && d1.day === d2.day;
+};
+
+/**
+ * 判断两个日期是否同一周
+ */
+export const isSameWeek = (d1: CalendarDay, d2: CalendarDay, weekstart: number = 0) => {
+  const range = weekRange(d1, weekstart);
+  const date = +new Date(d2.year, d2.month - 1, d2.day);
+  return date >= +range[0] && date <= +range[1];
 };
 
 /**
