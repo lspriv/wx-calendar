@@ -1,7 +1,6 @@
 <view class="container" style="padding-top: {{ padding }}px;">
   <calendar 
     id="calendar" 
-    style="width: 100%;"
     marks="{{ markers }}" 
     bindload="handleLoad"
     bindclick="handleClick"

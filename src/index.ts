@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-29 00:37:01
+ * @LastEditTime: 2024-07-29 04:29:11
  */
 
 import {
@@ -332,10 +332,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const mod = Math.abs(accumulation % calendarWidth);
       const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = accumulation / calendarWidth;
-      /**
-       * 安卓skyline渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
-       * 我的设备有限，测试的安卓机滑动一次的单位误差<0.5，累积误差不超过滑动次数offset
-       */
+
       if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset)) * 0.5) {
         const offset = Math.round(_offset);
         this.$_swiper_trans.value = 0;
