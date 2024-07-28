@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 19:29:30
+ * @LastEditTime: 2024-07-29 00:37:01
  */
 
 import {
@@ -234,7 +234,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const query = nodeRect(this);
       const [calendar, rects] = await promises([query(SELECTOR.CALENDAR), query(SELECTOR.WEEK_ITEM)]);
       const x = calendar[0].left.toFixed(1);
-      this.$_calendar_width.value = Math.floor(calendar[0].width);
+      const calendarWidth = calendar[0].width;
+      this.$_calendar_width.value = isSkyline(this.renderer) ? calendarWidth : Math.round(calendarWidth);
       this._centres_ = rects.map(({ left, width }) => sub(add(left.toFixed(1), div(width.toFixed(1), 2)), x));
     },
     async refreshView({ view }) {
@@ -308,14 +309,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const calendarWidth = type === 'panel' ? this.$_calendar_width.value : Layout.layout!.windowWidth;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
-      const mod = this._swiper_accumulator_ % calendarWidth;
+
+      const mod = Math.abs(this._swiper_accumulator_ % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = this._swiper_accumulator_ / calendarWidth;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      /**
-       * 部分安卓设备 webview 渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
-       * 测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
-       */
-      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
+
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset))) {
+        const offset = Math.round(this._swiper_accumulator_ / calendarWidth);
         this._swiper_accumulator_ = 0;
         if (offset) {
           if (type === 'panel') this.refreshPanels(offset);
@@ -328,14 +328,16 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const trans = this.$_swiper_trans;
       const accumulation = trans.value + e.detail.dx;
       const calendarWidth = this.$_calendar_width.value;
-      const mod = accumulation % calendarWidth;
+
+      const mod = Math.abs(accumulation % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = accumulation / calendarWidth;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
       /**
        * 安卓skyline渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
-       * 我的设备有限，测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
+       * 我的设备有限，测试的安卓机滑动一次的单位误差<0.5，累积误差不超过滑动次数offset
        */
-      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset)) * 0.5) {
+        const offset = Math.round(_offset);
         this.$_swiper_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshPanels.bind(this))(offset);
       } else {
@@ -347,10 +349,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const trans = this.$_annual_trans;
       const accumulation = trans.value + e.detail.dx;
       const calendarWidth = Layout.layout!.windowWidth;
-      const mod = accumulation % calendarWidth;
+
+      const mod = Math.abs(accumulation % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = accumulation / calendarWidth;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
+
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset)) * 0.5) {
+        const offset = Math.round(_offset);
         this.$_annual_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshAnnualPanels.bind(this))(offset);
       } else {
