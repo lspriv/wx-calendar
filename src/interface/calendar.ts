@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 04:15:13
+ * @LastEditTime: 2024-07-28 18:26:56
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
@@ -450,9 +450,8 @@ export const getWeekDateIdx = (date: CalendarDay, weeks: Array<WcWeek>): { wdx: 
 /**
  * 获取指定日期所在第几周
  * 每年的第一个日历星期有以下等效说法
- * 1. 本年度第一个星期四所在的星期
- * 2. 1月4日所在的星期
- * 3. 本年度第一个至少有4天在同一星期内的星期
+ * 1. 1月4日所在的星期
+ * 2. 本年度第一个至少有4天在同一星期内的星期
  * @param date 指定日期
  */
 const weekOrder = (date: CalendarDay, weekstart = 0) => {

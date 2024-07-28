@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 03:50:56
+ * @LastEditTime: 2024-07-28 19:29:30
  */
 
 import {
@@ -295,7 +295,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     swiperTrans(e) {
       if (!this._swiper_flag_) {
         this._swiper_flag_ = true;
-        const calendarWidth = this.$_calendar_width.value;
+        const type = e.currentTarget.dataset.type;
+        const calendarWidth = type === 'panel' ? this.$_calendar_width.value : Layout.layout!.windowWidth;
         this._swiper_accumulator_ = e.detail.dx > calendarWidth / 2 ? -initCurrent * calendarWidth : 0;
       }
       this.$_swiper_trans.value = e.detail.dx;
@@ -303,19 +304,20 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     swiperTransEnd(e) {
       this._swiper_flag_ = false;
       if (e.detail.source !== 'touch') return;
+      const type = e.currentTarget.dataset.type;
+      const calendarWidth = type === 'panel' ? this.$_calendar_width.value : Layout.layout!.windowWidth;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
-      const mod = this._swiper_accumulator_ % this.$_calendar_width.value;
-      const _offset = this._swiper_accumulator_ / this.$_calendar_width.value;
+      const mod = this._swiper_accumulator_ % calendarWidth;
+      const _offset = this._swiper_accumulator_ / calendarWidth;
       const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
       /**
        * 部分安卓设备 webview 渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
        * 测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
        */
-      if (mod === 0 || this.$_calendar_width.value - Math.abs(mod) <= Math.abs(offset)) {
+      if (mod === 0 || calendarWidth - Math.abs(mod) <= Math.abs(offset)) {
         this._swiper_accumulator_ = 0;
         if (offset) {
-          const type = e.currentTarget.dataset.type;
           if (type === 'panel') this.refreshPanels(offset);
           else this.refreshAnnualPanels(offset);
         }
@@ -344,7 +346,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       'worklet';
       const trans = this.$_annual_trans;
       const accumulation = trans.value + e.detail.dx;
-      const calendarWidth = this.$_calendar_width.value;
+      const calendarWidth = Layout.layout!.windowWidth;
       const mod = accumulation % calendarWidth;
       const _offset = accumulation / calendarWidth;
       const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
