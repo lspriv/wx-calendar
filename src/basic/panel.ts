@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板数据处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 03:53:38
+ * @LastEditTime: 2024-08-07 21:02:04
  */
 import { CalendarHandler } from '../interface/component';
 import { Layout } from './layout';
@@ -249,6 +249,7 @@ export class PanelTool extends CalendarHandler {
           await this.update();
         }
       } else {
+        await instance._pointer_.resetOffsetY(d);
         const pannel = instance.data.panels[current];
         const offset = monthDiff(pannel, { year: d.year, month: d.month });
         await this.refresh(offset, d, idx >= 0 ? idx : current);

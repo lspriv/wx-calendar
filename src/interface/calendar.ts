@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-07-28 18:26:56
+ * @LastEditTime: 2024-08-06 23:39:12
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
@@ -632,6 +632,7 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     const idx = this._PLUGINS_.findIndex(p => p.construct.KEY === plugin.KEY);
     if (idx >= 0) this._PLUGINS_.splice(idx, 1);
     this._PLUGINS_.push({ construct: plugin, options });
+    return this;
   }
 
   /**

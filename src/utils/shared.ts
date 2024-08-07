@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 19:41:20
+ * @LastEditTime: 2024-08-06 23:42:37
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -79,7 +79,7 @@ export const strToStyle = (str: string) => {
     (acc, item) => {
       if (item) {
         const [k, v] = item.split(':').map(s => s.trim());
-        if (k) acc[k] = v.trim();
+        if (k) acc[k] = v;
       }
       return acc;
     },
