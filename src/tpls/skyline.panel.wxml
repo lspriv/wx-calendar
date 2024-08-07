@@ -32,7 +32,7 @@
             style="top: {{ pointer.y }}; left: {{ pointer.x }};">
             <view 
               class="wc__panel-pointer-inner {{ pointer.animate ? 'wc__panel-pointer-inner--animate' : '' }}" 
-              bindanimationend="handlePointerAnimated"></view>
+              bind:animationend="handlePointerAnimated"></view>
           </view>
           <view 
             wx:for="{{ panel.weeks || [] }}" 
@@ -54,7 +54,7 @@
                 {{ tool_wxs.isChecked(pointer, day, checked, pdx, current) ? 'wc__panel-date--checked' : '' }}
                 {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
               ">
-              <view class="wc__panel-day" style="{{ day.style }}" catchtap="selDate">
+              <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
                 <view class="wc__panel-solar">{{ day.day }}<view 
                   wx:if="{{ day.corner }}"
                   class="wc__panel-corner"
@@ -74,12 +74,12 @@
                   style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
                   class="wc__panel-schedule"
                   data-sdx="{{ sdx }}"
-                  catchtap="selSchedule">{{ schedule.text }}</text>
+                  catch:tap="selSchedule">{{ schedule.text }}</text>
                 <text 
                   wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
                   class="wc__panel-schedule wc__panel-schedule--more"
                   data-all
-                  catchtap="selSchedule"
+                  catch:tap="selSchedule"
                 >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</text>
               </view>
             </view>

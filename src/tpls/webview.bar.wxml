@@ -6,9 +6,9 @@
 <wxs src="../wxs/transform.wxs" module="trans_wxs" />
 <view 
   class="wc__bar"
-  bindtouchstart="{{ trans_wxs.touchStart }}"
-  catchtouchmove="{{ trans_wxs.touchMove }}" 
-  catchtouchend="{{ trans_wxs.touchEnd }}">
+  bind:touchstart="{{ trans_wxs.touchStart }}"
+  catch:touchmove="{{ trans_wxs.touchMove }}" 
+  catch:touchend="{{ trans_wxs.touchEnd }}">
   <view class="wc__bar-control">
     <view class="wc__bar-control-item" >
       <view class="wc__bar-control-item-bar" id="control_1"></view>

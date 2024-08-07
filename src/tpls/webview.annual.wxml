@@ -8,7 +8,7 @@
   class="wc__annual {{ !customNavBar ? 'wc__annual--non-custom' : '' }}" 
   style="top: {{ annualTop }};opacity: {{ annualOpacity }};"
   change:opacity="{{ trans_wxs.updateAnuualCls }}" opacity="{{ annualOpacity }}"
-  catchtouchmove>
+  catch:touchmove>
   <view class="wc__annual-header">
     <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
     <view class="wc__annual-header-tips">
@@ -27,8 +27,8 @@
       current="{{ annualCurr }}" 
       class="wc__annual-panel-swiper"
       data-type="annual"
-      bindtransition="swiperTrans"
-      bindanimationfinish="swiperTransEnd">
+      bind:transition="swiperTrans"
+      bind:animationfinish="swiperTransEnd">
       <swiper-item
         wx:for="{{ years }}" 
         wx:for-item="year" 
@@ -41,7 +41,7 @@
             type="2d" 
             data-ydx="{{ ydx }}" 
             class="wc__annual-panel-canvas" 
-            catchtap="selMonth" />
+            catch:tap="selMonth" />
         </view>
       </swiper-item>
     </swiper>
