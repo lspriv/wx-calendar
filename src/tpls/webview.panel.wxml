@@ -57,7 +57,7 @@
           wx:for-item="week" 
           wx:for-index="wdx"
           wx:key="key"
-          class="wc__panel-week {{ tool_wxs.isNextWeekRow(panel, wdx) ? 'wc__panel-week--next' : '' }}">
+          class="wc__panel-week {{ panel.weeks.length > 5 && (wdx === panel.wdx + 1) ? 'wc__panel-week--next' : '' }}">
           <view 
             wx:for="{{ week.days }}" 
             wx:for-item="day" 

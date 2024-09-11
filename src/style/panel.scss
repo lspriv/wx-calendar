@@ -215,6 +215,7 @@
           }
           @include if(show) {
             opacity: 1 !important;
+            transition: unset !important;
           }
         }
       }
@@ -237,6 +238,18 @@
     }
     .wc__panel-schedules {
       opacity: 1;
+    }
+  }
+  &:not(.wc.wc--week) {
+    .wc__panel-container {
+      @include if(wl-6) {
+        .wc__panel-week {
+          @include if(next) {
+            opacity: 1;
+            transition: unset !important;
+          }
+        }
+      }
     }
   }
 }
