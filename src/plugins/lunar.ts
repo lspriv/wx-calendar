@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 农历计算 1901年-2100年
  * @Author: lspriv
- * @LastEditTime: 2024-06-08 18:48:28
+ * @LastEditTime: 2024-11-12 20:35:50
  */
 import { GREGORIAN_MONTH_DAYS } from '../basic/constants';
 import { getAnnualMarkKey, isLeapYear } from '../interface/calendar';
@@ -37,6 +37,7 @@ const CN_CALENDARS = [
   0x25, 0x54, 0x03
 ];
 
+//大闰月的闰年年份
 const BIG_LEAP_MYS = [6, 14, 19, 25, 33, 36, 38, 41, 44, 52, 55, 79, 117, 136, 147, 150, 155, 158, 185, 193];
 
 const SECTIONAL_TERMS = [
@@ -172,8 +173,15 @@ const absFloor = (number: number) => {
     // -0 -> 0
     return Math.ceil(number) || 0;
   } else {
-    return Math.floor(number);
+    return ~~number;
   }
+};
+
+const utcDate = (year: number, month: number, day: number) => {
+  const y = `${year}`.padStart(4, '0');
+  const m = `${month}`.padStart(2, '0');
+  const d = `${day}`.padStart(2, '0');
+  return new Date(`${y}-${m}-${d}T00:00:00Z`);
 };
 
 export interface LunarDate {
@@ -187,57 +195,55 @@ export interface LunarDate {
 }
 
 class Lunar {
-  public static lunar(year: number, month: number, day: number): LunarDate {
-    const revise = Lunar.reviseSolarTerm(year, month, day);
+  public static lunar(year: number, month: number, day: number): LunarDate | null {
+    if (year < 1901 || year > 2100) return null;
 
-    let cnYear: number | undefined = void 0;
-    let cnMonth: number | undefined = void 0;
-    let cnDay: number | undefined = void 0;
+    const revise = Lunar.reviseSolarTerm(year, month, day);
 
     let sectional: number | undefined = void 0;
     let principle: number | undefined = void 0;
 
-    if (year >= 1901 && year < 2100) {
-      /** 计算农历年月日 */
-      let startYear = BASE_DATE.YEAR;
-      let startMonth = BASE_DATE.MONTH;
-      let startDay = BASE_DATE.DAY;
+    /** 计算农历年月日 */
+    let startYear = BASE_DATE.YEAR;
+    let startMonth = BASE_DATE.MONTH;
+    let startDay = BASE_DATE.DAY;
 
-      cnYear = BASE_DATE.CN_YEAR;
-      cnMonth = BASE_DATE.CN_MONTH;
-      cnDay = BASE_DATE.CN_DAY;
+    let cnYear = BASE_DATE.CN_YEAR;
+    let cnMonth = BASE_DATE.CN_MONTH;
+    let cnDay = BASE_DATE.CN_DAY;
 
-      if (year >= 2000) {
-        // 第二个对应日，用以提高计算效率
-        // 公历 2000 年 1 月 1 日，对应农历 4697 年 11 月 25 日
-        startYear = BASE_DATE.YEAR + 99;
-        startMonth = 1;
-        startDay = 1;
-        cnYear = BASE_DATE.CN_YEAR + 99;
-        cnMonth = 11;
-        cnDay = 25;
-      }
-
-      const d1 = new Date(startYear, startMonth - 1, startDay);
-      const d2 = new Date(year, month - 1, day);
-      const diff = absFloor((+d2 - +d1) / 864e5);
-      cnDay += diff;
-
-      let lastDate = Lunar.cnMonthDays(cnYear, cnMonth);
-      let nextMonth = Lunar.nextCnMonth(cnYear, cnMonth);
-
-      while (cnDay > lastDate) {
-        if (Math.abs(nextMonth) < Math.abs(cnMonth)) cnYear++;
-        cnMonth = nextMonth;
-        cnDay -= lastDate;
-        lastDate = Lunar.cnMonthDays(cnYear, cnMonth);
-        nextMonth = Lunar.nextCnMonth(cnYear, cnMonth);
-      }
-
-      /** 计算节气 */
-      sectional = Lunar.sectionalTerm(year, month);
-      principle = Lunar.principleTerm(year, month);
+    if (year >= 2000) {
+      // 第二个对应日，用以提高计算效率
+      // 公历 2000 年 1 月 1 日，对应农历 4697 年 11 月 25 日
+      startYear = BASE_DATE.YEAR + 99;
+      startMonth = 1;
+      startDay = 1;
+      cnYear = BASE_DATE.CN_YEAR + 99;
+      cnMonth = 11;
+      cnDay = 25;
     }
+
+    const d1 = utcDate(startYear, startMonth, startDay);
+    const d2 = utcDate(year, month, day);
+
+    const diff = (+d2 - +d1) / 864e5;
+
+    cnDay += diff;
+
+    let lastDate = Lunar.cnMonthDays(cnYear, cnMonth);
+    let nextMonth = Lunar.nextCnMonth(cnYear, cnMonth);
+
+    while (cnDay > lastDate) {
+      if (Math.abs(nextMonth) < Math.abs(cnMonth)) cnYear++;
+      cnMonth = nextMonth;
+      cnDay -= lastDate;
+      lastDate = Lunar.cnMonthDays(cnYear, cnMonth);
+      nextMonth = Lunar.nextCnMonth(cnYear, cnMonth);
+    }
+
+    /** 计算节气 */
+    sectional = Lunar.sectionalTerm(year, month);
+    principle = Lunar.principleTerm(year, month);
 
     let lunarDay: string = Lunar.lunarDay(cnDay);
     let solar: string = '';
@@ -396,7 +402,7 @@ class Lunar {
 export class LunarPlugin implements Plugin {
   public static KEY = 'lunar' as const;
 
-  public getLunar(date: CalendarDay): LunarDate {
+  public getLunar(date: CalendarDay): ReturnType<(typeof Lunar)['lunar']> {
     return Lunar.lunar(date.year, date.month, date.day);
   }
 
@@ -405,8 +411,8 @@ export class LunarPlugin implements Plugin {
 
     return {
       festival: {
-        text: lunar.solar || lunar.lunarDay,
-        color: lunar.solar ? 'var(--wc-solar-color)' : null
+        text: lunar?.solar || lunar?.lunarDay || '',
+        color: lunar?.solar ? 'var(--wc-solar-color)' : null
       }
     };
   }
@@ -420,11 +426,11 @@ export class LunarPlugin implements Plugin {
       for (let j = 0; j < days; j++) {
         const day = j + 1;
         const lunar = Lunar.lunar(year.year, month, day);
-        if (month === 10 && day === 1) lunarYear = lunar.lunarYear;
-        if (lunar.day === 1) {
+        if (month === 10 && day === 1) lunarYear = lunar?.lunarYear || '';
+        if (lunar?.day === 1) {
           const key = getAnnualMarkKey({ month, day });
           const set: WcAnnualMark = {};
-          set.sub = lunar.month === 1 ? '#F56C6C' : '#409EFF';
+          set.sub = lunar?.month === 1 ? '#F56C6C' : '#409EFF';
           marks.set(key, set);
         }
       }
