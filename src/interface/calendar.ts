@@ -4,11 +4,21 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-08-06 23:39:12
+ * @LastEditTime: 2024-11-25 22:12:17
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
-import { Nullable, isDate, isFunction, isNumber, isString, camelToSnake, strToStyle } from '../utils/shared';
+import {
+  Nullable,
+  isDate,
+  isFunction,
+  isNumber,
+  isString,
+  camelToSnake,
+  strToStyle,
+  compareSame,
+  includes
+} from '../utils/shared';
 import { PluginService } from '../basic/service';
 import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
@@ -32,14 +42,12 @@ interface DateMark extends Partial<Pick<CalendarDay, 'day' | 'month' | 'year'>> 
   date?: string | number | Date | CalendarDay;
 }
 
-export interface CalendarMark extends DateMark {
-  type: 'schedule' | 'corner' | 'festival';
-  text: string;
-  color?: Nullable<string>;
-  bgColor?: Nullable<string>;
-}
-
 export type DateStyle = Record<string, string | number>;
+export interface CalendarMark extends DateMark {
+  type: 'schedule' | 'corner' | 'festival' | 'solar';
+  text: string;
+  style?: string | DateStyle;
+}
 
 export interface CalendarStyleMark extends DateMark {
   type: 'style';
@@ -48,11 +56,11 @@ export interface CalendarStyleMark extends DateMark {
 
 export type CalendarMarkTypes = CalendarMark['type'] | CalendarStyleMark['type'];
 
-export type WcMark = Pick<CalendarMark, 'text' | 'color'> & {
+export type WcMark = Pick<CalendarMark, 'text' | 'style'> & {
   key?: string;
 };
 
-export type WcScheduleMark = WcMark & Pick<CalendarMark, 'bgColor'>;
+export type WcScheduleMark = WcMark;
 
 export type WcStyleMark = CalendarStyleMark['style'];
 
@@ -66,6 +74,7 @@ export interface WcDate extends Required<CalendarDay> {
   key: string;
   kind: 'last' | 'current' | 'next';
   style: Nullable<string>;
+  solar: Nullable<WcMark>;
   mark: Nullable<WcMark>;
   corner: Nullable<WcMark>;
   schedules: Array<WcScheduleMark>;
@@ -144,14 +153,25 @@ export interface WcScheduleInfo {
   description?: string;
 }
 
-export const styleParse = (style: string | DateStyle | null) =>
-  typeof style === 'string' ? strToStyle(style) : style || {};
+export const styleParse = (style: string | DateStyle | null) => {
+  if (typeof style === 'string') {
+    const trimstr = style.trim();
+    if (!trimstr) return {};
+    return strToStyle(style);
+  }
+  return style;
+};
 
-export const styleStringify = (style: DateStyle) => {
-  return Object.keys(style)
-    .sort()
-    .map(key => `${camelToSnake(key, '-')}:${style[key]};`)
-    .join('');
+export const reorderStyle = (style: string | DateStyle, pick?: Array<string | RegExp>) => {
+  if (typeof style === 'string') return styleStringify(styleParse(style), pick);
+  return styleStringify(style, pick);
+};
+
+export const styleStringify = (style: DateStyle | null, pick?: Array<string | RegExp>) => {
+  if (!style) return '';
+  let keys = Object.keys(style).map(key => `${camelToSnake(key, '-')}:${style[key]};`);
+  if (pick?.length) keys = keys.filter(k => includes(pick, k));
+  return keys.sort().join('');
 };
 
 export const themeStyle = (style?: WcDateStyle): string | number | undefined => style?.[Layout.theme!] || style?.light;
@@ -192,8 +212,7 @@ export const getScheduleDetail = (
   const plugin = parse?.plugin ? service.getPlugin(parse.plugin as typeof MARK_PLUGIN_KEY) : void 0;
   return {
     text: schedule.text,
-    color: schedule.color,
-    bgColor: schedule.bgColor,
+    style: schedule.style,
     plugin: parse?.plugin,
     info: plugin?.PLUGIN_TRACK_SCHEDULE?.(date, parse?.id)
   };
@@ -266,6 +285,7 @@ const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
     today,
     style: '',
     mark: null,
+    solar: null,
     corner: null,
     schedules: []
   };
@@ -505,69 +525,13 @@ export const getDateInfo = (date: CalendarDay, weekstart: number, withWeek: bool
   return postfix;
 };
 
-export const sameMark = (m1?: Nullable<WcMark>, m2?: Nullable<WcMark>) => {
-  if (m1 && m2) {
-    if (m1.text !== m2.text && (m1.text || m2.text)) return false;
-    if (m1.color !== m2.color && (m1.color || m2.color)) return false;
-  } else if ((!m1 && m2) || (m1 && !m2)) return false;
-  return true;
-};
-
-export const sameSchedules = (as1?: Array<WcScheduleMark>, as2?: Array<WcScheduleMark>) => {
-  if (as1 && as2) {
-    if (as1.length !== as2.length) return false;
-    let i = 0;
-    while (i < as1.length) {
-      const s1 = as1[i];
-      const s2 = as2[i];
-      if (s1.key !== s2.key && (s1.key || s2.key)) return false;
-      if (s1.text !== s2.text && (s1.text || s2.text)) return false;
-      if (s1.color !== s2.color && (s1.color || s2.color)) return false;
-      if (s1.bgColor !== s2.bgColor && (s1.bgColor || s2.bgColor)) return false;
-      i++;
-    }
-  } else if (!as1 && as2) return !as2.length;
-  else if (as1 && !as2) return !as1.length;
-  return true;
-};
-
-export const sameAnnualMarkStyle = (s1?: WcAnnualDateStyle, s2?: WcAnnualDateStyle): boolean => {
-  if (!s1 && !s2) return true;
-  if (s1 && s2) {
-    const k1 = Object.keys(s1);
-    const k2 = Object.keys(s2);
-    if (k1.length !== k2.length) return false;
-    const ks = new Set([...k1, ...k2]);
-    if (ks.size !== k1.length) return false;
-    for (const k of ks) {
-      const t1 = s1[k],
-        t2 = s2[k];
-      if (t1.light !== t2.light || t1.dark !== t2.dark) return false;
-    }
-    return true;
-  }
-  return false;
-};
-
 export const sameAnnualMarks = (m1: WcAnnualMarks, m2?: WcAnnualMarks) => {
   if (!m1.size && !m2?.size) return true;
   if (m1.size !== m2?.size) return false;
   const entries = m1.entries();
   for (const [key, mk1] of entries) {
     const mk2 = m2.get(key);
-    if (!mk2 || mk2.rwtype !== mk1.sub || mk2.sub !== mk1.sub || !sameAnnualMarkStyle(mk1.style, mk2.style))
-      return false;
-  }
-  return true;
-};
-
-export const sameAnnualSubs = (m1?: Array<WcAnnualSub>, m2?: Array<WcAnnualSub>) => {
-  if (!m1?.length && !m2?.length) return true;
-  if (m1?.length !== m2?.length) return false;
-  for (let i = 0; i < m1!.length; i++) {
-    const m1s = m1![i];
-    const m2s = m2![i];
-    if (m1s.color !== m2s.color || m1s.text !== m2s.text) return false;
+    if (!compareSame(mk1, mk2)) return false;
   }
   return true;
 };
@@ -593,7 +557,7 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
   /** 插件服务 */
   public service: PluginService<T>;
 
-  constructor(component: CalendarInstance, services: T | Array<PluginUse<T>>) {
+  constructor(component: CalendarInstance, services: T | Array<PluginUse<T>> = []) {
     const _services = [...services, ...WxCalendar._PLUGINS_, MarkPlugin].map(service => {
       if ((service as PluginUse<any>).construct) return service as PluginUse<T>;
       return { construct: service } as PluginUse<T>;

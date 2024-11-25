@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 23:21:16
+ * @LastEditTime: 2024-11-25 19:23:59
  */
 export type * from './basic/tools';
 export type * from './interface/component';
@@ -23,5 +23,4 @@ export {
 } from './basic/tools';
 export * from './interface/calendar';
 export { Layout } from './basic/layout';
-export { LUNAR_PLUGIN_KEY } from './plugins/lunar';
 export { MARK_PLUGIN_KEY } from './plugins/mark';

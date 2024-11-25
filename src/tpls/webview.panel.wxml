@@ -72,34 +72,39 @@
               {{ tool_wxs.isChecked(pointer, day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
             ">
-            <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
-              <view class="wc__panel-solar">{{ day.day }}<view 
-                wx:if="{{ day.corner }}"
-                class="wc__panel-corner"
-                style="{{ day.corner.color ? 'color:' + day.corner.color + ';' : '' }}">{{ day.corner.text }}</view></view>
+            <block wx:if="{{ showRest || currView === 'week' || day.kind === 'current' }}">
+              <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
+                <view 
+                  class="wc__panel-solar" 
+                  style="{{ day.solar ? day.solar.style : '' }}">{{ day.solar ? day.solar.text : day.day }}<view 
+                  wx:if="{{ day.corner }}"
+                  class="wc__panel-corner"
+                  style="{{ day.corner.style }}">{{ day.corner.text }}</view></view>
+                <view 
+                  wx:if="{{ day.mark || alignDate === 'baseline' }}"
+                  class="wc__panel-mark" 
+                  style="{{ day.mark.style }}">{{ day.mark.text }}</view>
+              </view>
               <view 
-                class="wc__panel-mark" 
-                style="{{ day.mark.color ? 'color: ' + day.mark.color + ';' : '' }}">{{ day.mark.text }}</view>
-            </view>
-            <view 
-              wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
-              class="wc__panel-schedules">
-              <view 
-                wx:for="{{ tool_wxs.cutSchedules(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
-                wx:for-index="sdx"
-                wx:for-item="schedule"
-                wx:key="key"
-                style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
-                class="wc__panel-schedule"
-                data-sdx="{{ sdx }}"
-                catch:tap="selSchedule">{{ schedule.text }}</view>
-              <view 
-                wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
-                class="wc__panel-schedule wc__panel-schedule--more"
-                data-all
-                catch:tap="selSchedule"
-              >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</view>
-            </view>
+                wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
+                class="wc__panel-schedules">
+                <view 
+                  wx:for="{{ tool_wxs.cutSchedules(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
+                  wx:for-index="sdx"
+                  wx:for-item="schedule"
+                  wx:key="key"
+                  style="{{ schedule.style }}"
+                  class="wc__panel-schedule"
+                  data-sdx="{{ sdx }}"
+                  catch:tap="selSchedule">{{ schedule.text }}</view>
+                <view 
+                  wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
+                  class="wc__panel-schedule wc__panel-schedule--more"
+                  data-all
+                  catch:tap="selSchedule"
+                >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</view>
+              </view>
+            </block>
           </view>
         </view>
       </view>

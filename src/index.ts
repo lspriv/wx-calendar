@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-07-29 04:29:11
+ * @LastEditTime: 2024-11-25 21:44:23
  */
 
 import {
@@ -23,7 +23,6 @@ import { Layout } from './basic/layout';
 import { Dragger } from './basic/drag';
 import { AnnualPanelSwitch } from './basic/annual';
 import { YearPrinter } from './basic/printer';
-import { LunarPlugin } from './plugins/lunar';
 import { MARK_PLUGIN_KEY } from './plugins/mark';
 import {
   isView,
@@ -109,6 +108,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     areas: {
       type: Array
+    },
+    alignDate: {
+      type: String,
+      value: 'center'
+    },
+    showRest: {
+      type: Boolean,
+      value: true
     }
   },
   data: {
@@ -169,7 +176,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       /**
        * 实例化WxCalendar处理数据和插件
        */
-      this._calendar_ = new WxCalendar(this, [LunarPlugin]);
+      this._calendar_ = new WxCalendar(this);
     },
     initializeRender() {
       const isSkylineRender = isSkyline(this.renderer);
@@ -428,8 +435,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const last = (current + half) % CALENDAR_PANELS;
         const { year: sy, month: sm, day: sd } = panels[first].weeks[0].days[0];
         const lastWeeks = panels[last].weeks;
-        const lastDays = lastWeeks[lastWeeks.length - 1].days;
-        const { year: ey, month: em, day: ed } = lastDays[lastDays.length - 1];
+        const lastDays = lastWeeks.slice(-1)[0].days;
+        const [{ year: ey, month: em, day: ed }] = lastDays.slice(-1);
         detail.range = [
           { year: sy, month: sm, day: sd },
           { year: ey, month: em, day: ed }

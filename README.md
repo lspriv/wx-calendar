@@ -129,7 +129,7 @@ type CalendarDay = {
         <td>view</td>
         <td>string</td>
         <td>视图</td>
-        <td>month[week|schedule]</td>
+        <td>month [week|schedule]</td>
     </tr>
     <tr>
         <td>marks</td>
@@ -197,6 +197,18 @@ type CalendarDay = {
         <td>组件所在页面是否自定义导航栏</td>
         <td>true</td>
     </tr>
+    <tr>
+        <td>alignDate</td>
+        <td>string</td>
+        <td>日期排布（居中｜基线对齐）</td>
+        <td>center [center|baseline]</td>
+    </tr>
+    <tr>
+        <td>showRest</td>
+        <td>boolean</td>
+        <td>非本月日期是否显示</td>
+        <td>true</td>
+    </tr>
 </table>
 
 > [!TIP] 
@@ -224,10 +236,9 @@ type CalendarDay = {
 >   month?: number; // 月 
 >   day?: number; // 日
 >   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | Date
->   type: 'schedule' | 'corner' | 'festival'; // 日程｜角标｜节假日
+>   type: 'schedule' | 'corner' | 'festival' | 'solar'; // 日程｜角标｜节假日 | 日期文字
 >   text: string; // 内容
->   color: string; // 文本色
->   bgColor?: string; // 背景色，type为schedule时可选
+>   style?: string | Record<string, string | number>; // 标记样式
 > }
 > // 样式标记
 > type StyleMark = {
