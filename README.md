@@ -50,6 +50,19 @@ npm i @lspriv/wx-calendar -S
 <calendar id="calendar" bindload="handleLoad" />
 ```
 
+```javascript
+const { WxCalendar } = require('@lspriv/wx-calendar/lib');
+const { LunarPlugin } = require('@lspriv/wc-plugin-lunar');
+// 使用农历插件
+WxCalendar.use(LunarPlugin);
+
+Page({
+  handleLoad(detail) {
+    conosle.log('calendar load', detail);
+  }
+})
+```
+
 > [!IMPORTANT]
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
@@ -739,29 +752,6 @@ class MyPlugin implements Plugin {
       { year: 2024, month: 7, day: 1 } // 单点日期
     ]
   }
-}
-```
-
-#### 内置农历插件
-wx-calendar自带农历插件
-```javascript
-const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar/lib');
-// 你的页面中
-const calendar = this.selectComponent('#calendar');
-const lunarPlugin = calendar.getPlugin(LUNAR_PLUGIN_KEY);
-// 获取农历信息
-const lunarDate = lunarPlugin.getLunar({ year: 2023, month: 10, day: 26 });
-```
-农历信息
-```typescript
-type LunarDate = {
-  year: number; // 公历年
-  month: number; // 公历月
-  day: number; // 公历日
-  lunarYear: string; // 农历年
-  lunarMonth: string; // 农历月
-  lunarDay: string; // 农历日
-  solar: string; // 节气
 }
 ```
 
