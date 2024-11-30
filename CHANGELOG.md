@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.8.0](https://github.com/lspriv/wx-calendar/compare/v1.7.2...v1.8.0) (2024-11-30)
+
+
+### Features
+
+* 移除农历插件,新增角标,标记,日程和日期样式 ([a5e0ce2](https://github.com/lspriv/wx-calendar/commit/a5e0ce2a01e7b97b59829faec2d1fe6b208373da))
+
+
+### Bug Fixes
+
+* **webview:** 修复周视图下非当前周未隐藏的问题 ([bf6cf99](https://github.com/lspriv/wx-calendar/commit/bf6cf99d080dea7239db7a7c705f94f265fd706c))
+* **webview:** 修改wxs方法引起的周日期显示问题 ([65a5aa1](https://github.com/lspriv/wx-calendar/commit/65a5aa1951053d6494e8257b1c30daa9b470634f)), closes [#147](https://github.com/lspriv/wx-calendar/issues/147)
+* 优化周视图日期跳转动效 ([08a4a95](https://github.com/lspriv/wx-calendar/commit/08a4a951c12a8b3dcd298d75cf0b511e72b57b86))
+* 修复webview下dragger更新 ([bbca2a5](https://github.com/lspriv/wx-calendar/commit/bbca2a5549f6edae8e49d8e5c1541de98f930490)), closes [#140](https://github.com/lspriv/wx-calendar/issues/140)
+* 修复农历日期计算误差 ([818d174](https://github.com/lspriv/wx-calendar/commit/818d1748d7a23f3e2e0e74648f40867e6b26bb43)), closes [#148](https://github.com/lspriv/wx-calendar/issues/148)
+* 修复周排序的问题(算入周首日); ([c35615d](https://github.com/lspriv/wx-calendar/commit/c35615d6c1e1e7fd280f87cc890c1691acde53c6))
+* 修复周视图下跨月日期点击失败的问题 ([1036a04](https://github.com/lspriv/wx-calendar/commit/1036a04e96991acf5aa528a171784fd438a56e18))
+* 修复手势滑动问题 ([c99e4d8](https://github.com/lspriv/wx-calendar/commit/c99e4d8f435f6c75c7e0b95a81a665285f846208))
+* 解决周视图下可以点击非当前周日期的bug ([76fc8a1](https://github.com/lspriv/wx-calendar/commit/76fc8a166112f2d2fdd081dcce49f5352cd8231f))
+* 解决自定义组件宽度下年面板手势滑动问题 ([d0e8f53](https://github.com/lspriv/wx-calendar/commit/d0e8f53ddf98b7395fd010ca2bbd15cf82f13f6f))
+* 调整 ([1bb8a04](https://github.com/lspriv/wx-calendar/commit/1bb8a048f21bb20d591e4e5e11b6db22dacadad6))
+* 调整 ([152e927](https://github.com/lspriv/wx-calendar/commit/152e9276d0f6188953be1680c34d1a56ece1add2))
+* 调整NodesRef.boundingClientRect接口获取的容器宽度的偏差 ([bb41979](https://github.com/lspriv/wx-calendar/commit/bb41979d893831fd23384493713edb7edafe3218)), closes [#141](https://github.com/lspriv/wx-calendar/issues/141)
+* 调整事件绑定方式 ([e8b3e86](https://github.com/lspriv/wx-calendar/commit/e8b3e869f061f57c286e88f78c2619af05057275))
+
 ## [1.7.2](https://github.com/lspriv/wx-calendar/compare/v1.7.1...v1.7.2) (2024-06-11)
 
 
