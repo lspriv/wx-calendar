@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 19:51:14
+ * @LastEditTime: 2024-11-25 21:28:50
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
@@ -68,13 +68,13 @@ export class MarkPlugin implements Plugin {
       const result: TrackDateResult = {};
 
       if (mark.style) result.style = mark.style.style;
-      if (mark.corner) result.corner = { text: mark.corner.text, color: mark.corner.color };
-      if (mark.festival) result.festival = { text: mark.festival.text, color: mark.festival.color };
+      if (mark.solar) result.solar = { text: mark.solar.text, style: mark.solar.style };
+      if (mark.corner) result.corner = { text: mark.corner.text, style: mark.corner.style };
+      if (mark.festival) result.festival = { text: mark.festival.text, style: mark.festival.style };
       if (mark.schedule) {
         result.schedule = mark.schedule.map((schedule, i) => ({
           text: schedule.text,
-          color: schedule.color,
-          bgColor: schedule.bgColor,
+          style: schedule.style,
           key: getMarkKey(key, MARK_PLUGIN_KEY)
         }));
       }

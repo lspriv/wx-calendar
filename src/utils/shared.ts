@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 19:41:20
+ * @LastEditTime: 2024-11-25 22:04:10
  */
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
@@ -79,10 +79,54 @@ export const strToStyle = (str: string) => {
     (acc, item) => {
       if (item) {
         const [k, v] = item.split(':').map(s => s.trim());
-        if (k) acc[k] = v.trim();
+        if (k) acc[k] = v;
       }
       return acc;
     },
     {} as Record<string, string | number>
   );
+};
+
+export function compareArray(a: Array<any>, b: Array<any>): boolean {
+  if (a.length !== b.length) return false;
+  let i = a.length;
+  while (i--) {
+    // 顺序不一样也要返回 false
+    if (!compareSame(a[i], b[i])) return false;
+  }
+  return true;
+}
+
+export function compareSame(a: any, b: any): boolean {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  const typeA = typeof a;
+  if (typeA !== typeof b) return false;
+  if (typeA !== 'object') return a === b;
+  const isArrayA = Array.isArray(a);
+  const isArrayB = Array.isArray(b);
+  if (isArrayA && isArrayB) return compareArray(a, b);
+  else if (isArrayA || isArrayB) return false;
+  const aks = Object.keys(a);
+  const bks = Object.keys(b);
+  if (aks.length !== bks.length) return false;
+  let j = aks.length;
+  while (j--) {
+    const k = aks[j];
+    if (!compareSame(a[k], b[k])) return false;
+  }
+  return true;
+}
+
+export const includes = (arr: Array<string | RegExp>, search: string): boolean => {
+  let i = arr.length;
+  while (i--) {
+    const item = arr[i];
+    if (typeof item === 'string') {
+      if (item === search) return true;
+    } else {
+      if (item.test(search)) return true;
+    }
+  }
+  return false;
 };

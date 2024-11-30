@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-06-11 17:57:50
+ * @LastEditTime: 2024-11-25 19:41:51
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView } from '../basic/tools';
@@ -16,7 +16,6 @@ import type { AnnualPanelSwitch } from '../basic/annual';
 import type { YearPrinter } from '../basic/printer';
 import type { CalendarLayout } from '../basic/layout';
 import type { Nullable, Voidable } from '../utils/shared';
-import type { LunarPlugin } from '../plugins/lunar';
 import type { MarkPlugin } from '../plugins/mark';
 import type {
   PluginConstructor,
@@ -30,6 +29,8 @@ import type {
 export interface CalendarPanel extends WcMonth {
   /** 面板垂直偏移量 */
   offset: number;
+  /** 周视图下当前所在周索引 */
+  wdx: number;
 }
 
 export interface CalendarWeek {
@@ -113,6 +114,10 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   areas: FullProperty<ArrayConstructor>;
   /** 是否滑动手势控制视图 */
   viewGesture: FullProperty<BooleanConstructor>;
+  /** 日期排布, center 居中， baseline 对齐一条线 */
+  alignDate: FullProperty<StringConstructor>;
+  /** 非本月日期是否显示 */
+  showRest: FullProperty<BooleanConstructor>;
 }
 
 interface CalendarInitialize {
@@ -152,7 +157,7 @@ type SwiperAnimationFinishEvent<
   M extends WechatMiniprogram.IAnyObject = {}
 > = WechatMiniprogram.SwiperAnimationFinish<M, D>;
 
-export type DEFAULT_PLUGINS = [typeof LunarPlugin, typeof MarkPlugin];
+export type DEFAULT_PLUGINS = [typeof MarkPlugin];
 export type UsePlugins<T extends PluginConstructor[]> = [...T, ...DEFAULT_PLUGINS];
 export type UsePluginService<T extends PluginConstructor[] = []> = PluginService<UsePlugins<T>>;
 
@@ -215,7 +220,7 @@ export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
   range?: [startDate: CalendarDay, endDate: CalendarDay];
-  source?: 'click' | 'gesture' | 'annual' | 'control'; // 点击 ｜ 手势滑动 ｜ 年面板点击 ｜ 方法控制
+  source?: 'click' | 'gesture' | 'annual' | 'manual'; // 点击 ｜ 手势滑动 ｜ 年面板点击 ｜ 方法控制
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {

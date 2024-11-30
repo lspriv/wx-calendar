@@ -44,6 +44,7 @@
     width: 100%;
     position: relative;
     z-index: 1024;
+    transition: opacity .28s ease;
     @include column-rect;
   }
   &-date {
@@ -146,6 +147,7 @@
     background-color: theme(schedule-bg);
     padding: 0rpx 6rpx;
     border-radius: 2rpx;
+    box-sizing: border-box;
     overflow: hidden;
     text-align: center;
     text-overflow: ellipsis;
@@ -205,6 +207,20 @@
 
 .wcc {
   .wc.wc--week {
+    .wc__panel-container {
+      @include if(wl-6) {
+        .wc__panel-week {
+          @include month-week-rows(6);
+          @include if(next) {
+            opacity: 0;
+          }
+          @include if(show) {
+            opacity: 1 !important;
+            transition: unset !important;
+          }
+        }
+      }
+    }
     .wc__panel-schedules {
       opacity: 0;
     }
@@ -223,6 +239,28 @@
     }
     .wc__panel-schedules {
       opacity: 1;
+    }
+  }
+  .wc.wc--hidden-rest {
+    .wc__panel {
+      .wc__panel-date {
+        &.wc__panel-date--last,
+        &.wc__panel-date--next {
+          opacity: 0;
+        }
+      }
+    } 
+  }
+  &:not(.wc.wc--week) {
+    .wc__panel-container {
+      @include if(wl-6) {
+        .wc__panel-week {
+          @include if(next) {
+            opacity: 1;
+            transition: unset !important;
+          }
+        }
+      }
     }
   }
 }

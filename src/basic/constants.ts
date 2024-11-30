@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-06-09 15:27:28
+ * @LastEditTime: 2024-11-12 19:14:56
  */
 declare const $_VERSION: string;
 

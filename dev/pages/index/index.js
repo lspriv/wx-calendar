@@ -3,23 +3,29 @@
  * @Author: lishen
  * @Date: 2023-08-31 16:46:44
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-02-17 14:28:26
+ * @LastEditTime: 2024-11-25 22:22:23
  */
 Page({
   data: {
     padding: 0,
     markers: [
-      { year: 2023, month: 10, day: 1, type: 'festival', text: '国庆节', color: '#409EFF' },
-      { year: 2023, month: 10, day: 1, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 2, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 3, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 4, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 5, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 6, type: 'corner', text: '休', color: '#61b057' },
-      { year: 2023, month: 10, day: 7, type: 'corner', text: '班', color: '#f37b1d' },
-      { year: 2023, month: 10, day: 8, type: 'corner', text: '班', color: '#f37b1d' },
-      { year: 2023, month: 10, day: 18, type: 'schedule', text: '今天是个好日子' },
-      { year: 2023, month: 10, day: 31, type: 'festival', text: '万圣夜', color: '#409EFF' }
+      { year: 2024, month: 11, day: 19, type: 'festival', text: '国庆节', style: { color: '#409EFF' } },
+      {
+        year: 2024,
+        month: 11,
+        day: 19,
+        type: 'corner',
+        text: '休',
+        style: { color: '#409EFF' }
+      },
+      {
+        year: 2024,
+        month: 11,
+        day: 25,
+        type: 'solar',
+        text: '呵呵',
+        style: { color: '#409EFF' }
+      }
     ]
   },
   onLoad() {

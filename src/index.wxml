@@ -16,7 +16,7 @@
     mark:dragMax="{{ layout.dragMax }}"
     mark:view="{{ currView }}"
     mark:gesture="{{ gesture }}"
-    class="wc wc--{{ currView }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }}"
+    class="wc wc--{{ currView }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }} {{ showRest ? '' : 'wc--hidden-rest' }}"
   >
 
     <!-- Calendar Header Start -->

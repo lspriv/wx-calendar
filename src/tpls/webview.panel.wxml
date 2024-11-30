@@ -16,18 +16,18 @@
   change:offset="{{ trans_wxs.offsetChange }}" offset="{{ offsetChange }}"
   change:initView="{{ trans_wxs.initViewChange }}" initView="{{ initView }}"
   change:transView="{{ trans_wxs.transViewChange }}" transView="{{ transView }}"
-  bindtouchstart="{{ trans_wxs.touchStart }}"
-  catchtouchmove="{{ trans_wxs.touchMove }}" 
-  catchtouchend="{{ trans_wxs.touchEnd }}"
-  catchtransitionend="calendarTransitionEnd">
+  bind:touchstart="{{ trans_wxs.touchStart }}"
+  catch:touchmove="{{ trans_wxs.touchMove }}" 
+  catch:touchend="{{ trans_wxs.touchEnd }}"
+  catch:transitionend="calendarTransitionEnd">
   <swiper 
     circular 
     duration="{{ 300 }}" 
     current="{{ current }}" 
     class="wc__panel-swiper"
     data-type="panel"
-    bindtransition="swiperTrans"
-    bindanimationfinish="swiperTransEnd">
+    bind:transition="swiperTrans"
+    bind:animationfinish="swiperTransEnd">
     <swiper-item
       wx:for="{{ panels }}" 
       wx:for-item="panel" 
@@ -39,8 +39,10 @@
           wc__panel-container 
           {{ current === pdx ? 'wc__panel-container--current' : 'wc__panel-container--incurrent' }}
           wc__panel-container--wl-{{ panel.weeks.length }}
+          {{ currView === 'week' ? 'wc__panel-container--hidden' : '' }}
         "
         data-offset="{{ panel.offset }}"
+        data-wdx="{{ panel.wdx }}"
         >
         <view
           wx:if="{{ current === pdx && pointer && pointer.show }}"
@@ -48,14 +50,14 @@
           style="top: {{ pointer.y }}; left: {{ pointer.x }};">
           <view 
             class="wc__panel-pointer-inner {{ pointer.animate ? 'wc__panel-pointer-inner--animate' : '' }}" 
-            bindanimationend="handlePointerAnimated"></view>
+            bind:animationend="handlePointerAnimated"></view>
         </view>
         <view  
           wx:for="{{ panel.weeks }}" 
           wx:for-item="week" 
           wx:for-index="wdx"
           wx:key="key"
-          class="wc__panel-week">
+          class="wc__panel-week {{ panel.weeks.length > 5 && (wdx === panel.wdx + 1) ? 'wc__panel-week--next' : '' }}">
           <view 
             wx:for="{{ week.days }}" 
             wx:for-item="day" 
@@ -70,14 +72,17 @@
               {{ tool_wxs.isChecked(pointer, day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
             ">
-            <view class="wc__panel-day" style="{{ day.style }}" catchtap="selDate">
-              <view class="wc__panel-solar">{{ day.day }}<view 
+            <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
+              <view 
+                class="wc__panel-solar" 
+                style="{{ day.solar ? day.solar.style : '' }}">{{ day.solar ? day.solar.text : day.day }}<view 
                 wx:if="{{ day.corner }}"
                 class="wc__panel-corner"
-                style="{{ day.corner.color ? 'color:' + day.corner.color + ';' : '' }}">{{ day.corner.text }}</view></view>
+                style="{{ day.corner.style }}">{{ day.corner.text }}</view></view>
               <view 
+                wx:if="{{ day.mark || alignDate === 'baseline' }}"
                 class="wc__panel-mark" 
-                style="{{ day.mark.color ? 'color: ' + day.mark.color + ';' : '' }}">{{ day.mark.text }}</view>
+                style="{{ day.mark.style }}">{{ day.mark.text }}</view>
             </view>
             <view 
               wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
@@ -87,15 +92,15 @@
                 wx:for-index="sdx"
                 wx:for-item="schedule"
                 wx:key="key"
-                style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
+                style="{{ schedule.style }}"
                 class="wc__panel-schedule"
                 data-sdx="{{ sdx }}"
-                catchtap="selSchedule">{{ schedule.text }}</view>
+                catch:tap="selSchedule">{{ schedule.text }}</view>
               <view 
                 wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
                 class="wc__panel-schedule wc__panel-schedule--more"
                 data-all
-                catchtap="selSchedule"
+                catch:tap="selSchedule"
               >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</view>
             </view>
           </view>

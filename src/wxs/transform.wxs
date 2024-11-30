@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 23:19:30
+ * @LastEditTime: 2024-09-11 13:24:17
  */
 
 var nonNullable = function (value) {
@@ -73,6 +73,20 @@ var setCurrPanelSchedule = function (instance, opacity, transition = 'unset', al
 var TOUCH_CHECK_PASS = 1 << 0;
 var TOUCH_CHECK_FAIL = 1 << 1;
 
+var showNextWeekRow = function (instance) {
+  var rows = instance.selectAllComponents('.wc__panel-week--next');
+  for (var i = 0; i < rows.length; i++) {
+    rows[i].addClass('wc__panel-week--show');
+  }
+};
+
+var removeNextWeekRowCls = function (instance) {
+  var rows = instance.selectAllComponents('.wc__panel-week--show');
+  for (var i = 0; i < rows.length; i++) {
+    rows[i].removeClass('wc__panel-week--show');
+  }
+};
+
 /** 手指触摸面板动作开始 */
 var touchStart = function (e, instance) {
   var mark = e.mark;
@@ -88,7 +102,10 @@ var touchStart = function (e, instance) {
   state.lastY = state.y;
   /** 入角检查入角 */
   state.check = 0;
-  if (mark.view === 'week') state.currentHeight = mark.min;
+  if (mark.view === 'week') {
+    state.currentHeight = mark.min;
+    showNextWeekRow(instance);
+  }
   if (mark.view === 'month') state.currentHeight = mark.main;
   if (mark.view === 'schedule') state.currentHeight = mark.max;
 };
@@ -254,6 +271,8 @@ var touchEnd = function (e, instance) {
   /** 计算日程透明度  */
   var opacity = toMax ? 1 : 0;
   setCurrPanelSchedule(instance, opacity, 'all .3s ease');
+
+  if (view === 'week') removeNextWeekRowCls(instance);
 
   instance.callMethod('refreshView', { view: toMin ? 1 : toMax ? 4 : 2 });
 };
