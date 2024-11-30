@@ -241,6 +241,16 @@
       opacity: 1;
     }
   }
+  .wc.wc--hidden-rest {
+    .wc__panel {
+      .wc__panel-date {
+        &.wc__panel-date--last,
+        &.wc__panel-date--next {
+          opacity: 0;
+        }
+      }
+    } 
+  }
   &:not(.wc.wc--week) {
     .wc__panel-container {
       @include if(wl-6) {
