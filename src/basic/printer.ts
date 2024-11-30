@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-11 02:15:55
+ * @LastEditTime: 2024-11-30 12:37:21
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -388,7 +388,7 @@ export class YearPrinter extends CalendarHandler {
     const radiusMin = Math.min((minWidth - monthPaddingX * 2) / 14, (minHeight - 3 * row) / 12);
     const checkedRadiusFr = isMax ? this._checked_radius_max_ : radiusMin;
     const checkedRadiusTo = isMax ? radiusMin : this._checked_radius_max_;
-    const checkedRadius = iframe(checkedRadiusFr, checkedRadiusTo, frame);
+    const checkedRadius = Math.max(iframe(checkedRadiusFr, checkedRadiusTo, frame), 0);
 
     const checkedOffsetFr = isMax ? this._checked_offset_max_ : 0;
     const checkedOffsetTo = isMax ? 0 : this._checked_offset_max_;
@@ -629,7 +629,7 @@ export class YearPrinter extends CalendarHandler {
       const ctx = canvas.ctx!;
       const _x = locate.x - frame.markWidth / 2;
       const _y = locate.y + frame.dateFontSize / 2 + this._mark_height_.min;
-      const radius = frame.markHeight / 2;
+      const radius = Math.max(frame.markHeight / 2, 0);
       ctx.globalAlpha = canvas.state & PrinterState.maximize ? 1 : frame.alpha;
       ctx.fillStyle = mark.sub;
 
@@ -688,7 +688,7 @@ export class YearPrinter extends CalendarHandler {
   private dateBgRadius(checkedRadius: number, radius?: number): number {
     if (!radius) return 0;
     if (radius > 50) return checkedRadius;
-    return Math.floor((radius * checkedRadius * 2) / 100);
+    return Math.max(Math.floor((radius * checkedRadius * 2) / 100), 0);
   }
 
   /**
