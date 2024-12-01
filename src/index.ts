@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-11-25 21:44:23
+ * @LastEditTime: 2024-12-01 19:14:53
  */
 
 import {
@@ -57,6 +57,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
+  externalClasses: ['i-class'],
   options: {
     pureDataPattern: PURE_PROPS
   },
