@@ -58,7 +58,7 @@ WxCalendar.use(LunarPlugin);
 
 Page({
   handleLoad(detail) {
-    conosle.log('calendar load', detail);
+    console.log('calendar load', detail);
   }
 })
 ```
@@ -762,7 +762,7 @@ class MyPlugin implements Plugin {
 
 
 #### 已完成插件
-- [x] <a href="https://github.com/lspriv/wc-plugin-lunar" target="_blank">**@lspriv/wc-plugin-lunar 农历插件**</a>
+- [x] <a href="https://github.com/lspriv/wc-plugin-lunar/tree/alpha" target="_blank">**@lspriv/wc-plugin-lunar 农历插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-disabled" target="_blank">**@lspriv/wc-plugin-disabled 日历禁用插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-multiple" target="_blank">**@lspriv/wc-plugin-multiple 日历多选插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">**@lspriv/wc-plugin-ics ICS日历订阅插件**</a>

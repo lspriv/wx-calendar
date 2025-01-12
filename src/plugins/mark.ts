@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-12-01 20:12:47
+ * @LastEditTime: 2025-01-12 16:08:25
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
@@ -39,7 +39,7 @@ export class MarkPlugin implements Plugin {
           if (_mark.schedule) _mark.schedule.push(mark);
           else _mark.schedule = [mark];
         } else {
-          _mark[mark.type] = mark as any;
+          (_mark[mark.type] as CalendarStyleMark | CalendarMark) = mark;
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };

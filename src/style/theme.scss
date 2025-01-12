@@ -56,6 +56,8 @@ $wc-theme-size: (
 	/** annual **/
 	annual-title-size: 50rpx, // 年面板左上角年份标题字体字号
 	annual-title-sub-size: 18rpx, // 年面板左上角年份标题右侧信息字体字号
+
+	panel-height: $wc-calendar-panel-height // 日期面板高度（不包括头部，星期和底部的bar）
 );
 
 /** 主题色 **/

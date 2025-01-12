@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-11-25 22:06:51
+ * @LastEditTime: 2025-01-12 16:07:34
  */
 import { nextTick, OnceEmiter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -496,19 +496,17 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   private setUpdateRecord(map: Map<string, DateResult>, date: CalendarDay) {
     const key = `${date.year}_${date.month}_${date.day}`;
     if (!map.has(key)) {
-      const result = this.walkForDate(date);
-      if (result) {
-        result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
-        result.corner?.style && (result.corner.style = reorderStyle(result.corner.style));
-        result.festival?.style && (result.festival.style = reorderStyle(result.festival.style));
-        result.solar?.style && (result.solar.style = reorderStyle(result.solar.style));
-        if (result.schedule?.length) {
-          result.schedule.forEach(sc => {
-            sc.style && (sc.style = reorderStyle(sc.style, SCHEDULE_STYLE_KEYS));
-          });
-        }
-        map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+      const result = this.walkForDate(date) || ({} as TrackDateRecord);
+      result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
+      result.corner?.style && (result.corner.style = reorderStyle(result.corner.style));
+      result.festival?.style && (result.festival.style = reorderStyle(result.festival.style));
+      result.solar?.style && (result.solar.style = reorderStyle(result.solar.style));
+      if (result.schedule?.length) {
+        result.schedule.forEach(sc => {
+          sc.style && (sc.style = reorderStyle(sc.style, SCHEDULE_STYLE_KEYS));
+        });
       }
+      map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
     }
   }
 
