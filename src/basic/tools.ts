@@ -67,6 +67,7 @@ export const nextTick = <
 };
 
 export const severalTicks = async (times: number) => {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (!times) break;
     await nextTick();
@@ -139,12 +140,12 @@ export const mergeStr = (strs: Array<string>, separator: string = ',') => {
   return strs.flatMap(s => s.split(separator).map(w => w.trim())).join(separator);
 };
 
-export interface OnceEmiter {
+export interface OnceEmitter {
   emit: (...detail: any[]) => void;
   cancel: () => void;
 }
 /** 触发一次 */
-export const onceEmiter = (instance: ComponentInstance, event: string): OnceEmiter => {
+export const onceEmitter = (instance: ComponentInstance, event: string): OnceEmitter => {
   let emits = 0;
   return {
     emit: function (...detail: any[]) {

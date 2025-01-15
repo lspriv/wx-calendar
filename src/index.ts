@@ -34,7 +34,7 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  onceEmiter,
+  onceEmitter,
   layoutHideCls
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -444,7 +444,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      const emiter = onceEmiter(this, event);
+      const emiter = onceEmitter(this, event);
       dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
       emiter.emit(detail);
     },
@@ -515,35 +515,24 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   },
   export() {
     if (!this._loaded_) return null as unknown as CalendarExport;
-    const instance = this;
     return {
       version: VERSION,
-      checked(date) {
-        return instance._panel_.toDate(date);
-      },
-      toggleView(view) {
-        const flag = view ? viewFlag(view) : instance._view_ & View.week ? View.month : View.week;
+      checked: date => this._panel_.toDate(date),
+      toggleView: view => {
+        const flag = view ? viewFlag(view) : this._view_ & View.week ? View.month : View.week;
         const _view = flag || View.month;
-        if (isSkyline(instance.renderer)) {
-          instance.toggleView(_view);
+        if (isSkyline(this.renderer)) {
+          this.toggleView(_view);
         } else {
-          instance.setData({
+          this.setData({
             transView: flagView(_view)
           });
         }
       },
-      openAnuual() {
-        return instance.selYear();
-      },
-      getMarks(date) {
-        return instance._calendar_.service.getEntireMarks(date);
-      },
-      getPlugin(key) {
-        return instance._calendar_.service.getPlugin(key);
-      },
-      updateDates(dates) {
-        return instance._calendar_.service.updateDates(dates);
-      }
+      openAnnual: () => this.selYear(),
+      getMarks: date => this._calendar_.service.getEntireMarks(date),
+      getPlugin: key => this._calendar_.service.getPlugin(key),
+      updateDates: dates => this._calendar_.service.updateDates(dates)
     } as CalendarExport;
   }
 });

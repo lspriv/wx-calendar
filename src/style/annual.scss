@@ -5,6 +5,8 @@
  * @Description: 年度面板
  * @Author: lspriv
  */
+@use 'funcs' as *;
+@use 'mixin' as *;
 
 .wc__annual {
   width: 100vw;

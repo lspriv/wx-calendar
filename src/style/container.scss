@@ -1,3 +1,7 @@
+@use 'theme' as *;
+@use 'funcs' as *;
+@use 'mixin' as *;
+
 .wcc {
   width: 100vw;
   @include theme-values($wc-theme-size);

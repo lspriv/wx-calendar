@@ -1,6 +1,6 @@
 /*
  * @Description: Description
- * @Author: lishen
+ * @Author: lspriv
  * @LastEditTime: 2024-02-09 10:57:27
  */
 const gulp = require('gulp');
@@ -16,6 +16,7 @@ const ts = require('gulp-typescript');
 
 const { PRJ_NAME, htmlMinConfig, jsMiniOpts, wxsMiniOpts, unPackGlobs, dependenciesGlobs } = require('./config');
 const { wxss, errorLogger } = require('./handler');
+const { isWxml, isSass, isCss, isWxss, isJson, isTs, isJs, isWxs, gor } = require('./utils');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -25,16 +26,16 @@ module.exports = () =>
   gulp
     .src(['src/**/*', ...dependenciesGlobs, ...unPackGlobs], { nodir: true })
     .pipe(plumber())
-    .pipe(gf(file => file.extname === '.wxml', htmlmin(htmlMinConfig)))
-    .pipe(gf(file => file.extname === '.scss' || file.extname === '.sass', sassGlob()))
-    .pipe(gf(file => file.extname === '.scss' || file.extname === '.sass', sass({ outputStyle: 'compressed' })))
+    .pipe(gf(isWxml, htmlmin(htmlMinConfig)))
+    .pipe(gf(isSass, sassGlob()))
+    .pipe(gf(isSass, sass.sync({ style: 'compressed' })))
     .on('error', sass.logError)
-    .pipe(gf(file => file.extname === '.css' || file.extname === '.wxss', wxss()))
-    .pipe(gf(file => file.extname === '.json', jsonFormat(2)))
-    .pipe(gf(file => file.extname === '.ts', tsProject()))
+    .pipe(gf(gor(isCss, isWxss), wxss()))
+    .pipe(gf(isJson, jsonFormat(2)))
+    .pipe(gf(isTs, tsProject()))
     .on('error', errorLogger('typescript'))
-    .pipe(gf(file => file.extname === '.js', uglify(jsMiniOpts)))
-    .pipe(gf(file => file.extname === '.wxs', uglify(wxsMiniOpts)))
+    .pipe(gf(isJs, uglify(jsMiniOpts)))
+    .pipe(gf(isWxs, uglify(wxsMiniOpts)))
     .pipe(plumber.stop())
     .pipe(size({ title: 'pack complete', showFiles: true, showTotal: true }))
     .pipe(

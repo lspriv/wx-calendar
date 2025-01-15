@@ -352,7 +352,7 @@ type ScheduleEventDetail = {
 }
 ```
 
-[***`openAnuual`***](#openAnuual) 打开年度面板
+[***`openAnnual`***](#openAnnual) 打开年度面板
 ```typescript
 {
   (): Promise<void>;
@@ -682,7 +682,7 @@ class MyPlugin implements Plugin {
 ##### 事件响应
 响应日历组件事件 `load` `click` `change` `viewChange`。
 ```typescript 
-import { Plugin, PluginService, CalendarEventDetail, OnceEmiter } from '@lspriv/wx-calendar/lib';
+import { Plugin, PluginService, CalendarEventDetail, OnceEmitter } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
 
@@ -692,7 +692,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     // 获取日历组件实例
     const component = service.component;
 
@@ -706,7 +706,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     
   }
 
@@ -716,7 +716,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     
   }
 
@@ -726,7 +726,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
 
   }
 }

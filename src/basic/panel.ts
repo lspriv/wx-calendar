@@ -135,7 +135,7 @@ export class PanelTool extends CalendarHandler {
     const $current = sets.current ?? instance.data.current;
     const $checked = sets.checked ?? instance.data.checked!;
 
-    const _current = isExcludes ? $current : <number>excludes ?? $current;
+    const _current = isExcludes ? $current : (excludes ?? $current);
     const _checked = isExcludes ? $checked : checked || $checked;
 
     const _exclude = isExcludes ? excludes : [];

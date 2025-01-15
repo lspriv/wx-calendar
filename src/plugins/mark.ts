@@ -73,7 +73,7 @@ export class MarkPlugin implements Plugin {
       if (mark.corner) result.corner = { text: mark.corner.text, style: mark.corner.style };
       if (mark.festival) result.festival = { text: mark.festival.text, style: mark.festival.style };
       if (mark.schedule) {
-        result.schedule = mark.schedule.map((schedule, i) => ({
+        result.schedule = mark.schedule.map(schedule => ({
           text: schedule.text,
           style: schedule.style,
           key: getMarkKey(key, MARK_PLUGIN_KEY)

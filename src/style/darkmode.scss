@@ -5,9 +5,11 @@
  * @Description: 深色模式
  * @Author: lspriv
  */
+@use 'mixin' as *;
+@use 'theme' as *;
 
 @media (prefers-color-scheme: dark) {
 	.wcc.wcc--darkmode {
-  	@include theme-use($wc-theme-dark, 'dark');
+  		@include theme-use($wc-theme-dark, 'dark');
 	}
 }

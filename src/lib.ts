@@ -6,21 +6,11 @@
  * @Author: lspriv
  * @LastEditTime: 2024-12-01 20:13:06
  */
-export type * from './basic/tools';
+export * from './utils/shared';
+export * from './basic/tools';
+export * from './basic/constants';
+export * from './interface/calendar';
 export type * from './interface/component';
 export type * from './basic/service';
-export * from './utils/shared';
-export * from './basic/constants';
-export {
-  nextTick,
-  severalTicks,
-  viewFlag,
-  flagView,
-  isSkyline,
-  layoutHideCls,
-  addLayoutHideCls,
-  hasLayoutArea
-} from './basic/tools';
-export * from './interface/calendar';
 export { Layout } from './basic/layout';
 export { MARK_PLUGIN_KEY, SCHEDULE_MARK_ORIGIN } from './plugins/mark';

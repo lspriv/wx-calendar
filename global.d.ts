@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /*
  * Copyright 2023 lspriv. All Rights Reserved.
  * Distributed under MIT license.
@@ -40,23 +41,6 @@ declare namespace WechatMiniprogram {
     currentTarget: Target<DataSet>;
   }
 
-  // interface GragGestureResponseEvent {
-  //   clientX: number;
-  //   clientY: number;
-  //   deltaX: number;
-  //   deltaY: number;
-  //   force: number;
-  //   identifier: number;
-  //   localX: number;
-  //   localY: number;
-  //   radiusX: number;
-  //   radiusY: number;
-  //   rotationAngle: number;
-  //   tilt: number;
-  //   timeStamp: number;
-  //   type: string;
-  // }
-
   namespace Component {
     interface AnimatedUpdater {
       (): SkylineStyleObject;
@@ -72,7 +56,7 @@ declare namespace WechatMiniprogram {
     }
 
     interface InstanceProperties {
-      renderer?: 'webview' | 'skyline';
+      renderer: 'webview' | 'skyline';
       applyAnimatedStyle(
         selector: string,
         updater: AnimatedUpdater,

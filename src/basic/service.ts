@@ -6,7 +6,7 @@
  * @Author: lspriv
  * @LastEditTime: 2025-01-12 16:07:34
  */
-import { nextTick, OnceEmiter } from './tools';
+import { nextTick, OnceEmitter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
 import { camelToSnake, notEmptyObject, compareSame } from '../utils/shared';
 import {
@@ -22,7 +22,7 @@ import {
   fillAnnualSubs
 } from '../interface/calendar';
 
-import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
+import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable, PlainObject } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
@@ -77,7 +77,7 @@ interface PluginInterception {
    */
   PLUGIN_CATCH_TAP?(
     service: PluginService,
-    event: WechatMiniprogram.TouchEvent<{}, { wdx: number; ddx: number }>,
+    event: WechatMiniprogram.TouchEvent<PlainObject, { wdx: number; ddx: number }>,
     intercept: EventIntercept
   ): void;
 
@@ -102,25 +102,25 @@ interface PluginEventHandler {
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期点击触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
    * @param service PliginService实例
@@ -479,7 +479,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         if (rstart > pend || rend < pstart) continue;
 
         let st = Math.max(rstart, pstart);
-        let ed = Math.min(rend, pend);
+        const ed = Math.min(rend, pend);
 
         while (st <= ed) {
           const date = normalDate(st);
@@ -584,7 +584,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param event 事件名
    * @param action 默认行为
    */
-  public interceptEvent<K extends PluginInterceptNames, R extends any = any>(
+  public interceptEvent<K extends PluginInterceptNames, R = any>(
     name: K,
     detail: PluginInterceptDetail<K>,
     action?: (...args: any[]) => R
