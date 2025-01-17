@@ -454,7 +454,9 @@ type ScheduleEventDetail = {
     --wc-operator-size: 22rpx; /** 视图控制按钮字号 */ 
     --wc-week-size: 20rpx; /** 星期字号 */ 
     --wc-date-size: 36rpx; /** 日期字体字号 */ 
-    --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */ 
+    --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */
+    --wc-dot-size: 10rpx; /** 日期上方‘･’大小 */
+    --wc-dot-offset: 0rpx; /** 日期上方‘･’垂直方向偏移 */ 
     --wc-corner-size: 16rpx; /** 日期角标字体字号 */ 
     --wc-schedule-size: 16rpx; /** 日程字体字号 */ 
     --wc-annual-title-size: 50rpx; /** 年面板左上角年份标题字体字号 */ 

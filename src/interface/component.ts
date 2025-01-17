@@ -134,6 +134,7 @@ export type CalendarProp = {
   /** 非本月日期是否显示 */
   showRest: FullProperty<BooleanConstructor>;
 };
+
 interface CalendarInitialize {
   /**
    * 初始化必需的共享变量
