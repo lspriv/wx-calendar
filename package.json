@@ -7,8 +7,7 @@
   "types": "./dist/index.d.ts",
   "miniprogram": "dist",
   "files": [
-    "dist/",
-    "global.d.ts"
+    "dist/"
   ],
   "exports": {
     ".": "./dist/lib.js"

@@ -250,8 +250,8 @@ export class PanelTool extends CalendarHandler {
         }
       } else {
         await instance._pointer_.resetOffsetY(d);
-        const pannel = instance.data.panels[current];
-        const offset = monthDiff(pannel, { year: d.year, month: d.month });
+        const panel = instance.data.panels[current];
+        const offset = monthDiff(panel, { year: d.year, month: d.month });
         await this.refresh(offset, d, idx >= 0 ? idx : current);
       }
       instance.trigger('change', { checked: d, source: 'manual' });

@@ -13,6 +13,39 @@ import { values } from '../utils/shared';
 import type { Voidable } from '../utils/shared';
 import type { CalendarWeek, LayoutArea } from '../interface/component';
 
+declare global {
+  namespace WechatMiniprogram {
+    namespace Component {
+      interface AnimatedUpdater {
+        (): SkylineStyleObject;
+      }
+      interface AnimatedUserConfig {
+        immediate?: boolean;
+        flush?: 'async' | 'sync';
+      }
+      interface AnimatedResult {
+        styleId: number;
+      }
+      interface InstanceProperties {
+        renderer: 'webview' | 'skyline';
+        applyAnimatedStyle(
+          selector: string,
+          updater: AnimatedUpdater,
+          userConfig?: AnimatedUserConfig,
+          callback?: (result: AnimatedResult) => void
+        ): void;
+        clearAnimatedStyle(selector: string, styleIds: Array<number>, callback?: () => void): void;
+      }
+    }
+  }
+}
+
+export type SkylineStyleObject = Record<string, string | number>;
+
+export interface Shared<T> {
+  value: T;
+}
+
 export type BoundingClientRects = Array<WechatMiniprogram.BoundingClientRectCallbackResult>;
 
 export type ComponentInstance = WechatMiniprogram.Component.Instance<

@@ -92,46 +92,46 @@ interface PluginInterception {
 
 interface PluginEventHandler {
   /**
-   * 日历组件attche阶段
-   * @param service PliginService实例
+   * 日历组件attache阶段
+   * @param service PluginService实例
    * @param sets 视图初次渲染数据
    */
   PLUGIN_ON_ATTACH?(service: PluginService, sets: Partial<CalendarData>): void;
   /**
    * 日历组件onLoad事件触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
   PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期点击触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
   PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
   PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
   PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    */
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
 export interface Plugin extends PluginEventHandler, PluginInterception {
   /**
-   * PliginService初始化完成
-   * @param service PliginService实例
+   * PluginService实例初始化完成
+   * @param service PluginService实例
    */
   PLUGIN_INITIALIZE?(service: PluginService): void;
   /**
@@ -152,7 +152,7 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
   PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
   /**
    * 对已提供的有效日期进行过滤
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param dates 日期数组
    */
   PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<CalendarDay | DateRange>;
@@ -171,7 +171,7 @@ export interface PluginConstructor {
   /**
    * 日历组件版本
    */
-  REQUIER_VERSION?: string;
+  REQUIRE_VERSION?: string;
   /**
    * 原型
    */

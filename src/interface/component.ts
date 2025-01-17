@@ -7,7 +7,7 @@
  * @LastEditTime: 2024-11-25 19:41:51
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
-import { isSkyline, type CalendarView } from '../basic/tools';
+import { isSkyline, type CalendarView, Shared } from '../basic/tools';
 import type { View } from '../basic/constants';
 import type { Pointer, CalendarPointer } from '../basic/pointer';
 import type { PanelTool } from '../basic/panel';
@@ -25,6 +25,21 @@ import type {
   PluginEventNames,
   ServicePluginMap
 } from '../basic/service';
+
+declare global {
+  namespace WechatMiniprogram {
+    interface GragGestureEvent<DataSet extends IAnyObject = IAnyObject> {
+      state: 0 | 1 | 2 | 3 | 4;
+      absoluteX: number;
+      absoluteY: number;
+      deltaX: number;
+      deltaY: number;
+      velocityX: number;
+      velocityY: number;
+      currentTarget: Target<DataSet>;
+    }
+  }
+}
 
 export interface CalendarPanel extends WcMonth {
   /** 面板垂直偏移量 */

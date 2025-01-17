@@ -388,8 +388,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
-      const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
-      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accmulation, 20));
+      const accumulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
+      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accumulation, 20));
 
       /** 计算左上角视图控制的位置 */
       const translateX = Math.max(0, Math.min(60, ((mainHeight - usefulHeight) * 60) / (mainHeight - minHeight)));
@@ -444,9 +444,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      const emiter = onceEmitter(this, event);
-      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
-      emiter.emit(detail);
+      const emitter = onceEmitter(this, event);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emitter);
+      emitter.emit(detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
