@@ -59,7 +59,7 @@ type FullProperty<T extends WechatMiniprogram.Component.PropertyType> = WechatMi
 
 export type LayoutArea = 'header' | 'title' | 'subinfo' | 'today' | 'viewbar' | 'dragbar';
 
-export interface CalendarData extends WechatMiniprogram.Component.DataOption {
+export type CalendarData = {
   /** 渲染模式 */
   renderer: 'webview' | 'skyline' | 'unknown';
   /** 选中日期 */
@@ -102,9 +102,9 @@ export interface CalendarData extends WechatMiniprogram.Component.DataOption {
   darkside: boolean;
   /** 属性 layout 的翻版 */
   areaHideCls: string;
-}
+};
 
-export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption {
+export type CalendarProp = {
   /** 暗黑模式 */
   darkmode: FullProperty<BooleanConstructor>;
   /** 默认选中日期 */
@@ -133,7 +133,7 @@ export interface CalendarProp extends WechatMiniprogram.Component.PropertyOption
   alignDate: FullProperty<StringConstructor>;
   /** 非本月日期是否显示 */
   showRest: FullProperty<BooleanConstructor>;
-}
+};
 interface CalendarInitialize {
   /**
    * 初始化必需的共享变量

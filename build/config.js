@@ -24,7 +24,7 @@ module.exports.PRJ_PATH = path.resolve(process.cwd(), 'dev');
 
 module.exports.unPackGlobs = ['!src/style/**'];
 
-module.exports.dependenciesGlobs = ['node_modules/miniprogram-api-typings/index.d.ts', 'global.d.ts'];
+module.exports.dependenciesGlobs = ['node_modules/miniprogram-api-typings/index.d.ts'];
 
 module.exports.htmlMinConfig = {
   caseSensitive: true,
