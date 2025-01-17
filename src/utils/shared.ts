@@ -9,13 +9,15 @@
 export type PartRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;
 export type Voidable<T> = T | undefined;
 export type Nullable<T> = T | null;
+export type Callable = (...args: any[]) => any;
+export type PlainObject = NonNullable<unknown>;
 
 const toTypeString = (val: unknown): string => Object.prototype.toString.call(val);
 
 export const isDate = (val: unknown): val is Date => toTypeString(val) === '[object Date]';
 export const isString = (val: unknown): val is string => typeof val === 'string';
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
-export const isFunction = (val: unknown): val is Function => typeof val === 'function';
+export const isFunction = (val: unknown): val is Callable => typeof val === 'function';
 export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
 export const isPromise = <T = any>(val: unknown): val is Promise<T> =>
   isObject(val) && isFunction(val.then) && isFunction(val.catch);
@@ -39,10 +41,10 @@ export type SnakeToLowerCamel<T extends string, K = Lowercase<T>> = K extends `$
   : K;
 
 /** 小驼峰（lowerCamelCase）转下划线（snake_case） */
-export type LowerCamelToSnake<T extends string> = T extends `${infer R}${infer P}`
+export type LowerCamelToSnake<T extends string, S extends string = '_'> = T extends `${infer R}${infer P}`
   ? R extends Lowercase<R>
-    ? `${R}${LowerCamelToSnake<P>}`
-    : `_${Lowercase<R>}${LowerCamelToSnake<P>}`
+    ? `${R}${LowerCamelToSnake<P, S>}`
+    : `${S}${Lowercase<R>}${LowerCamelToSnake<P, S>}`
   : T;
 
 export const camelToSnake = <T extends string>(str: T, separator: string = '_') =>
@@ -58,7 +60,7 @@ export const promises = <T extends any[]>(all: T) => Promise.all(all.filter(isPr
 
 export const values = <T>(obj: Record<string, T>): T[] => Object.keys(obj).map(key => obj[key]);
 
-export const notEmptyObject = (val: Object): boolean => !!Object.keys(val).length;
+export const notEmptyObject = (val: Record<any, any>): boolean => !!Object.keys(val).length;
 
 export const easingOpt = (
   duration: number,
@@ -71,7 +73,7 @@ export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, k
       if (!keys.includes(key as K)) acc[key] = obj[key];
       return acc;
     },
-    {} as Pick<T, Exclude<keyof T, K>>
+    {} as Omit<T, K>
   );
 
 export const strToStyle = (str: string) => {

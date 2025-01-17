@@ -5,8 +5,9 @@
  * @Description: scss公共方法
  * @Author: lspriv
  */
-
 @use "sass:string";
+@use 'theme' as *;
+
 @function theme ($theme-key) {
 	@return var(#{$wc-theme-prefix}#{$theme-key});
 }

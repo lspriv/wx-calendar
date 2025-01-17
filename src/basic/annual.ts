@@ -8,7 +8,7 @@
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
-import { applyAnimated, clearAnimated, nextTick, nodeRect, severalTicks } from './tools';
+import { applyAnimated, clearAnimated, nextTick, nodeRect, severalTicks, Shared } from './tools';
 import { SELECTOR } from './constants';
 import { promises, isFunction } from '../utils/shared';
 

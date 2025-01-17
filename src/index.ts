@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-11-25 21:44:23
+ * @LastEditTime: 2024-12-01 19:14:53
  */
 
 import {
@@ -34,7 +34,7 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  onceEmiter,
+  onceEmitter,
   layoutHideCls
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -57,6 +57,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
+  externalClasses: ['i-class'],
   options: {
     pureDataPattern: PURE_PROPS
   },
@@ -387,8 +388,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
-      const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
-      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accmulation, 20));
+      const accumulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
+      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accumulation, 20));
 
       /** 计算左上角视图控制的位置 */
       const translateX = Math.max(0, Math.min(60, ((mainHeight - usefulHeight) * 60) / (mainHeight - minHeight)));
@@ -443,9 +444,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         ];
       }
 
-      const emiter = onceEmiter(this, event);
-      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
-      emiter.emit(detail);
+      const emitter = onceEmitter(this, event);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emitter);
+      emitter.emit(detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
@@ -514,35 +515,24 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   },
   export() {
     if (!this._loaded_) return null as unknown as CalendarExport;
-    const instance = this;
     return {
       version: VERSION,
-      checked(date) {
-        return instance._panel_.toDate(date);
-      },
-      toggleView(view) {
-        const flag = view ? viewFlag(view) : instance._view_ & View.week ? View.month : View.week;
+      checked: date => this._panel_.toDate(date),
+      toggleView: view => {
+        const flag = view ? viewFlag(view) : this._view_ & View.week ? View.month : View.week;
         const _view = flag || View.month;
-        if (isSkyline(instance.renderer)) {
-          instance.toggleView(_view);
+        if (isSkyline(this.renderer)) {
+          this.toggleView(_view);
         } else {
-          instance.setData({
+          this.setData({
             transView: flagView(_view)
           });
         }
       },
-      openAnuual() {
-        return instance.selYear();
-      },
-      getMarks(date) {
-        return instance._calendar_.service.getEntireMarks(date);
-      },
-      getPlugin(key) {
-        return instance._calendar_.service.getPlugin(key);
-      },
-      updateDates(dates) {
-        return instance._calendar_.service.updateDates(dates);
-      }
+      openAnnual: () => this.selYear(),
+      getMarks: date => this._calendar_.service.getEntireMarks(date),
+      getPlugin: key => this._calendar_.service.getPlugin(key),
+      updateDates: dates => this._calendar_.service.updateDates(dates)
     } as CalendarExport;
   }
 });

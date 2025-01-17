@@ -11,6 +11,8 @@
 @use "sass:string";
 @use "sass:selector";
 
+@use 'theme' as *;
+
 @mixin column-width ($columms: 7) {
 	width: calc(100% / #{$columms});
 }
@@ -56,10 +58,7 @@
 	$direction: normal, 
 	$fill-mode: none
 ) {
-	$-name: #{$name}-#{unique-id()};
-	@keyframes #{$-name} {
-		@content;
-	}
+	$-name: #{$name}-#{string.unique-id()};
 	animation-name: $-name;
 	animation-duration: $duration;
 	animation-timing-function: $timing-func;
@@ -67,6 +66,9 @@
 	animation-fill-mode: $fill-mode;
 	animation-iteration-count: $count;
 	animation-direction: $direction;
+	@keyframes #{$-name} {
+		@content;
+	}
 }
 
 @mixin transition(

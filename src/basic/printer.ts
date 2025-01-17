@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-06-11 02:15:55
+ * @LastEditTime: 2024-11-30 12:37:21
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
@@ -15,6 +15,23 @@ import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
+
+declare global {
+  interface HTMLCanvasElement {
+    /**
+     * 在下次进行重绘时执行。 支持在 2D Canvas 和 WebGL Canvas 下使用, 但不支持混用 2D 和 WebGL 的方法。
+     * @param callback 执行的 callback
+     * @see https://developers.weixin.qq.com/miniprogram/dev/api/canvas/Canvas.requestAnimationFrame.html
+     */
+    requestAnimationFrame(callback: () => void): number;
+    /**
+     * 取消由 requestAnimationFrame 添加到计划中的动画帧请求。支持在 2D Canvas 和 WebGL Canvas 下使用, 但不支持混用 2D 和 WebGL 的方法。
+     * @param requestID requestAnimationFrame返回的请求 ID
+     * @see https://developers.weixin.qq.com/miniprogram/dev/api/canvas/Canvas.cancelAnimationFrame.html
+     */
+    cancelAnimationFrame(requestID: number): void;
+  }
+}
 
 const ANIMATE_FRAMES = 20;
 
@@ -160,7 +177,7 @@ export class YearPrinter extends CalendarHandler {
   private _date_size_: StateValue;
   private _date_height_: number;
 
-  private _pannel_padding_: StateValue;
+  private _panel_padding_: StateValue;
   private _month_padding_: StateValue;
 
   private _title_size_: StateValue;
@@ -220,7 +237,7 @@ export class YearPrinter extends CalendarHandler {
 
     const pannelPaddingMin = Layout.rpxToPx(16);
     const pannelPaddingMax = Layout.rpxToPx(0);
-    this._pannel_padding_ = createState(pannelPaddingMax, pannelPaddingMin);
+    this._panel_padding_ = createState(pannelPaddingMax, pannelPaddingMin);
 
     this._title_padding_x_ = Layout.rpxToPx(20);
 
@@ -292,8 +309,8 @@ export class YearPrinter extends CalendarHandler {
     const alpha = state & PrinterState.minimize && frame ? Math.max((_alpha * 10 * 15 - 50) / 100, 0) : _alpha;
 
     /** 面板内边距 */
-    const paddingFr = isMax ? this._pannel_padding_.max : this._pannel_padding_.min;
-    const paddingTo = isMax ? this._pannel_padding_.min : this._pannel_padding_.max;
+    const paddingFr = isMax ? this._panel_padding_.max : this._panel_padding_.min;
+    const paddingTo = isMax ? this._panel_padding_.min : this._panel_padding_.max;
     const padding = iframe(paddingFr, paddingTo, frame);
 
     /** 面板水平偏移 */
@@ -388,7 +405,7 @@ export class YearPrinter extends CalendarHandler {
     const radiusMin = Math.min((minWidth - monthPaddingX * 2) / 14, (minHeight - 3 * row) / 12);
     const checkedRadiusFr = isMax ? this._checked_radius_max_ : radiusMin;
     const checkedRadiusTo = isMax ? radiusMin : this._checked_radius_max_;
-    const checkedRadius = iframe(checkedRadiusFr, checkedRadiusTo, frame);
+    const checkedRadius = Math.max(iframe(checkedRadiusFr, checkedRadiusTo, frame), 0);
 
     const checkedOffsetFr = isMax ? this._checked_offset_max_ : 0;
     const checkedOffsetTo = isMax ? 0 : this._checked_offset_max_;
@@ -629,7 +646,7 @@ export class YearPrinter extends CalendarHandler {
       const ctx = canvas.ctx!;
       const _x = locate.x - frame.markWidth / 2;
       const _y = locate.y + frame.dateFontSize / 2 + this._mark_height_.min;
-      const radius = frame.markHeight / 2;
+      const radius = Math.max(frame.markHeight / 2, 0);
       ctx.globalAlpha = canvas.state & PrinterState.maximize ? 1 : frame.alpha;
       ctx.fillStyle = mark.sub;
 
@@ -688,7 +705,7 @@ export class YearPrinter extends CalendarHandler {
   private dateBgRadius(checkedRadius: number, radius?: number): number {
     if (!radius) return 0;
     if (radius > 50) return checkedRadius;
-    return Math.floor((radius * checkedRadius * 2) / 100);
+    return Math.max(Math.floor((radius * checkedRadius * 2) / 100), 0);
   }
 
   /**
@@ -726,7 +743,7 @@ export class YearPrinter extends CalendarHandler {
     return canvas;
   }
 
-  private async inintializeTransform(canvas: Canvas, mdx: number) {
+  private async initializeTransform(canvas: Canvas, mdx: number) {
     const calendarWidth = this._instance_.$_calendar_width.value;
     this._translate_x_ = -calendarWidth * (mdx % 3);
     this._translate_y_ = -canvas.width * Math.floor(mdx / 3) + (this._calendar_y_ - Layout.layout!.menuBottom);
@@ -770,14 +787,14 @@ export class YearPrinter extends CalendarHandler {
   public async open(
     mon: CalendarMonth,
     rect: WechatMiniprogram.BoundingClientRectCallbackResult,
-    prepose?: () => void
+    propose?: () => void
   ) {
     this._calendar_x_ = rect.left;
     this._calendar_y_ = rect.top;
 
     const current = this._instance_.data.annualCurr!;
     const canvas = await this.getCanvas(current);
-    await this.inintializeTransform(canvas, mon.month - 1);
+    await this.initializeTransform(canvas, mon.month - 1);
 
     const year = this._instance_._panel_.getFullYear(current);
 
@@ -793,7 +810,7 @@ export class YearPrinter extends CalendarHandler {
     }
 
     /** 执行动画前置操作 */
-    prepose?.();
+    propose?.();
 
     /** 执行动画 */
     await this.requestAnimation(canvas, year);
@@ -809,7 +826,7 @@ export class YearPrinter extends CalendarHandler {
   public async close(mon: CalendarMonth) {
     const current = this._instance_.data.annualCurr!;
     const canvas = this._canvas_[current];
-    await this.inintializeTransform(canvas, mon.month - 1);
+    await this.initializeTransform(canvas, mon.month - 1);
 
     const year = this._instance_._panel_.getFullYear(current);
 
@@ -830,7 +847,7 @@ export class YearPrinter extends CalendarHandler {
    */
   public async getTapMonth(ydx: number, x: number, y: number): Promise<CalendarMonth> {
     const canvas = this._canvas_[ydx];
-    const padding = this._pannel_padding_.min;
+    const padding = this._panel_padding_.min;
 
     const query = nodeRect(this._instance_);
     const [offset, rect] = await promises([viewportOffset(this._instance_), query(`${SELECTOR.ANNUAL_CANVAS}${ydx}`)]);

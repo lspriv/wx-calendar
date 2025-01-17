@@ -5,6 +5,9 @@
  * @Description: 面板底部控制条
  * @Author: lspriv
  */
+@use 'funcs' as *;
+@use 'mixin' as *;
+@use 'theme' as *;
 
 .wc__bar {
   width: 100%;

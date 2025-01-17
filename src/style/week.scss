@@ -5,6 +5,9 @@
  * @Description: 星期
  * @Author: lspriv
  */
+@use 'funcs' as *;
+@use 'mixin' as *;
+@use 'theme' as *;
 
 .wc__week {
   @include column-rect;
