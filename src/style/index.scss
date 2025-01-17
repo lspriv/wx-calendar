@@ -5,15 +5,10 @@
  * @Description: scss入口
  * @Author: lspriv
  */
-
-@import "theme.scss";
-@import "funcs.scss";
-@import "mixin.scss";
-@import "animation.scss";
-@import "container.scss";
-@import "header.scss";
-@import "week.scss";
-@import "panel.scss";
-@import "bar.scss";
-@import "annual.scss";
-@import "darkmode.scss";
+@use "container.scss";
+@use "header.scss";
+@use "week.scss";
+@use "panel.scss";
+@use "bar.scss";
+@use "annual.scss";
+@use "darkmode.scss";

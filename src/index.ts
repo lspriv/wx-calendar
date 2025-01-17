@@ -4,10 +4,18 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-06-11 17:58:01
+ * @LastEditTime: 2024-12-01 19:14:53
  */
 
-import { WxCalendar, normalDate, sortWeeks, isSameDate, getDateInfo, getScheduleDetail } from './interface/calendar';
+import {
+  WxCalendar,
+  normalDate,
+  sortWeeks,
+  isSameDate,
+  isSameWeek,
+  getDateInfo,
+  getScheduleDetail
+} from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, View, PURE_PROPS, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer, createPointer } from './basic/pointer';
 import { PanelTool } from './basic/panel';
@@ -15,7 +23,6 @@ import { Layout } from './basic/layout';
 import { Dragger } from './basic/drag';
 import { AnnualPanelSwitch } from './basic/annual';
 import { YearPrinter } from './basic/printer';
-import { LunarPlugin } from './plugins/lunar';
 import { MARK_PLUGIN_KEY } from './plugins/mark';
 import {
   isView,
@@ -27,7 +34,7 @@ import {
   InitPanels,
   InitWeeks,
   mergeStr,
-  onceEmiter,
+  onceEmitter,
   layoutHideCls
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
@@ -50,6 +57,7 @@ const initCurrent = middle(CALENDAR_PANELS);
 
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
+  externalClasses: ['i-class'],
   options: {
     pureDataPattern: PURE_PROPS
   },
@@ -101,6 +109,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     areas: {
       type: Array
+    },
+    alignDate: {
+      type: String,
+      value: 'center'
+    },
+    showRest: {
+      type: Boolean,
+      value: true
     }
   },
   data: {
@@ -161,7 +177,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       /**
        * 实例化WxCalendar处理数据和插件
        */
-      this._calendar_ = new WxCalendar(this, [LunarPlugin]);
+      this._calendar_ = new WxCalendar(this);
     },
     initializeRender() {
       const isSkylineRender = isSkyline(this.renderer);
@@ -204,7 +220,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         currView: initView,
         initView,
         gesture: this.data.viewGesture,
-        info: getDateInfo(checked, isWeekView),
+        info: getDateInfo(checked, this.data.weekstart, isWeekView),
         pointer: createPointer(),
         darkside: this.data.darkmode && Layout.darkmode,
         areaHideCls
@@ -226,7 +242,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const query = nodeRect(this);
       const [calendar, rects] = await promises([query(SELECTOR.CALENDAR), query(SELECTOR.WEEK_ITEM)]);
       const x = calendar[0].left.toFixed(1);
-      this.$_calendar_width.value = calendar[0].width;
+      const calendarWidth = calendar[0].width;
+      this.$_calendar_width.value = isSkyline(this.renderer) ? calendarWidth : Math.round(calendarWidth);
       this._centres_ = rects.map(({ left, width }) => sub(add(left.toFixed(1), div(width.toFixed(1), 2)), x));
     },
     async refreshView({ view }) {
@@ -256,12 +273,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const { wdx, ddx } = e.mark!;
         const panel = this.data.panels[this.data.current];
         const date = panel.weeks[wdx].days[ddx];
+        const isWeekView = this._view_ & View.week;
+        if (isWeekView && !isSameWeek(this.data.checked!, date, this.data.weekstart)) return;
         this.trigger('click', { checked: date });
         if (isSameDate(date, this.data.checked!)) return;
         const checked = normalDate(date);
-        const isWeekView = this._view_ & View.week;
         if (date.kind === 'current') {
-          const sets = { info: getDateInfo(checked, isWeekView), checked };
+          const sets = { info: getDateInfo(checked, this.data.weekstart, isWeekView), checked };
           if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
           this._pointer_.update(sets, true);
           this.setData(sets);
@@ -286,30 +304,28 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     swiperTrans(e) {
       if (!this._swiper_flag_) {
         this._swiper_flag_ = true;
-        const calendarWidth = this.$_calendar_width.value;
+        const type = e.currentTarget.dataset.type;
+        const calendarWidth = type === 'panel' ? this.$_calendar_width.value : Layout.layout!.windowWidth;
         this._swiper_accumulator_ = e.detail.dx > calendarWidth / 2 ? -initCurrent * calendarWidth : 0;
-        if (e.detail.dx > calendarWidth / 2) {
-          this._swiper_accumulator_ = -initCurrent * calendarWidth;
-        }
       }
       this.$_swiper_trans.value = e.detail.dx;
     },
     swiperTransEnd(e) {
       this._swiper_flag_ = false;
       if (e.detail.source !== 'touch') return;
+      const type = e.currentTarget.dataset.type;
+      const calendarWidth = type === 'panel' ? this.$_calendar_width.value : Layout.layout!.windowWidth;
       this._swiper_accumulator_ += this.$_swiper_trans.value;
       this.$_swiper_trans.value = 0;
-      const mod = this._swiper_accumulator_ % this.$_calendar_width.value;
-      const _offset = this._swiper_accumulator_ / this.$_calendar_width.value;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      /**
-       * 部分安卓设备 webview 渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
-       * 测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
-       */
-      if (mod === 0 || this.$_calendar_width.value - Math.abs(mod) < Math.abs(offset)) {
+
+      const mod = Math.abs(this._swiper_accumulator_ % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
+      const _offset = this._swiper_accumulator_ / calendarWidth;
+
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset))) {
+        const offset = Math.round(this._swiper_accumulator_ / calendarWidth);
         this._swiper_accumulator_ = 0;
         if (offset) {
-          const type = e.currentTarget.dataset.type;
           if (type === 'panel') this.refreshPanels(offset);
           else this.refreshAnnualPanels(offset);
         }
@@ -320,14 +336,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const trans = this.$_swiper_trans;
       const accumulation = trans.value + e.detail.dx;
       const calendarWidth = this.$_calendar_width.value;
-      const mod = accumulation % calendarWidth;
+
+      const mod = Math.abs(accumulation % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = accumulation / calendarWidth;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      /**
-       * 安卓skyline渲染下滑动一个滑块后并不恰好是calendarWidth，是一个近似数
-       * 我的设备有限，测试的安卓机滑动一次的单位误差<1，累积误差不超过滑动次数offset
-       */
-      if (mod === 0 || calendarWidth - Math.abs(mod) < Math.abs(offset)) {
+
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset)) * 0.5) {
+        const offset = Math.round(_offset);
         this.$_swiper_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshPanels.bind(this))(offset);
       } else {
@@ -338,11 +353,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       'worklet';
       const trans = this.$_annual_trans;
       const accumulation = trans.value + e.detail.dx;
-      const calendarWidth = this.$_calendar_width.value;
-      const mod = accumulation % calendarWidth;
+      const calendarWidth = Layout.layout!.windowWidth;
+
+      const mod = Math.abs(accumulation % calendarWidth);
+      const minimumErr = Math.min(mod, calendarWidth - mod);
       const _offset = accumulation / calendarWidth;
-      const offset = _offset < 0 ? Math.floor(_offset) : Math.ceil(_offset);
-      if (mod === 0 || calendarWidth - Math.abs(mod) < Math.abs(offset)) {
+
+      if (mod === 0 || minimumErr <= Math.ceil(Math.abs(_offset)) * 0.5) {
+        const offset = Math.round(_offset);
         this.$_annual_trans.value = 0;
         if (offset) wx.worklet.runOnJS(this.refreshAnnualPanels.bind(this))(offset);
       } else {
@@ -370,8 +388,8 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
-      const accmulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
-      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accmulation, 20));
+      const accumulation = direct * 0.5 + this.$_drag_bar_rotate!.value;
+      this.$_drag_bar_rotate!.value = Math.max(-20, Math.min(accumulation, 20));
 
       /** 计算左上角视图控制的位置 */
       const translateX = Math.max(0, Math.min(60, ((mainHeight - usefulHeight) * 60) / (mainHeight - minHeight)));
@@ -418,17 +436,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const last = (current + half) % CALENDAR_PANELS;
         const { year: sy, month: sm, day: sd } = panels[first].weeks[0].days[0];
         const lastWeeks = panels[last].weeks;
-        const lastDays = lastWeeks[lastWeeks.length - 1].days;
-        const { year: ey, month: em, day: ed } = lastDays[lastDays.length - 1];
+        const lastDays = lastWeeks.slice(-1)[0].days;
+        const [{ year: ey, month: em, day: ed }] = lastDays.slice(-1);
         detail.range = [
           { year: sy, month: sm, day: sd },
           { year: ey, month: em, day: ed }
         ];
       }
 
-      const emiter = onceEmiter(this, event);
-      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emiter);
-      emiter.emit(detail);
+      const emitter = onceEmitter(this, event);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emitter);
+      emitter.emit(detail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
@@ -457,7 +475,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   observers: {
     date: function (date: string | number) {
       if (this._loaded_) this._panel_.toDate(date);
-      else this._dragger_!.update();
+      else this._dragger_?.update();
     },
     marks: function (marks: Array<CalendarMark | CalendarStyleMark>) {
       const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
@@ -497,35 +515,24 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   },
   export() {
     if (!this._loaded_) return null as unknown as CalendarExport;
-    const instance = this;
     return {
       version: VERSION,
-      checked(date) {
-        return instance._panel_.toDate(date);
-      },
-      toggleView(view) {
-        const flag = view ? viewFlag(view) : instance._view_ & View.week ? View.month : View.week;
+      checked: date => this._panel_.toDate(date),
+      toggleView: view => {
+        const flag = view ? viewFlag(view) : this._view_ & View.week ? View.month : View.week;
         const _view = flag || View.month;
-        if (isSkyline(instance.renderer)) {
-          instance.toggleView(_view);
+        if (isSkyline(this.renderer)) {
+          this.toggleView(_view);
         } else {
-          instance.setData({
+          this.setData({
             transView: flagView(_view)
           });
         }
       },
-      openAnuual() {
-        return instance.selYear();
-      },
-      getMarks(date) {
-        return instance._calendar_.service.getEntireMarks(date);
-      },
-      getPlugin(key) {
-        return instance._calendar_.service.getPlugin(key);
-      },
-      updateDates(dates) {
-        return instance._calendar_.service.updateDates(dates);
-      }
+      openAnnual: () => this.selYear(),
+      getMarks: date => this._calendar_.service.getEntireMarks(date),
+      getPlugin: key => this._calendar_.service.getPlugin(key),
+      updateDates: dates => this._calendar_.service.updateDates(dates)
     } as CalendarExport;
   }
 });

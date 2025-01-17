@@ -4,17 +4,36 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板拖拽控制
  * @Author: lspriv
- * @LastEditTime: 2024-02-09 14:45:28
+ * @LastEditTime: 2024-07-27 23:53:34
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
-import { applyAnimated, clearAnimated, circularDiff } from './tools';
+import { applyAnimated, clearAnimated, circularDiff, Shared } from './tools';
 import { SELECTOR, View, CALENDAR_PANELS } from './constants';
 import { Layout } from './layout';
 import { PanelTool } from './panel';
 import { offsetDate, normalDate } from '../interface/calendar';
-import { promises, easingOpt } from '../utils/shared';
+import { promises, easingOpt, Callable } from '../utils/shared';
 
 import type { CalendarDay } from '../interface/calendar';
+
+declare global {
+  namespace WechatMiniprogram {
+    interface Worklet {
+      shared<T>(initialValue: T): Shared<T>;
+      timing<T>(toValue: T, options: TimingOption, callback?: (...args: any[]) => any): T;
+      spring<T>(toValue: T, options: SpringOption, callback?: (...args: any[]) => any): T;
+      delay<T>(delayMS: number, delayedAnimation: T): T;
+      sequence<T>(...args: Array<T>): T;
+    }
+    interface WorkletEasing {
+      in(easing?: Callable): any;
+      out(easing?: Callable): any;
+      inOut(easing?: Callable): any;
+      sin(...args: any[]): any;
+      bezier(x1: number, y1: number, x2: number, y2: number): any;
+    }
+  }
+}
 
 const { shared, timing, sequence, Easing, delay, runOnJS } = wx.worklet;
 
@@ -34,17 +53,17 @@ export class Dragger extends CalendarHandler {
   /** 保存动画id */
   private _style_ids_: Map<string, number> = new Map();
   /** 保存当前面板的日程样式选择器 */
-  private _schdule_selector_?: string;
+  private _schedule_selector_?: string;
 
   constructor(instance: CalendarInstance) {
     super(instance);
-    this.initailizeShared();
+    this.initializeShared();
   }
 
   /**
    * 初始化动画变量
    */
-  private initailizeShared() {
+  private initializeShared() {
     const instance = this._instance_;
     instance.$_drag_state = shared(0);
     instance.$_current = shared(instance.data.current);
@@ -191,25 +210,25 @@ export class Dragger extends CalendarHandler {
     this.clearScheduleAnimation();
 
     const current = instance.data.current;
-    this._schdule_selector_ = `${SELECTOR.PANEL}${current} ${SELECTOR.SCHEDULES}`;
+    this._schedule_selector_ = `${SELECTOR.PANEL}${current} ${SELECTOR.SCHEDULES}`;
 
-    const id = await applyAnimated(instance, this._schdule_selector_, () => {
+    const id = await applyAnimated(instance, this._schedule_selector_, () => {
       'worklet';
       return {
         opacity: this._instance_.$_drag_schedule_opacity!.value
       };
     });
-    this._style_ids_.set(this._schdule_selector_, id);
+    this._style_ids_.set(this._schedule_selector_, id);
   }
 
   /**
    * 清除日程动画绑定
    */
   private clearScheduleAnimation() {
-    const id = this._style_ids_.get(this._schdule_selector_!);
+    const id = this._style_ids_.get(this._schedule_selector_!);
     if (id) {
-      clearAnimated(this._instance_, this._schdule_selector_!, [id]);
-      this._style_ids_.delete(this._schdule_selector_!);
+      clearAnimated(this._instance_, this._schedule_selector_!, [id]);
+      this._style_ids_.delete(this._schedule_selector_!);
     }
   }
 
@@ -220,7 +239,11 @@ export class Dragger extends CalendarHandler {
    */
   private calcPanelOffset(idx: number, checked: CalendarDay): number {
     const data = this._instance_.data;
-    return PanelTool.calcPanelOffset(offsetDate(checked, circularDiff(idx, data.current) * 7), data.weekstart);
+    const [_, offset] = PanelTool.calcPanelOffset(
+      offsetDate(checked, circularDiff(idx, data.current) * 7),
+      data.weekstart
+    );
+    return offset;
   }
 
   /**

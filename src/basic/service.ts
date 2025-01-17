@@ -4,27 +4,25 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2024-06-10 06:27:08
+ * @LastEditTime: 2025-01-12 16:07:34
  */
-import { nextTick, OnceEmiter } from './tools';
+import { nextTick, OnceEmitter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
-import { camelToSnake, notEmptyObject } from '../utils/shared';
+import { camelToSnake, notEmptyObject, compareSame } from '../utils/shared';
 import {
   monthDiff,
-  sameMark,
-  sameSchedules,
   sameAnnualMarks,
   getWeekDateIdx,
   mergeAnnualMarks,
   styleParse,
+  reorderStyle,
   styleStringify,
   timestamp,
   normalDate,
-  sameAnnualSubs,
   fillAnnualSubs
 } from '../interface/calendar';
 
-import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable } from '../utils/shared';
+import type { Union, SnakeToLowerCamel, LowerCamelToSnake, Nullable, Voidable, PlainObject } from '../utils/shared';
 import type { CalendarData, CalendarEventDetail, CalendarInstance } from '../interface/component';
 import type {
   CalendarDay,
@@ -45,6 +43,8 @@ const PLUGIN_EVENT_HANDLE_PREFIX = 'PLUGIN_ON_';
 const PLUGIN_EVENT_INTERCEPT_PREFIX = 'PLUGIN_CATCH_';
 type PEH_PRE = typeof PLUGIN_EVENT_HANDLE_PREFIX;
 type PEI_PRE = typeof PLUGIN_EVENT_INTERCEPT_PREFIX;
+
+const SCHEDULE_STYLE_KEYS = [/^background/, 'color', /^border/];
 
 type Schedules = Array<WcScheduleMark>;
 
@@ -77,53 +77,61 @@ interface PluginInterception {
    */
   PLUGIN_CATCH_TAP?(
     service: PluginService,
-    event: WechatMiniprogram.TouchEvent<{}, { wdx: number; ddx: number }>,
+    event: WechatMiniprogram.TouchEvent<PlainObject, { wdx: number; ddx: number }>,
     intercept: EventIntercept
   ): void;
+
+  /**
+   * 捕获手动日期选中
+   * @param service PliginService实例
+   * @param date 日期
+   * @param intercept 拦截
+   */
+  PLUGIN_CATCH_MANUAL?(service: PluginService, date: CalendarDay, intercept: EventIntercept): void;
 }
 
 interface PluginEventHandler {
   /**
-   * 日历组件attche阶段
-   * @param service PliginService实例
+   * 日历组件attache阶段
+   * @param service PluginService实例
    * @param sets 视图初次渲染数据
    */
   PLUGIN_ON_ATTACH?(service: PluginService, sets: Partial<CalendarData>): void;
   /**
    * 日历组件onLoad事件触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期点击触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 日期变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void;
+  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
-   * @param service PliginService实例
+   * @param service PluginService实例
    */
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
 export interface Plugin extends PluginEventHandler, PluginInterception {
   /**
-   * PliginService初始化完成
-   * @param service PliginService实例
+   * PluginService实例初始化完成
+   * @param service PluginService实例
    */
   PLUGIN_INITIALIZE?(service: PluginService): void;
   /**
@@ -144,7 +152,7 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
   PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
   /**
    * 对已提供的有效日期进行过滤
-   * @param service PliginService实例
+   * @param service PluginService实例
    * @param dates 日期数组
    */
   PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<CalendarDay | DateRange>;
@@ -163,7 +171,7 @@ export interface PluginConstructor {
   /**
    * 日历组件版本
    */
-  REQUIER_VERSION?: string;
+  REQUIRE_VERSION?: string;
   /**
    * 原型
    */
@@ -298,6 +306,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       if (result) {
         if (result.corner && !record.corner) record.corner = result.corner;
         if (result.festival && !record.festival) record.festival = result.festival;
+        if (result.solar && !record.solar) record.solar = result.solar;
         if (result.schedule?.length) {
           record.schedule = (record.schedule || []).concat(result.schedule);
         }
@@ -334,6 +343,14 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
           const record = this.walkForDate(date);
           if (record) {
             record.style && (record.style = styleStringify(record.style) as unknown as DateStyle);
+            record.corner?.style && (record.corner.style = reorderStyle(record.corner.style));
+            record.festival?.style && (record.festival.style = reorderStyle(record.festival.style));
+            record.solar?.style && (record.solar.style = reorderStyle(record.solar.style));
+            if (record.schedule?.length) {
+              record.schedule.forEach(sc => {
+                sc.style && (sc.style = reorderStyle(sc.style, SCHEDULE_STYLE_KEYS));
+              });
+            }
             records.push({ wdx: i, ddx: j, record: record as WalkDateRecord });
           }
         }
@@ -361,9 +378,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             const { wdx, ddx, record } = month.days[i];
             const day = panels[k].weeks[wdx].days[ddx];
             const _key = `panels[${k}].weeks[${wdx}].days[${ddx}]`;
-            if (!sameMark(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner || null;
-            if (!sameMark(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival || null;
-            if (!sameSchedules(record.schedule, day.schedules)) sets[`${_key}.schedules`] = record.schedule || null;
+            if (!compareSame(record.solar, day.solar)) sets[`${_key}.solar`] = record.solar || null;
+            if (!compareSame(record.corner, day.corner)) sets[`${_key}.corner`] = record.corner || null;
+            if (!compareSame(record.festival, day.mark)) sets[`${_key}.mark`] = record.festival || null;
+            if (!compareSame(record.schedule, day.schedules)) sets[`${_key}.schedules`] = record.schedule || null;
             if (record.style !== day.style) sets[`${_key}.style`] = record.style || '';
           }
         }
@@ -378,7 +396,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       const sets: Partial<CalendarData> = {};
       const ydx = years.findIndex(y => y.year === year.year);
       if (ydx >= 0) {
-        if (!sameAnnualSubs(year.result.subinfo, years[ydx].subinfo))
+        if (!compareSame(year.result.subinfo, years[ydx].subinfo))
           sets[`years[${ydx}].subinfo`] = year.result.subinfo || null;
         if (!sameAnnualMarks(this.component._years_[ydx].marks, year.result.marks)) {
           this.component._years_[ydx].marks = year.result.marks || new Map();
@@ -406,9 +424,10 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
             if (wdx >= 0) {
               const key = `panels[${j}].weeks[${wdx}].days[${ddx}]`;
               const _day = panel.weeks[wdx].days[ddx];
-              if (!sameMark(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner || null;
-              if (!sameMark(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival || null;
-              if (!sameSchedules(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || null;
+              if (!compareSame(_day.solar, record.solar)) sets[`${key}.solar`] = record.solar || null;
+              if (!compareSame(_day.corner, record.corner)) sets[`${key}.corner`] = record.corner || null;
+              if (!compareSame(_day.mark, record.festival)) sets[`${key}.mark`] = record.festival || null;
+              if (!compareSame(_day.schedules, record.schedule)) sets[`${key}.schedules`] = record.schedule || null;
               if (record.style !== _day.style) sets[`${key}.style`] = record.style || '';
             }
           }
@@ -443,8 +462,8 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     const half = Math.floor(CALENDAR_PANELS / 2);
     const pstart = timestamp(panels[(current - half + CALENDAR_PANELS) % CALENDAR_PANELS].weeks[0].days[0]);
     const lastPanel = panels[(current + half) % CALENDAR_PANELS];
-    const lastDays = lastPanel.weeks[lastPanel.weeks.length - 1];
-    const pend = timestamp(lastDays.days[lastDays.days.length - 1]);
+    const [lastDays] = lastPanel.weeks.slice(-1);
+    const pend = timestamp(lastDays.days.slice(-1)[0]);
 
     const map = new Map<string, DateResult>();
 
@@ -460,7 +479,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         if (rstart > pend || rend < pstart) continue;
 
         let st = Math.max(rstart, pstart);
-        let ed = Math.min(rend, pend);
+        const ed = Math.min(rend, pend);
 
         while (st <= ed) {
           const date = normalDate(st);
@@ -477,11 +496,17 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   private setUpdateRecord(map: Map<string, DateResult>, date: CalendarDay) {
     const key = `${date.year}_${date.month}_${date.day}`;
     if (!map.has(key)) {
-      const result = this.walkForDate(date);
-      if (result) {
-        result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
-        map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
+      const result = this.walkForDate(date) || ({} as TrackDateRecord);
+      result.style && (result.style = styleStringify(result.style) as unknown as DateStyle);
+      result.corner?.style && (result.corner.style = reorderStyle(result.corner.style));
+      result.festival?.style && (result.festival.style = reorderStyle(result.festival.style));
+      result.solar?.style && (result.solar.style = reorderStyle(result.solar.style));
+      if (result.schedule?.length) {
+        result.schedule.forEach(sc => {
+          sc.style && (sc.style = reorderStyle(sc.style, SCHEDULE_STYLE_KEYS));
+        });
       }
+      map.set(key, { year: date.year, month: date.month, day: date.day, record: result as WalkDateRecord });
     }
   }
 
@@ -499,7 +524,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
         const year = years[ydx];
         const result = this.walkForYear(year);
         if (result) {
-          if (!sameAnnualSubs(result.subinfo, year.subinfo)) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
+          if (!compareSame(result.subinfo, year.subinfo)) sets[`years[${ydx}].subinfo`] = result.subinfo || null;
           if (!sameAnnualMarks(this.component._years_[ydx].marks, result.marks)) {
             this.component._years_[ydx].marks = result.marks || new Map();
             ydxs.push(ydx);
@@ -517,12 +542,13 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param date 日期
    */
   public getEntireMarks(date: CalendarDay): PluginEntireMarks {
-    const marks: PluginEntireMarks = { corner: [], festival: [], schedule: [], style: [] };
+    const marks: PluginEntireMarks = { solar: [], corner: [], festival: [], schedule: [], style: [] };
 
     this.traversePlugins((plugin, key) => {
       const result = plugin.PLUGIN_TRACK_DATE?.(date);
       if (result) {
         if (result.style) marks.style.push({ ...styleParse(result.style), key });
+        if (result.solar) marks.solar.push({ ...result.solar, key });
         if (result.corner) marks.corner.push({ ...result.corner, key });
         if (result.festival) marks.festival.push({ ...result.festival, key });
         if (result.schedule?.length) {
@@ -558,11 +584,11 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
    * @param event 事件名
    * @param action 默认行为
    */
-  public interceptEvent<K extends PluginInterceptNames>(
+  public interceptEvent<K extends PluginInterceptNames, R = any>(
     name: K,
     detail: PluginInterceptDetail<K>,
-    action?: (...args: any[]) => any
-  ) {
+    action?: (...args: any[]) => R
+  ): R | void {
     const handler: PluginEventInterceptName<K> = `${PLUGIN_EVENT_INTERCEPT_PREFIX}${
       camelToSnake(name).toUpperCase() as Uppercase<LowerCamelToSnake<K>>
     }`;
@@ -581,7 +607,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       }
     }
 
-    execAction && action?.();
+    return execAction ? action?.() : void 0;
   }
 
   /**

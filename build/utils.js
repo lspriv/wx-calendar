@@ -36,3 +36,16 @@ module.exports.wait = ms => {
     setTimeout(resolve, ms);
   });
 };
+
+module.exports.isSass = file => file.extname === '.scss' || file.extname === '.sass';
+module.exports.isCss = file => file.extname === '.css';
+module.exports.isWxss = file => file.extname === '.wxss';
+module.exports.isWxml = file => file.extname === '.wxml';
+module.exports.isJson = file => file.extname === '.json' || file.extname === '.jsonp';
+module.exports.isTs = file => file.extname === '.ts';
+module.exports.isJs = file => file.extname === '.js';
+module.exports.isWxs = file => file.extname === '.wxs';
+module.exports.gor =
+  (...iss) =>
+  file =>
+    iss.some(fn => fn(file));

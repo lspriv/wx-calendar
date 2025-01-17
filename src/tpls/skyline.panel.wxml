@@ -32,7 +32,7 @@
             style="top: {{ pointer.y }}; left: {{ pointer.x }};">
             <view 
               class="wc__panel-pointer-inner {{ pointer.animate ? 'wc__panel-pointer-inner--animate' : '' }}" 
-              bindanimationend="handlePointerAnimated"></view>
+              bind:animationend="handlePointerAnimated"></view>
           </view>
           <view 
             wx:for="{{ panel.weeks || [] }}" 
@@ -54,14 +54,17 @@
                 {{ tool_wxs.isChecked(pointer, day, checked, pdx, current) ? 'wc__panel-date--checked' : '' }}
                 {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
               ">
-              <view class="wc__panel-day" style="{{ day.style }}" catchtap="selDate">
-                <view class="wc__panel-solar">{{ day.day }}<view 
+              <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
+                <view 
+                  class="wc__panel-solar" 
+                  style="{{ day.solar ? day.solar.style : '' }}">{{ day.solar ? day.solar.text : day.day }}<view 
                   wx:if="{{ day.corner }}"
                   class="wc__panel-corner"
-                  style="{{ day.corner.color ? 'color:' + day.corner.color + ';' : '' }}">{{ day.corner.text }}</view></view>
+                  style="{{ day.corner.style }}">{{ day.corner.text }}</view></view>
                 <view 
+                  wx:if="{{ day.mark || alignDate === 'baseline' }}"
                   class="wc__panel-mark" 
-                  style="{{ day.mark.color ? 'color: ' + day.mark.color + ';' : '' }}">{{ day.mark.text }}</view>
+                  style="{{ day.mark.style }}">{{ day.mark.text }}</view>
               </view>
               <view 
                 wx:if="{{ day.schedules.length && current === pdx || currView == 'schedule'  }}" 
@@ -71,15 +74,15 @@
                   wx:for-index="sdx"
                   wx:for-item="schedule"
                   wx:key="key"
-                  style="{{ schedule.color ? 'color:' + schedule.color + ';' : '' }}{{ schedule.bgColor ? 'background-color:' + schedule.bgColor + ';' : '' }}"
+                  style="{{ schedule.style }}"
                   class="wc__panel-schedule"
                   data-sdx="{{ sdx }}"
-                  catchtap="selSchedule">{{ schedule.text }}</text>
+                  catch:tap="selSchedule">{{ schedule.text }}</text>
                 <text 
                   wx:if="{{ tool_wxs.scheduleShowRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}" 
                   class="wc__panel-schedule wc__panel-schedule--more"
                   data-all
-                  catchtap="selSchedule"
+                  catch:tap="selSchedule"
                 >+{{ tool_wxs.scheduleRest(day.schedules, panel.weeks.length, layout.maxScheduleSize) }}</text>
               </view>
             </view>

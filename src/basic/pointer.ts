@@ -4,8 +4,9 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 选中日期的背景圆圈 Pointer
  * @Author: lspriv
- * @LastEditTime: 2024-06-09 14:48:04
+ * @LastEditTime: 2024-08-07 21:02:56
  */
+import { nextTick } from './tools';
 import { findDateIndex } from '../interface/calendar';
 import { CalendarHandler } from '../interface/component';
 
@@ -101,5 +102,17 @@ export class Pointer extends CalendarHandler {
     if (instance.data.vibrate && this._vibrate_ && this.show) {
       wx.vibrateShort({ type: 'light' });
     }
+  }
+
+  public async resetOffsetY(date: CalendarDay) {
+    const instance = this._instance_;
+    const month = instance._calendar_.createMonth(date, instance.data.weekstart);
+    const { y } = calcPosition(month, date, instance._centres_);
+    instance.setData({
+      [`pointer.y`]: y,
+      [`pointer.show`]: false,
+      [`pointer.animate`]: false
+    });
+    await nextTick();
   }
 }

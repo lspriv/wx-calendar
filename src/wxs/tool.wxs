@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wxs工具方法
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 14:35:52
+ * @LastEditTime: 2024-09-11 12:35:05
  */
 
 var isSkyline = function (renderer) {

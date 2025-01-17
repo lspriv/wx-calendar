@@ -4,7 +4,8 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/recommended',
-    'plugin:prettier/recommended'
+    'plugin:prettier/recommended',
+    'plugin:import/typescript'
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'import', 'node'],
@@ -30,8 +31,20 @@ module.exports = {
       }
     ],
     'import/prefer-default-export': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        ignoreRestSiblings: true
+      }
+    ],
     '@typescript-eslint/no-require-imports': 'off',
-    '@typescript-eslint/no-var-requires': 'off'
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-namespace': 'off'
   },
   globals: {
     window: true,

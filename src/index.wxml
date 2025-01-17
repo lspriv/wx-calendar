@@ -6,7 +6,7 @@
 <wxs src="./wxs/tool.wxs" module="tool_wxs" />
 <wxs src="./wxs/transform.wxs" module="trans_wxs" />
 <view 
-  class="wcc wcc--{{ renderer }} {{ darkside ? 'wcc--darkmode' : '' }}"
+  class="wcc wcc--{{ renderer }} {{ darkside ? 'wcc--darkmode' : '' }} i-class"
   style="--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
   <view 
     id="calendar"
@@ -16,7 +16,7 @@
     mark:dragMax="{{ layout.dragMax }}"
     mark:view="{{ currView }}"
     mark:gesture="{{ gesture }}"
-    class="wc wc--{{ currView }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }}"
+    class="wc wc--{{ currView }} {{ areaHideCls }} {{ sameChecked ? 'wc--same-checked' : '' }} {{ showRest ? '' : 'wc--hidden-rest' }}"
   >
 
     <!-- Calendar Header Start -->

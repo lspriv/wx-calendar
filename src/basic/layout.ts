@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 布局
  * @Author: lspriv
- * @LastEditTime: 2024-06-07 16:30:13
+ * @LastEditTime: 2024-12-01 20:31:22
  */
 import { View } from './constants';
 
@@ -48,7 +48,8 @@ export class Layout {
   public static initialize() {
     if (Layout.layout) return;
 
-    const { safeArea, windowWidth, windowHeight, theme, pixelRatio } = wx.getSystemInfoSync();
+    const { theme } = wx.getAppBaseInfo();
+    const { safeArea, windowWidth, windowHeight, pixelRatio } = wx.getWindowInfo();
     const { top, bottom } = wx.getMenuButtonBoundingClientRect();
 
     Layout.theme = theme || 'light';

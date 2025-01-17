@@ -101,7 +101,7 @@ commander
 
     spinner.start(`git pushing v${version} ...`);
     try {
-      execSync('git add .');
+      execSync('git add package.json');
       execSync(`git commit -m "build(package): version ${version}"`);
       execSync('git push origin HEAD');
     } catch (error) {

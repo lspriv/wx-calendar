@@ -50,11 +50,24 @@ npm i @lspriv/wx-calendar -S
 <calendar id="calendar" bindload="handleLoad" />
 ```
 
+```javascript
+const { WxCalendar } = require('@lspriv/wx-calendar/lib');
+const { LunarPlugin } = require('@lspriv/wc-plugin-lunar');
+// 使用农历插件
+WxCalendar.use(LunarPlugin);
+
+Page({
+  handleLoad(detail) {
+    console.log('calendar load', detail);
+  }
+})
+```
+
 > [!IMPORTANT]
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
-alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当于你们的SIT，发pr到master打tag，拉取哪个分支自行考量
+alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当SIT，发pr到master打tag，拉取哪个分支自行考量
 
 #### 启动
 ```bash
@@ -129,7 +142,7 @@ type CalendarDay = {
         <td>view</td>
         <td>string</td>
         <td>视图</td>
-        <td>month[week|schedule]</td>
+        <td>month [week|schedule]</td>
     </tr>
     <tr>
         <td>marks</td>
@@ -168,22 +181,10 @@ type CalendarDay = {
         <td>''</td>
     </tr>
     <tr>
-        <td>sameChecked</td>
-        <td>boolean</td>
-        <td>保持选中日期样式一致</td>
-        <td>false</td>
-    </tr>
-    <tr>
         <td>font</td>
         <td>string</td>
         <td>设置字体</td>
         <td>''</td>
-    </tr>
-    <tr>
-        <td>customNavBar</td>
-        <td>boolean</td>
-        <td>组件所在页面是否自定义导航栏</td>
-        <td>true</td>
     </tr>
     <tr>
         <td>areas</td>
@@ -197,10 +198,34 @@ type CalendarDay = {
         <td>是否滑动手势控制视图</td>
         <td>true</td>
     </tr>
+    <tr>
+        <td>sameChecked</td>
+        <td>boolean</td>
+        <td>保持选中日期样式一致</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>customNavBar</td>
+        <td>boolean</td>
+        <td>组件所在页面是否自定义导航栏</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>alignDate</td>
+        <td>string</td>
+        <td>日期排布（居中｜基线对齐）</td>
+        <td>center [center|baseline]</td>
+    </tr>
+    <tr>
+        <td>showRest</td>
+        <td>boolean</td>
+        <td>非本月日期是否显示</td>
+        <td>true</td>
+    </tr>
 </table>
 
 > [!TIP] 
-> 1.7.0+版本已经移除了固定视图，新增手势控制属性 `viewGesture` ，用一下方式实现固定视图，有更高的自由度
+> 1.7.0+版本已经移除了固定视图属性，新增手势控制属性 `viewGesture` ，用以下方式实现固定视图，有更高的自由度
 
 固定视图的新方式
 ```html
@@ -224,10 +249,9 @@ type CalendarDay = {
 >   month?: number; // 月 
 >   day?: number; // 日
 >   date?: string | number | Date; // 日期 yyyy-mm-dd | timestamp | Date
->   type: 'schedule' | 'corner' | 'festival'; // 日程｜角标｜节假日
+>   type: 'schedule' | 'corner' | 'festival' | 'solar'; // 日程｜角标｜节假日 | 日期文字
 >   text: string; // 内容
->   color: string; // 文本色
->   bgColor?: string; // 背景色，type为schedule时可选
+>   style?: string | Record<string, string | number>; // 标记样式
 > }
 > // 样式标记
 > type StyleMark = {
@@ -240,6 +264,8 @@ type CalendarDay = {
 > ```
 > 角标内容最好一个字符长度，只对一个字符校正了位置，多出的请自行调整位置
 
+> [!IMPORTANT]
+> 如果组件所在页面未开启自定义导航栏，请设置属性 `customNavBar` 为 `false`
 ### Events 事件
 
 [***`bindload`***](#bindload)  日历加载完成
@@ -326,7 +352,7 @@ type ScheduleEventDetail = {
 }
 ```
 
-[***`openAnuual`***](#openAnuual) 打开年度面板
+[***`openAnnual`***](#openAnnual) 打开年度面板
 ```typescript
 {
   (): Promise<void>;
@@ -631,14 +657,22 @@ class MyPlugin implements Plugin {
     // intercept(0) 直接退出 
     // intercept(1) 继续向其他插件传播，但不会执行日历组件默认行为
   }
+
+  /**
+   * 拦截日期跳转动作（如跳转到今日或者调用toDate方法），可选择实现该方法
+   * @param service PliginService实例
+   * @param date 要跳转的日期
+   * @param intercept 拦截器
+   */
+  PLUGIN_CATCH_MANUAL(service: PluginService, date: CalendarDay, intercept: EventIntercept): void {}
 }
 
 ```
 > [!NOTE] 
-> 本日历统计共有七个主要的动作，当前仅提供日期点击动作的捕获，七个动作分别是
+> 本日历统计共有七个主要的动作，当前仅提供日期点击动作和日期跳转动作的捕获，七个动作分别是
 > - 日期点击
+> - 日期跳转（今日按钮点击跳转到今日或者调用toDate方法）
 > - 头部标题点击（打开年面板）
-> - 今日按钮点击（跳转到今日）
 > - 视图按钮点击（按钮切换视图）
 > - 垂直手势滑动（手势切换视图）
 > - 水平手势滑动（swiper滑动滑块）
@@ -648,7 +682,7 @@ class MyPlugin implements Plugin {
 ##### 事件响应
 响应日历组件事件 `load` `click` `change` `viewChange`。
 ```typescript 
-import { Plugin, PluginService, CalendarEventDetail, OnceEmiter } from '@lspriv/wx-calendar/lib';
+import { Plugin, PluginService, CalendarEventDetail, OnceEmitter } from '@lspriv/wx-calendar/lib';
 
 class MyPlugin implements Plugin {
 
@@ -658,7 +692,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_LOAD(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     // 获取日历组件实例
     const component = service.component;
 
@@ -672,7 +706,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_CLICK(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     
   }
 
@@ -682,7 +716,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_CHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
     
   }
 
@@ -692,7 +726,7 @@ class MyPlugin implements Plugin {
    * @param detail 响应数据
    * @param emiter 事件触发器
    */
-  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmiter): void {
+  PLUGIN_ON_VIEWCHANGE(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void {
 
   }
 }
@@ -721,29 +755,6 @@ class MyPlugin implements Plugin {
 }
 ```
 
-#### 内置农历插件
-wx-calendar自带农历插件
-```javascript
-const { LUNAR_PLUGIN_KEY } = require('@lspriv/wx-calendar/lib');
-// 你的页面中
-const calendar = this.selectComponent('#calendar');
-const lunarPlugin = calendar.getPlugin(LUNAR_PLUGIN_KEY);
-// 获取农历信息
-const lunarDate = lunarPlugin.getLunar({ year: 2023, month: 10, day: 26 });
-```
-农历信息
-```typescript
-type LunarDate = {
-  year: number; // 公历年
-  month: number; // 公历月
-  day: number; // 公历日
-  lunarYear: string; // 农历年
-  lunarMonth: string; // 农历月
-  lunarDay: string; // 农历日
-  solar: string; // 节气
-}
-```
-
 #### 插件说明
 - `数据标记` 后引入的插件数据覆盖先引入的插件数据
 - `动作捕捉` 后引入的先执行
@@ -751,6 +762,7 @@ type LunarDate = {
 
 
 #### 已完成插件
+- [x] <a href="https://github.com/lspriv/wc-plugin-lunar/tree/alpha" target="_blank">**@lspriv/wc-plugin-lunar 农历插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-disabled" target="_blank">**@lspriv/wc-plugin-disabled 日历禁用插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-multiple" target="_blank">**@lspriv/wc-plugin-multiple 日历多选插件**</a>
 - [x] <a href="https://github.com/lspriv/wc-plugin-ics" target="_blank">**@lspriv/wc-plugin-ics ICS日历订阅插件**</a>

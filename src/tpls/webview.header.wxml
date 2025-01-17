@@ -5,15 +5,15 @@
  -->
 <wxs src="../wxs/transform.wxs" module="trans_wxs" />
 <view class="wc__header">
-  <view class="wc__header-title" catchtap="selYear">
+  <view class="wc__header-title" catch:tap="selYear">
     <span>{{ panels[current].year }}年{{ panels[current].month }}月</span>
     <span class="wc__header-title-info">{{ info }}</span>
   </view>
   <view class="wc__operators">
     <view 
       class="wc__operator wc__operator--today {{ (checked && !checked.today) ? 'wc__operator--show' : '' }}" 
-      catchtap="toToday"></view>
-    <view class="wc__operator wc__operator--views" catchtap="{{ trans_wxs.toggleView }}">
+      catch:tap="toToday"></view>
+    <view class="wc__operator wc__operator--views" catch:tap="{{ trans_wxs.toggleView }}">
       <view id="view_bar_1" class="wc__operator-view">
         <view class="wc__operator-view-text">月</view>
       </view>

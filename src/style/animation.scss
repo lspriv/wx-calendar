@@ -5,6 +5,7 @@
  * @Description: 动画
  * @Author: lspriv
  */
+@use 'mixin' as *;
 
 @mixin animation-pointer {
 	@include animation(pointer, ease, .28s) {

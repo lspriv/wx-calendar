@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 处理组件marks属性的插件
  * @Author: lspriv
- * @LastEditTime: 2024-06-05 19:51:14
+ * @LastEditTime: 2025-01-12 16:08:25
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
@@ -20,6 +20,7 @@ import type {
 } from '../interface/calendar';
 import type { CalendarInstance } from '../interface/component';
 
+export const SCHEDULE_MARK_ORIGIN = 'component_prop_marks';
 export class MarkPlugin implements Plugin {
   public static KEY = 'mark' as const;
 
@@ -38,7 +39,7 @@ export class MarkPlugin implements Plugin {
           if (_mark.schedule) _mark.schedule.push(mark);
           else _mark.schedule = [mark];
         } else {
-          _mark[mark.type] = mark as any;
+          (_mark[mark.type] as CalendarStyleMark | CalendarMark) = mark;
         }
       } else {
         const form = mark.type === 'schedule' ? { schedule: [mark] } : { [mark.type]: mark };
@@ -68,13 +69,13 @@ export class MarkPlugin implements Plugin {
       const result: TrackDateResult = {};
 
       if (mark.style) result.style = mark.style.style;
-      if (mark.corner) result.corner = { text: mark.corner.text, color: mark.corner.color };
-      if (mark.festival) result.festival = { text: mark.festival.text, color: mark.festival.color };
+      if (mark.solar) result.solar = { text: mark.solar.text, style: mark.solar.style };
+      if (mark.corner) result.corner = { text: mark.corner.text, style: mark.corner.style };
+      if (mark.festival) result.festival = { text: mark.festival.text, style: mark.festival.style };
       if (mark.schedule) {
-        result.schedule = mark.schedule.map((schedule, i) => ({
+        result.schedule = mark.schedule.map(schedule => ({
           text: schedule.text,
-          color: schedule.color,
-          bgColor: schedule.bgColor,
+          style: schedule.style,
           key: getMarkKey(key, MARK_PLUGIN_KEY)
         }));
       }
@@ -90,7 +91,7 @@ export class MarkPlugin implements Plugin {
     return {
       dtStart: new Date(date.year, month, date.day),
       dtEnd: new Date(date.year, month, date.day + 1),
-      origin: 'component_prop_marks'
+      origin: SCHEDULE_MARK_ORIGIN
     };
   }
 }
