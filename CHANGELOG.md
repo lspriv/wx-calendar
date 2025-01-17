@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.8.1](https://github.com/lspriv/wx-calendar/compare/v1.8.0...v1.8.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* **pacakge:** 调整导出 ([0b7bd1a](https://github.com/lspriv/wx-calendar/commit/0b7bd1a0fe3425c94817fcecf15cbf0374070ff7))
+* 修复canvas圆角绘制的bug ([e68ab1f](https://github.com/lspriv/wx-calendar/commit/e68ab1f872c2232f22ff13c12f61bc0d0905a488))
+* 升级小程序接口 ([15c2a0b](https://github.com/lspriv/wx-calendar/commit/15c2a0b912c649c62cc4db3b3645827346d931cf))
+* 解决冲突 ([2a8c573](https://github.com/lspriv/wx-calendar/commit/2a8c5738d0ba6fd6d4e7b5d0fdaaa8b0fc89dc0b))
+* 解决删除mark不更新的 bug ([c1f5223](https://github.com/lspriv/wx-calendar/commit/c1f522361fd08e2043042d4c2cc6d63a1287b990)), closes [#153](https://github.com/lspriv/wx-calendar/issues/153)
+* 调整 ([c60b5cd](https://github.com/lspriv/wx-calendar/commit/c60b5cdd81d7c5f6a62c0df5117ed7cf4f433711))
+* 调整外部样式类 ([85f9334](https://github.com/lspriv/wx-calendar/commit/85f933480168b0e5f506a95d95f3f6e52f4d8dfa))
+* 调整类型声明 ([31947cb](https://github.com/lspriv/wx-calendar/commit/31947cb5d793de8c5a8e748857ccbb5389638508))
+* 调整类型声明 ([186db87](https://github.com/lspriv/wx-calendar/commit/186db87a54352d9f844ba29d27f07978792b0702))
+* 调整类型声明 ([d66ca88](https://github.com/lspriv/wx-calendar/commit/d66ca883a6c0eda28aa74a82558e7aad4f38ef70))
+* 调整类型声明 ([ab828a9](https://github.com/lspriv/wx-calendar/commit/ab828a908ef9b6370224933fb8eead08d0856d43))
+
 ## [1.8.0](https://github.com/lspriv/wx-calendar/compare/v1.7.2...v1.8.0) (2024-11-30)
 
 
