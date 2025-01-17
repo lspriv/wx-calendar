@@ -41,10 +41,10 @@ export type SnakeToLowerCamel<T extends string, K = Lowercase<T>> = K extends `$
   : K;
 
 /** 小驼峰（lowerCamelCase）转下划线（snake_case） */
-export type LowerCamelToSnake<T extends string> = T extends `${infer R}${infer P}`
+export type LowerCamelToSnake<T extends string, S extends string = '_'> = T extends `${infer R}${infer P}`
   ? R extends Lowercase<R>
-    ? `${R}${LowerCamelToSnake<P>}`
-    : `_${Lowercase<R>}${LowerCamelToSnake<P>}`
+    ? `${R}${LowerCamelToSnake<P, S>}`
+    : `${S}${Lowercase<R>}${LowerCamelToSnake<P, S>}`
   : T;
 
 export const camelToSnake = <T extends string>(str: T, separator: string = '_') =>
