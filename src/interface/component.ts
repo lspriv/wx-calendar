@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2025-01-19 13:11:11
+ * @LastEditTime: 2025-01-19 13:21:50
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView, Shared } from '../basic/tools';
@@ -245,10 +245,12 @@ export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
   info?: Nullable<WcScheduleInfo>;
 }
 
+export type CalendarCustomEvent<T> = WechatMiniprogram.CustomEvent<
+  T extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail
+>;
+
 export type CalendarEvents = {
-  [P in CalendarEventSimplified as `bind${P}`]: (
-    event: WechatMiniprogram.CustomEvent<P extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail>
-  ) => void;
+  [P in CalendarEventSimplified as `bind${P}`]: (event: CalendarCustomEvent<P>) => void;
 };
 
 export interface CalendarMethod
