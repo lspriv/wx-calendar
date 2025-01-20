@@ -63,6 +63,21 @@ Page({
 })
 ```
 
+
+#### 5.类型检查
+由于小程序构建npm的特殊性，日历组件本身是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的jsconfig.json或是tsconfig.json文件中指明路径。
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@lspriv/wx-calendar/*": [
+          "./node_modules/@lspriv/wx-calendar/dist/*"
+        ]
+    }
+  }
+}
+```
+
 > [!IMPORTANT]
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
@@ -466,20 +481,6 @@ type ScheduleEventDetail = {
 修改样式
 ```html
 <calendar style="--wc-bg-light: #000;" />
-```
-
-### 类型检查
-由于小程序构建npm的特殊性，本组件又是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的jsconfig.json或是tsconfig.json文件中指明路径。
-```json
-{
-  "compilerOptions": {
-    "paths": {
-      "@lspriv/wx-calendar/*": [
-          "./node_modules/@lspriv/wx-calendar/dist/*"
-        ]
-    }
-  }
-}
 ```
 
 ### 插件
