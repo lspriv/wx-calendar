@@ -244,7 +244,7 @@ type CalendarDay = {
 > 关于属性 `marks`
 > ```typescript
 > // 标记里的日期，要么输入年月日year｜month｜day，要么输入日期 date
-> type Mark = {
+> type CalendarMark = {
 >   year?: number; // 年
 >   month?: number; // 月 
 >   day?: number; // 日
@@ -254,7 +254,7 @@ type CalendarDay = {
 >   style?: string | Record<string, string | number>; // 标记样式
 > }
 > // 样式标记
-> type StyleMark = {
+> type CalendarStyleMark = {
 >   year?: number; // 年
 >   month?: number; // 月 
 >   day?: number; // 日
