@@ -435,6 +435,13 @@ type ScheduleEventDetail = {
     --wc-annual-bg-light: #FFF; /* 年面板背景 */
     --wc-annual-title-color-light: #333; /* 年面板左上角标题 */
     --wc-annual-title-sub-color-light: #7A7A7A; /* 年面板左上角标题右侧信息 */
+    --wc-annual-cv-month-color-light: #333; /* 年面板月份标题颜色 */
+    --wc-annual-cv-week-color-light: #ABABAB; /* 年面板星期颜色 */
+    --wc-annual-cv-date-color-light: #333; /* 年面板普通日期颜色 */
+    --wc-annual-cv-rest-color-light: #ABABAB; /* 年面板休息日颜色 */
+    --wc-annual-cv-checked-color-light: #FFF; /* 年面板普通日期选中时颜色 */
+    --wc-annual-cv-checked-bg-light: #F5F5F5; /* 年面板普通日期选中时背景颜色 */
+    --wc-annual-cv-present-color-light: #409EFF; /* 年面板当前月份标题和今日选中时颜色 */
 
     /* 深色主题，以下和浅色主题一一对应 */
     --wc-bg-dark: #000;
@@ -462,6 +469,13 @@ type ScheduleEventDetail = {
     --wc-annual-bg-dark: #000;
     --wc-annual-title-color-dark: #E5E5E5;
     --wc-annual-title-sub-color-dark: #3F3F3F;
+    --wc-annual-cv-month-color-dark: #D9D9D9; 
+    --wc-annual-cv-week-color-dark: #484848; 
+    --wc-annual-cv-date-color-dark: #D9D9D9; 
+    --wc-annual-cv-rest-color-dark: #484848; 
+    --wc-annual-cv-checked-color-dark: #D9D9D9; 
+    --wc-annual-cv-checked-bg-dark: #262626;
+    --wc-annual-cv-present-color-dark: #409EFF; 
 
     /** 字号 */
     --wc-title-size: 46rpx; /** 左上角日期标题字号 */ 
