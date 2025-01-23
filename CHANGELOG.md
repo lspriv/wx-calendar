@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.8.2](https://github.com/lspriv/wx-calendar/compare/v1.8.1...v1.8.2) (2025-01-23)
+
+
+### Bug Fixes
+
+* 补充事件类型 ([c4eb67c](https://github.com/lspriv/wx-calendar/commit/c4eb67c67df9314bf8e2573e6a7786efc56dba59))
+* 调整dot ([dd8b526](https://github.com/lspriv/wx-calendar/commit/dd8b5265787197e39a8913a968159111ebbb5ddd)), closes [#159](https://github.com/lspriv/wx-calendar/issues/159)
+* 调整年面板颜色样式控制 ([055678d](https://github.com/lspriv/wx-calendar/commit/055678d5f31d1888af5e62f97fc423ee113089c0))
+* 调整类型声明 ([bc27cf5](https://github.com/lspriv/wx-calendar/commit/bc27cf5a03acdfaa50a358879e3900ed14c1f336))
+* 调整说明 ([07dde5d](https://github.com/lspriv/wx-calendar/commit/07dde5df96c2c9321fe73993910394b3fca5099c))
+
 ## [1.8.1](https://github.com/lspriv/wx-calendar/compare/v1.8.0...v1.8.1) (2025-01-17)
 
 
