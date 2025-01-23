@@ -129,7 +129,7 @@ npm run package
 注意事项请参考 [UniApp小程序自定义组件支持](https://uniapp.dcloud.net.cn/tutorial/miniprogram-subject.html)
 
 #### Taro
-参考 `Taro 使用原生模块`
+请使用日历组件 [Taro插件](https://github.com/lspriv/plugin-taro)
 > [!NOTE]
 > 如果在 Taro 项目引用了小程序原生的组件，那么该项目将不再具备多端转换的能力。
 
