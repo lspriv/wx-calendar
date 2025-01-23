@@ -63,6 +63,21 @@ Page({
 })
 ```
 
+
+#### 5.类型检查
+由于小程序构建npm的特殊性，日历组件本身是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的jsconfig.json或是tsconfig.json文件中指明路径。
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@lspriv/wx-calendar/*": [
+          "./node_modules/@lspriv/wx-calendar/dist/*"
+        ]
+    }
+  }
+}
+```
+
 > [!IMPORTANT]
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
@@ -244,7 +259,7 @@ type CalendarDay = {
 > 关于属性 `marks`
 > ```typescript
 > // 标记里的日期，要么输入年月日year｜month｜day，要么输入日期 date
-> type Mark = {
+> type CalendarMark = {
 >   year?: number; // 年
 >   month?: number; // 月 
 >   day?: number; // 日
@@ -254,7 +269,7 @@ type CalendarDay = {
 >   style?: string | Record<string, string | number>; // 标记样式
 > }
 > // 样式标记
-> type StyleMark = {
+> type CalendarStyleMark = {
 >   year?: number; // 年
 >   month?: number; // 月 
 >   day?: number; // 日
@@ -420,6 +435,13 @@ type ScheduleEventDetail = {
     --wc-annual-bg-light: #FFF; /* 年面板背景 */
     --wc-annual-title-color-light: #333; /* 年面板左上角标题 */
     --wc-annual-title-sub-color-light: #7A7A7A; /* 年面板左上角标题右侧信息 */
+    --wc-annual-cv-month-color-light: #333; /* 年面板月份标题颜色 */
+    --wc-annual-cv-week-color-light: #ABABAB; /* 年面板星期颜色 */
+    --wc-annual-cv-date-color-light: #333; /* 年面板普通日期颜色 */
+    --wc-annual-cv-rest-color-light: #ABABAB; /* 年面板休息日颜色 */
+    --wc-annual-cv-checked-color-light: #FFF; /* 年面板普通日期选中时颜色 */
+    --wc-annual-cv-checked-bg-light: #F5F5F5; /* 年面板普通日期选中时背景颜色 */
+    --wc-annual-cv-present-color-light: #409EFF; /* 年面板当前月份标题和今日选中时颜色 */
 
     /* 深色主题，以下和浅色主题一一对应 */
     --wc-bg-dark: #000;
@@ -447,6 +469,13 @@ type ScheduleEventDetail = {
     --wc-annual-bg-dark: #000;
     --wc-annual-title-color-dark: #E5E5E5;
     --wc-annual-title-sub-color-dark: #3F3F3F;
+    --wc-annual-cv-month-color-dark: #D9D9D9; 
+    --wc-annual-cv-week-color-dark: #484848; 
+    --wc-annual-cv-date-color-dark: #D9D9D9; 
+    --wc-annual-cv-rest-color-dark: #484848; 
+    --wc-annual-cv-checked-color-dark: #D9D9D9; 
+    --wc-annual-cv-checked-bg-dark: #262626;
+    --wc-annual-cv-present-color-dark: #409EFF; 
 
     /** 字号 */
     --wc-title-size: 46rpx; /** 左上角日期标题字号 */ 
@@ -454,7 +483,9 @@ type ScheduleEventDetail = {
     --wc-operator-size: 22rpx; /** 视图控制按钮字号 */ 
     --wc-week-size: 20rpx; /** 星期字号 */ 
     --wc-date-size: 36rpx; /** 日期字体字号 */ 
-    --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */ 
+    --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */
+    --wc-dot-size: 10rpx; /** 日期上方‘･’大小 */
+    --wc-dot-offset: 0rpx; /** 日期上方‘･’垂直方向偏移 */ 
     --wc-corner-size: 16rpx; /** 日期角标字体字号 */ 
     --wc-schedule-size: 16rpx; /** 日程字体字号 */ 
     --wc-annual-title-size: 50rpx; /** 年面板左上角年份标题字体字号 */ 
@@ -464,20 +495,6 @@ type ScheduleEventDetail = {
 修改样式
 ```html
 <calendar style="--wc-bg-light: #000;" />
-```
-
-### 类型检查
-由于小程序构建npm的特殊性，本组件又是非纯js库，为了获得正确的的类型提示，需要在小程序根目录的jsconfig.json或是tsconfig.json文件中指明路径。
-```json
-{
-  "compilerOptions": {
-    "paths": {
-      "@lspriv/wx-calendar/*": [
-          "./node_modules/@lspriv/wx-calendar/dist/*"
-        ]
-    }
-  }
-}
 ```
 
 ### 插件

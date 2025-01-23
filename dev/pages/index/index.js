@@ -19,10 +19,10 @@ Page({
         style: { color: '#409EFF' }
       },
       {
-        year: 2024,
-        month: 11,
+        year: 2025,
+        month: 1,
         day: 25,
-        type: 'solar',
+        type: 'schedule',
         text: '呵呵',
         style: { color: '#409EFF' }
       }

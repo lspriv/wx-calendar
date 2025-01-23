@@ -7,8 +7,10 @@
  * @LastEditTime: 2024-11-12 19:14:56
  */
 declare const $_VERSION: string;
+declare const $_PKG_NAME: string;
 
 export const VERSION = $_VERSION;
+export const PKG_NAME = $_PKG_NAME;
 
 /** 大于3的奇数 */
 export const CALENDAR_PANELS = 3;
