@@ -10,8 +10,8 @@ import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises } from '../utils/shared';
-import { hasLayoutArea, nodeRect, viewportOffset } from './tools';
+import { Nullable, promises, strToStyle } from '../utils/shared';
+import { hasLayoutArea, nodeRect, viewportOffset, warn } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
 import type { Theme } from './layout';
@@ -135,32 +135,39 @@ const iframe = (from: number, to: number, frame: number): number => {
   return c * (to - from) + from;
 };
 
-/** 主题色 */
-const PrimaryColor = '#409EFF';
+interface AnnualColors {
+  month: string;
+  week: string;
+  date: string;
+  rest: string;
+  checked: string;
+  present: string;
+  'checked-bg': string;
+}
+
+type AnnualThemeColors = Record<'dark' | 'light', AnnualColors>;
 
 /** 深浅模式色号 */
-const PrinterTheme = {
+const PrinterTheme: AnnualThemeColors = {
   light: {
-    title: '#333',
+    month: '#333',
     week: '#ABABAB',
     date: '#333',
     rest: '#ABABAB',
     checked: '#FFF',
-    checkedBg: '#F5F5F5'
+    present: '#409EFF',
+    'checked-bg': '#F5F5F5'
   },
   dark: {
-    title: '#D9D9D9',
+    month: '#D9D9D9',
     week: '#484848',
     date: '#D9D9D9',
     rest: '#484848',
     checked: '#D9D9D9',
-    checkedBg: '#262626'
+    present: '#409EFF',
+    'checked-bg': '#262626'
   }
-} as const;
-
-type PrinterThemeMode = (typeof PrinterTheme)['dark' | 'light'];
-type PrinterThemeKey = keyof PrinterThemeMode;
-const color = <K extends PrinterThemeKey>(key: K): PrinterThemeMode[K] => PrinterTheme[Layout.theme!][key];
+};
 
 interface ThemeListener {
   (res: { theme?: Theme }): void;
@@ -205,6 +212,8 @@ export class YearPrinter extends CalendarHandler {
   /** 字体 */
   private _font_: string;
 
+  private _colors_: AnnualThemeColors;
+
   /** 处理系统深色模式的监听 */
   private _theme_listener_?: ThemeListener;
 
@@ -216,6 +225,7 @@ export class YearPrinter extends CalendarHandler {
     this._weeks_ = sortWeeks(weekstart);
     if (darkside) this.bindThemeChange();
     this.initializeSize();
+    this.initializeColors();
     return this.initializeRender();
   }
 
@@ -235,9 +245,9 @@ export class YearPrinter extends CalendarHandler {
     const dateSizeMax = Layout.rpxToPx(36);
     this._date_size_ = createState(dateSizeMax, dateSizeMin);
 
-    const pannelPaddingMin = Layout.rpxToPx(16);
-    const pannelPaddingMax = Layout.rpxToPx(0);
-    this._panel_padding_ = createState(pannelPaddingMax, pannelPaddingMin);
+    const panelPaddingMin = Layout.rpxToPx(16);
+    const panelPaddingMax = Layout.rpxToPx(0);
+    this._panel_padding_ = createState(panelPaddingMax, panelPaddingMin);
 
     this._title_padding_x_ = Layout.rpxToPx(20);
 
@@ -265,6 +275,27 @@ export class YearPrinter extends CalendarHandler {
     }
     const hasHeader = hasLayoutArea(this._instance_.data.areaHideCls, 'header');
     this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
+  }
+
+  private initializeColors() {
+    const styles = strToStyle(this._instance_.data.style || '');
+    const { light, dark } = PrinterTheme;
+    const initColors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
+    this._colors_ = Object.keys(styles).reduce((acc, key) => {
+      const match = key.match(/^--wc-annual-cv-(.+)-(dark|light)/);
+      if (match) {
+        const value = `${styles[key]}`;
+        if (/^var\(/.test(value)) {
+          warn(`年面板颜色样式不支持css变量：${key}: ${value};`);
+          return acc;
+        }
+        const [, name, theme] = match;
+        const _name = name.replace(/-color$/, '');
+        acc[theme] = acc[theme] || {};
+        acc[theme][_name] = value;
+      }
+      return acc;
+    }, initColors);
   }
 
   private initializeCanvas(id: string) {
@@ -297,6 +328,10 @@ export class YearPrinter extends CalendarHandler {
         this.render(canvas, this._instance_._panel_.getFullYear(i));
       });
     }
+  }
+
+  private color<K extends keyof AnnualColors>(key: K): AnnualColors[K] {
+    return this._colors_[Layout.theme!][key];
   }
 
   private renderFrame(canvas: Canvas): AnnualFrames {
@@ -424,17 +459,17 @@ export class YearPrinter extends CalendarHandler {
       titleOffsetY,
       titleFontSize,
       titlePaddingX: this._title_padding_x_,
-      titleColor: color('title'),
+      titleColor: this.color('month'),
       weekHeight,
       weekFontSize,
       weekPaddingY,
-      weekColor: color('week'),
+      weekColor: this.color('week'),
       dateRow,
       dateCol,
       dateFontSize,
       dateHeight,
-      dateColor: color('date'),
-      restColor: color('rest'),
+      dateColor: this.color('date'),
+      restColor: this.color('rest'),
       markWidth,
       markHeight,
       checkedRadius,
@@ -457,7 +492,9 @@ export class YearPrinter extends CalendarHandler {
     frame.checked = isMax || !month ? null : inMonthDate(year, month, checked.day);
     frame.todayIsChecked = !!frame.checked && isToday(frame.checked);
     frame.todayCheckedColor =
-      this.renderCheckedBg && (frame.todayIsChecked || isMax || !canvas.frame) ? color('checked') : PrimaryColor;
+      this.renderCheckedBg && (frame.todayIsChecked || isMax || !canvas.frame)
+        ? this.color('checked')
+        : this.color('present');
   }
 
   public render(canvas: Canvas, year: WcFullYear, month?: number) {
@@ -514,7 +551,7 @@ export class YearPrinter extends CalendarHandler {
     ctx!.font = `bold ${frame.titleFontSize}px ${this._font_}`;
     ctx!.textBaseline = 'bottom';
     ctx!.textAlign = 'left';
-    ctx!.fillStyle = curr ? PrimaryColor : frame.titleColor;
+    ctx!.fillStyle = curr ? this.color('present') : frame.titleColor;
     ctx!.fillText(`${mon.month}月`, x + frame.titlePaddingX, y + frame.titleOffsetY);
     ctx!.globalAlpha = alpha;
   }
@@ -556,7 +593,7 @@ export class YearPrinter extends CalendarHandler {
       const ty = y + trdx * frame.dateOuterHeight! + frame.dateHeight / 2;
 
       if (isMax || frame.todayIsChecked || !canvas.frame) {
-        ctx!.fillStyle = PrimaryColor;
+        ctx!.fillStyle = this.color('present');
         ctx!.beginPath();
         ctx!.arc(tx, ty + frame.checkedOffset, frame.checkedRadius, 0, 2 * Math.PI);
         ctx!.fill();
@@ -571,7 +608,7 @@ export class YearPrinter extends CalendarHandler {
       const cx = x + frame.monthPaddingX + cw * frame.dateCol + frame.dateCol / 2;
       const cy = y + crdx * frame.dateOuterHeight! + frame.dateHeight / 2;
 
-      ctx!.fillStyle = color('checkedBg');
+      ctx!.fillStyle = this.color('checked-bg');
       ctx!.beginPath();
       ctx!.arc(cx, cy + frame.checkedOffset, frame.checkedRadius, 0, 2 * Math.PI);
       ctx!.fill();

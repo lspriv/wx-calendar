@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2024-11-25 19:41:51
+ * @LastEditTime: 2025-01-19 13:21:50
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView, Shared } from '../basic/tools';
@@ -134,6 +134,7 @@ export type CalendarProp = {
   /** 非本月日期是否显示 */
   showRest: FullProperty<BooleanConstructor>;
 };
+
 interface CalendarInitialize {
   /**
    * 初始化必需的共享变量
@@ -230,6 +231,8 @@ interface CalendarEventHandlers {
   calendarTransitionEnd(): void;
 }
 
+export type CalendarEventSimplified = 'load' | 'click' | 'change' | 'viewchange' | 'schedule';
+
 export interface CalendarEventDetail {
   checked?: CalendarDay;
   view?: CalendarView;
@@ -241,6 +244,14 @@ export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
   plugin?: string;
   info?: Nullable<WcScheduleInfo>;
 }
+
+export type CalendarCustomEvent<T> = WechatMiniprogram.CustomEvent<
+  T extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail
+>;
+
+export type CalendarEvents = {
+  [P in CalendarEventSimplified as `bind${P}`]: (event: CalendarCustomEvent<P>) => void;
+};
 
 export interface CalendarMethod
   extends WechatMiniprogram.Component.MethodOption,

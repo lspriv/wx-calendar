@@ -6,5 +6,6 @@
 const package = require('../package.json');
 
 module.exports = {
-  $_VERSION: package.version
+  $_VERSION: package.version,
+  $_PKG_NAME: package.name
 };

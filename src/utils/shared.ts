@@ -79,8 +79,9 @@ export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, k
 export const strToStyle = (str: string) => {
   return str.split(';').reduce(
     (acc, item) => {
-      if (item) {
-        const [k, v] = item.split(':').map(s => s.trim());
+      const trim = item.trim();
+      if (trim) {
+        const [k, v] = trim.split(':').map(s => s.trim());
         if (k) acc[k] = v;
       }
       return acc;

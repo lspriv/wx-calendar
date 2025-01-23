@@ -90,12 +90,15 @@
 
     @include if(scheduled) {
       .wc__panel-day::after {
-        content: "･";
+        content: "";
         position: absolute;
-        top: 0;
+        top: 16rpx;
         left: 50%;
-        transform: translateX(-50%);
-        color: theme(dot-color);
+        transform: translate(-50%, theme(dot-offset));
+        width: theme(dot-size);
+        height: theme(dot-size);
+        border-radius: 50%;
+        background-color: theme(dot-color);
         font-size: 32rpx;
         line-height: 1;
         opacity: 1;

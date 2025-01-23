@@ -7,7 +7,7 @@
  * @LastEditTime: 2024-06-07 23:21:38
  */
 
-import { WEEKS, VIEWS, CALENDAR_PANELS, FULL_LAYOUT, View } from './constants';
+import { PKG_NAME, WEEKS, VIEWS, CALENDAR_PANELS, FULL_LAYOUT, View } from './constants';
 import { values } from '../utils/shared';
 
 import type { Voidable } from '../utils/shared';
@@ -205,3 +205,5 @@ export const addLayoutHideCls = (cls: string, area: LayoutArea): string => {
 };
 
 export const hasLayoutArea = (cls: string, area: LayoutArea) => !new RegExp(`wc--hide-${area}\\s*`).test(cls);
+
+export const warn = (...args: any[]) => console.warn(`[${PKG_NAME}]`, ...args);
