@@ -53,7 +53,8 @@ $wc-theme-size: (
 	corner-size: 16rpx, // 日期角标字体字号
 	schedule-size: 16rpx, // 日程字体字号
 	dot-size: 10rpx,
-	dot-offset: 0rpx,
+	dot-offset-x: 0,
+	dot-offset-y: 0,
 
 	/** annual **/
 	annual-title-size: 50rpx, // 年面板左上角年份标题字体字号

@@ -9,7 +9,7 @@
 import { CalendarHandler, CalendarInstance } from '../interface/component';
 import { CalendarMonth } from '../interface/calendar';
 import { applyAnimated, clearAnimated, nextTick, nodeRect, severalTicks, Shared } from './tools';
-import { SELECTOR } from './constants';
+import { SELECTOR, View } from './constants';
 import { promises, isFunction } from '../utils/shared';
 
 const { shared, timing, Easing } = wx.worklet;
@@ -167,7 +167,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
       isSkyline && this.hiddenCalendar();
     } else {
       /** 日历跳转到指定月 */
-      await instance._panel_.toAnnualMonth(mon, instance.$_gesture.value);
+      await instance._panel_.toAnnualMonth(mon, !(instance._view_ & View.week));
       /** 等待视图更新 */
       await severalTicks(10);
       /** 执行年度面板关闭动画 */
