@@ -117,7 +117,7 @@ npm run package
 - Android XWeb SDK，在 project.miniapp.json中开启
 
 #### UniApp
-1. 项目根目录下创建 wxcomponents 文件夹，将打包后dist里的文件拷贝过来放到单独的一个文件夹，比如 wxcomponents/wx-calendar/**
+1. 项目根目录下创建 components 文件夹，将打包后dist里的文件拷贝过来放到单独的一个文件夹，比如 components/wx-calendar/**
 2. 在 `pages.json` 的 `globalStyle` 中配置 `usingComponents`
    ```json
    {
