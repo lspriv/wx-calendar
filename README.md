@@ -117,7 +117,7 @@ npm run package
 - Android XWeb SDK，在 project.miniapp.json中开启
 
 #### UniApp
-1. 项目根目录下创建 wxcomponents 文件夹，将打包后dist里的文件拷贝过来放到单独的一个文件夹，比如 wxcomponents/wx-calendar/**
+1. 项目根目录下创建 components 文件夹，将打包后dist里的文件拷贝过来放到单独的一个文件夹，比如 components/wx-calendar/**
 2. 在 `pages.json` 的 `globalStyle` 中配置 `usingComponents`
    ```json
    {
@@ -129,7 +129,7 @@ npm run package
 注意事项请参考 [UniApp小程序自定义组件支持](https://uniapp.dcloud.net.cn/tutorial/miniprogram-subject.html)
 
 #### Taro
-参考 `Taro 使用原生模块`
+请使用日历组件 [Taro插件](https://github.com/lspriv/plugin-taro)
 > [!NOTE]
 > 如果在 Taro 项目引用了小程序原生的组件，那么该项目将不再具备多端转换的能力。
 
@@ -485,7 +485,8 @@ type ScheduleEventDetail = {
     --wc-date-size: 36rpx; /** 日期字体字号 */ 
     --wc-mark-size: 20rpx; /** 日期下方信息字体字号 */
     --wc-dot-size: 10rpx; /** 日期上方‘･’大小 */
-    --wc-dot-offset: 0rpx; /** 日期上方‘･’垂直方向偏移 */ 
+    --wc-dot-offset-x: 0; /** 日期上方‘･’水平偏移量 */ 
+    --wc-dot-offset-y: 0; /** 日期上方‘･’垂直偏移量 */ 
     --wc-corner-size: 16rpx; /** 日期角标字体字号 */ 
     --wc-schedule-size: 16rpx; /** 日程字体字号 */ 
     --wc-annual-title-size: 50rpx; /** 年面板左上角年份标题字体字号 */ 
