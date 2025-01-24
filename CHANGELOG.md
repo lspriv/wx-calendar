@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.3](https://github.com/lspriv/wx-calendar/compare/v1.8.2...v1.8.3) (2025-01-24)
+
+
+### Bug Fixes
+
+* 修复日期日程·的颜色bug，调整平移控制 ([a73cbb3](https://github.com/lspriv/wx-calendar/commit/a73cbb3eb5163fb6fa894ae763f9792813812711))
+
 ## [1.8.2](https://github.com/lspriv/wx-calendar/compare/v1.8.1...v1.8.2) (2025-01-23)
 
 
