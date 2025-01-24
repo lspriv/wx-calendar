@@ -70,7 +70,7 @@
     @include if(checked) {
       .wc__panel-day {
         &::after {
-          color: theme(checked-dot-color);
+          background-color: theme(checked-dot-color);
         }
       }
       .wc__panel-solar, .wc__panel-mark {
@@ -91,10 +91,11 @@
     @include if(scheduled) {
       .wc__panel-day::after {
         content: "";
+        display: block;
         position: absolute;
-        top: 16rpx;
-        left: 50%;
-        transform: translate(-50%, theme(dot-offset));
+        top: calc(((100rpx - theme(date-size)) / 2 - theme(dot-size)) / 2 + 4rpx);
+        left: calc(50% - theme(dot-size) / 2);
+        transform: translateX(theme(dot-offset-x)) translateY(theme(dot-offset-y));
         width: theme(dot-size);
         height: theme(dot-size);
         border-radius: 50%;
@@ -302,7 +303,7 @@
 %date-today-checked {
   .wc__panel-day {
     &::after {
-      color: theme(checked-today-color) !important;
+      background-color: theme(checked-today-color) !important;
     }
   }
   .wc__panel-solar,
