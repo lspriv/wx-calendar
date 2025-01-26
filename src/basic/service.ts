@@ -182,11 +182,12 @@ interface TraverseCallback {
   (plugin: Plugin, key: string): void;
 }
 
-type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
+// type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
 
-export interface PluginUse<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
-  construct: ConstructorUse<T>;
+export interface PluginUse<T extends PluginConstructor = any> {
+  construct: T;
   options?: Record<string, any>;
+  keys?: string[];
 }
 
 interface RegistPlugin {
@@ -278,7 +279,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   /** 插件队列 */
   private _plugins_: Array<RegistPlugin> = [];
 
-  constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
+  constructor(component: CalendarInstance, services: PluginUse[]) {
     this.component = component;
     this._plugins_ = (services || []).flatMap(service => {
       return service.construct.KEY

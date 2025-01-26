@@ -42,7 +42,8 @@ commander
   .version('0.0.1')
   .argument('[semantic]', 'set semantic version')
   .argument('[preid]', 'set prerelease preid')
-  .action(async function (semantic, preid) {
+  .option('--not-publish', 'set not publish', false)
+  .action(async function (semantic, preid, options) {
     validSemantic(semantic);
     validPreid(preid);
     const spinner = ora('calendar building');
@@ -91,7 +92,7 @@ commander
 
     try {
       execSync(command);
-      preid && execSync('npm publish --access public', { stdio: 'inherit' });
+      preid && !options.notPublish && execSync('npm publish --access public', { stdio: 'inherit' });
     } catch (error) {
       execSync('git checkout -- package.json');
       throw error;

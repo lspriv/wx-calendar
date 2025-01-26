@@ -22,6 +22,7 @@ import {
 import { PluginService } from '../basic/service';
 import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
+import type { ArrItem } from '../utils/shared';
 import type { PluginConstructor, PluginKeys, PluginUse, ServicePlugins } from '../basic/service';
 import type { CalendarInstance, UsePluginService, ScheduleEventDetail, DEFAULT_PLUGINS } from './component';
 
@@ -544,12 +545,17 @@ export const fillAnnualSubs = (uk: string, year: number, subinfos?: Array<WcAnnu
 
 export const timestamp = (date: CalendarDay) => +new Date(date.year, date.month - 1, date.day, 0, 0, 0, 0);
 
+const isPluginUse = (val: unknown): val is PluginUse<any> => {
+  return typeof val === 'object' && val !== null && 'construct' in val;
+};
+
 export type WxCalendarPlugins<T extends WxCalendar<any>> = T extends WxCalendar<infer R> ? R : never;
 
 interface ClearFilter {
   (plugin: PluginUse): boolean;
 }
-export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
+
+export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstructor>, U extends PluginConstructor = ArrItem<T>> {
   /** 今天 */
   public static today = normalDate(new Date());
   /** 预设插件 */
@@ -557,10 +563,10 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
   /** 插件服务 */
   public service: PluginService<T>;
 
-  constructor(component: CalendarInstance, services: T | Array<PluginUse<T>> = []) {
+  constructor(component: CalendarInstance, services: Array<PluginUse<U> | U> = []) {
     const _services = [...services, ...WxCalendar._PLUGINS_, MarkPlugin].map(service => {
-      if ((service as PluginUse<any>).construct) return service as PluginUse<T>;
-      return { construct: service } as PluginUse<T>;
+      if (isPluginUse(service)) return service;
+      return { construct: service };
     });
     this.service = new PluginService(component, _services);
   }

@@ -100,11 +100,8 @@ export const nextTick = <
 };
 
 export const severalTicks = async (times: number) => {
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (!times) break;
+  while (times--) {
     await nextTick();
-    times--;
   }
 };
 
