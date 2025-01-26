@@ -27,6 +27,8 @@ export const isVoid = (val: unknown): val is undefined => val === void 0;
 
 export type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
 
+export type ArrItem<T> = T extends (infer R)[] ? R : never;
+
 // /** 元组 join */
 // export type Join<T extends ReadonlyArray<string>, S = ',', U = ''> = T extends readonly [
 //   infer R,
