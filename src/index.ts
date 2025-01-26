@@ -197,7 +197,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const isWeekView = this._view_ & View.week;
 
       const panels = isWeekView ? this._panel_.createWeekPanels(checked) : this._panel_.createMonthPanels(checked);
-      const _years = this._panel_.createYearPanels(checked);
+      const _years = this._panel_.createAnnualPanels(checked);
       const years: Array<WcYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
       this._years_ = _years.map(({ year, months, marks }) => ({ year, months, marks }));
 
