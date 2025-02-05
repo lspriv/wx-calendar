@@ -636,4 +636,13 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
       callback(plugin.instance, plugin.key);
     }
   }
+
+  // 获取插件有效配置
+  public getConf<T>(key: string | symbol): T | undefined {
+    let i = this._plugins_.length;
+    while (i--) {
+      const plugin = this._plugins_[i].instance;
+      if (plugin[key] != null) return plugin[key];
+    }
+  }
 }
