@@ -68,7 +68,9 @@ export type TrackYearResult = {
 export interface EventIntercept {
   (signal?: number): never;
 }
-interface PluginInterception {
+
+// 不导出
+export interface PluginInterception {
   /**
    * 捕获日期点击动作
    * @param service PliginService实例
@@ -90,7 +92,13 @@ interface PluginInterception {
   PLUGIN_CATCH_MANUAL?(service: PluginService, date: CalendarDay, intercept: EventIntercept): void;
 }
 
-interface PluginEventHandler {
+// 不导出
+export interface PluginEventHandler {
+  /**
+   * PluginService实例初始化完成
+   * @param service PluginService实例
+   */
+  PLUGIN_ON_INITIALIZE?(service: PluginService): void;
   /**
    * 日历组件attache阶段
    * @param service PluginService实例
@@ -128,12 +136,8 @@ interface PluginEventHandler {
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
-export interface Plugin extends PluginEventHandler, PluginInterception {
-  /**
-   * PluginService实例初始化完成
-   * @param service PluginService实例
-   */
-  PLUGIN_INITIALIZE?(service: PluginService): void;
+// 不导出
+export interface PluginTracker {
   /**
    * 捕获日期
    * @param date 日期
@@ -150,12 +154,17 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
    * @param id plugin内部id
    */
   PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
+}
+
+export interface Plugin extends PluginTracker, PluginEventHandler, PluginInterception {
   /**
    * 对已提供的有效日期进行过滤
    * @param service PluginService实例
    * @param dates 日期数组
    */
   PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<CalendarDay | DateRange>;
+  /** others */
+  [P: string | symbol]: any;
 }
 
 export interface PluginConstructor {
@@ -168,15 +177,11 @@ export interface PluginConstructor {
    * 插件版本
    */
   VERSION?: string;
-  /**
-   * 日历组件版本
-   */
-  REQUIRE_VERSION?: string;
-  /**
-   * 原型
-   */
-  readonly prototype: Plugin;
 }
+
+export const isPluginConstructor = (constructor: unknown): constructor is PluginConstructor => {
+  return typeof constructor === 'function' && Object.prototype.hasOwnProperty.call(constructor, 'KEY');
+};
 
 interface TraverseCallback {
   (plugin: Plugin, key: string): void;
@@ -272,6 +277,7 @@ class PluginInterceptError extends Error {
 export const intercept = (signal?: number): never => {
   throw new PluginInterceptError(void 0, signal);
 };
+
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -294,7 +300,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
 
   private initialize() {
     this.traversePlugins(plugin => {
-      plugin.PLUGIN_INITIALIZE?.(this);
+      (plugin.PLUGIN_ON_INITIALIZE || plugin.PLUGIN_INITIALIZE)?.(this);
     });
   }
 
