@@ -2,7 +2,6 @@
   <calendar 
     id="calendar" 
     marks="{{ markers }}" 
-    style="--wc-annual-month-color-light: red;--wc-annual-checked-bg-light: red;"
     bindload="handleLoad"
     bindclick="handleClick"
     bindchange="handleChange" 

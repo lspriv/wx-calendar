@@ -230,6 +230,8 @@ export class YearPrinter extends CalendarHandler {
   }
 
   private initializeSize() {
+    const instance = this._instance_;
+
     const titleSizeMin = Layout.rpxToPx(40);
     const titleSizeMax = Layout.rpxToPx(60);
     this._title_size_ = createState(titleSizeMax, titleSizeMin);
@@ -263,17 +265,20 @@ export class YearPrinter extends CalendarHandler {
     const markHeightMax = Layout.rpxToPx(8);
     this._mark_height_ = createState(markHeightMax, markHeightMin);
 
+    const PRINTER_ALWAYS_DATE_MARK = instance._calendar_.service.getConf<boolean>('PRINTER_ALWAYS_DATE_MARK');
+    const markOffset = PRINTER_ALWAYS_DATE_MARK ? 24 : 0;
+
     this._title_height_ = Layout.rpxToPx(100);
     this._title_padding_y_ = Layout.rpxToPx(20);
     this._week_height_ = Layout.rpxToPx(50);
-    this._date_height_ = Layout.rpxToPx(100 - 24);
+    this._date_height_ = Layout.rpxToPx(100 - markOffset);
     this._checked_radius_max_ = Layout.rpxToPx(50);
-    this._checked_offset_max_ = Layout.rpxToPx(12);
+    this._checked_offset_max_ = Layout.rpxToPx(markOffset / 2);
 
-    if (!this._instance_.data.customNavBar) {
+    if (!instance.data.customNavBar) {
       this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
     }
-    const hasHeader = hasLayoutArea(this._instance_.data.areaHideCls, 'header');
+    const hasHeader = hasLayoutArea(instance.data.areaHideCls, 'header');
     this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
   }
 
@@ -391,8 +396,8 @@ export class YearPrinter extends CalendarHandler {
     const titleHeightTo = isMax ? row! * 2 : this._title_height_;
     const titleHeight = iframe(titleHeightFr, titleHeightTo, frame);
 
-    const titleYMax = this._title_height_ / 2 + this._title_padding_y_ / 2 + this._title_size_.max / 2;
-    const titleYMin = row + row / 2 + this._week_size_.min / 2;
+    const titleYMax = (this._title_height_ + this._title_padding_y_ + this._title_size_.max) / 2;
+    const titleYMin = row + (row + this._week_size_.min) / 2;
 
     /** 月标题字体垂直偏移 */
     const titleOffsetYFr = isMax ? titleYMax : titleYMin;
