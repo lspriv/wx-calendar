@@ -8,7 +8,6 @@
  */
 import { normalDate, formDateByStrKey, getMarkKey } from '../interface/calendar';
 
-import type { Nullable } from '../utils/shared';
 import type { Plugin, TrackDateResult } from '../basic/service';
 import type {
   CalendarMark,
@@ -60,7 +59,7 @@ export class MarkPlugin implements Plugin {
     if (instance._loaded_) instance._calendar_.service.updateDates([...updates, ...deletes]);
   }
 
-  public PLUGIN_TRACK_DATE(date: CalendarDay): Nullable<TrackDateResult> {
+  public PLUGIN_TRACK_DATE(date: CalendarDay) {
     if (!this._marks_) return null;
 
     const key = `${date.year}_${date.month}_${date.day}`;
@@ -85,14 +84,14 @@ export class MarkPlugin implements Plugin {
     return null;
   }
 
-  PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id?: string): Nullable<WcScheduleInfo> {
+  public PLUGIN_TRACK_SCHEDULE(date: CalendarDay, id?: string) {
     if (!id) return null;
     const month = date.month - 1;
     return {
       dtStart: new Date(date.year, month, date.day),
       dtEnd: new Date(date.year, month, date.day + 1),
       origin: SCHEDULE_MARK_ORIGIN
-    };
+    } as WcScheduleInfo;
   }
 }
 

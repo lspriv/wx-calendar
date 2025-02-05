@@ -551,7 +551,7 @@ class MyPlugin implements Plugin {
    * 在日历组件 created 阶段最后，在插件实例化后
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE(service: PluginService): void {
+  PLUGIN_ON_INITIALIZE(service: PluginService): void {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -772,6 +772,34 @@ class MyPlugin implements Plugin {
   }
 }
 ```
+
+#### 使用装饰器声明上述钩子
+```typescript
+import { WcPlugin, Track, Catch, On, Filter } from '@lspriv/wx-calendar/lib';
+
+export const MY_PLUGIN_KEY = 'my-plugin';
+
+@WcPlugin(MY_PLUGIN_KEY) // 声明插件和KEY
+class MyPlugin {
+
+  @Track('date')
+  trackDate() {}
+
+  @Track('year')
+  trackYear() {}
+
+  @Catch('tap')
+  catchTap() {}
+
+  @On('load')
+  onLoad() {}
+
+  @Filter
+  datesFilter() {}
+}
+
+```
+
 
 #### 插件说明
 - `数据标记` 后引入的插件数据覆盖先引入的插件数据

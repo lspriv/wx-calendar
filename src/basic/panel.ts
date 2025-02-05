@@ -32,6 +32,10 @@ type RefreshFields = PartRequired<CalendarData, 'current' | 'checked'>;
 
 type Offsets = [wdx: number, offset: number];
 export class PanelTool extends CalendarHandler {
+  /**
+   * 创建【月｜日程】视图面板数据
+   * @param checked 选中日期
+   */
   public createMonthPanels(checked: CalendarDay) {
     const current = this._instance_.data.current;
     const { year, month, day } = checked;
@@ -41,6 +45,10 @@ export class PanelTool extends CalendarHandler {
     });
   }
 
+  /**
+   * 创建周视图面板数据
+   * @param checked 选中日期
+   */
   public createWeekPanels(checked: CalendarDay) {
     const current = this._instance_.data.current;
     const panels: Array<CalendarPanel> = [];
@@ -51,11 +59,19 @@ export class PanelTool extends CalendarHandler {
     return panels;
   }
 
-  public createYearPanels(checked: CalendarDay) {
+  /**
+   * 创建年视图面板数据
+   * @param checked 选中日期
+   */
+  public createAnnualPanels(checked: CalendarDay) {
     const current = this._instance_.data.current;
-    return Array.from({ length: CALENDAR_PANELS }, (_, i) => this.createYearPanel(checked.year + i - current, i));
+    return Array.from({ length: CALENDAR_PANELS }, (_, i) => this.createAnnualPanel(checked.year + i - current, i));
   }
 
+  /**
+   * 刷新主面板数据
+   * @param sets 变更数据，setData方法的参数
+   */
   private refreshPanels(sets: RefreshFields) {
     const { current, checked } = sets;
     const isWeekView = this._instance_._view_ & View.week;
@@ -81,7 +97,7 @@ export class PanelTool extends CalendarHandler {
   }
 
   /**
-   * 刷新面板数据
+   * 刷新主面板数据
    * @param offset 偏移量，单位月视图下为月，周视图下为周
    * @param checked 要设置的选中日期，不传则由offset计算出偏移后的月份同天或同星期日
    * @param curr 要设置的面板滑块的index，不传则由offset计算得出偏移后的index
@@ -109,6 +125,10 @@ export class PanelTool extends CalendarHandler {
     await this.update();
   }
 
+  /**
+   * 刷新视图
+   * @param view 指定视图
+   */
   public async refreshView(view: View) {
     const instance = this._instance_;
     const { current, checked, weekstart } = instance.data;
@@ -127,6 +147,13 @@ export class PanelTool extends CalendarHandler {
   public refreshOffsets(sets: Partial<CalendarData>, current?: number, checked?: CalendarDay): void;
   public refreshOffsets(sets: Partial<CalendarData>, excludes?: number[]): void;
 
+  /**
+   * 更新选中日期的面板偏移量（垂直方向）
+   * 用于周月视图切换时垂直方向的偏移量
+   * @param sets 变更数据，setData方法的参数
+   * @param excludes 不需要更新的面板索引数组
+   * @param checked 指定选中日期
+   */
   public refreshOffsets(sets: Partial<CalendarData>, excludes?: number | number[], checked?: CalendarDay) {
     const instance = this._instance_;
 
@@ -155,6 +182,12 @@ export class PanelTool extends CalendarHandler {
     }
   }
 
+  /**
+   * 刷新年度面板数据
+   * @param offset 指定年份与当前年份的偏移量
+   * @param curr 当前年面板swiper索引
+   * @param nonAnimate 年面板swiper是否过渡动画
+   */
   public async refreshAnnualPanels(offset: number, curr?: number, nonAnimate: boolean = false) {
     const instance = this._instance_;
     const annualCurr = instance.data.annualCurr ?? middle(CALENDAR_PANELS);
@@ -170,7 +203,7 @@ export class PanelTool extends CalendarHandler {
       const diff = circularDiff(i, current);
       const y = year + diff;
       if (annual.year !== y) {
-        const panel = this.createYearPanel(y, i);
+        const panel = this.createAnnualPanel(y, i);
         sets[`years[${i}]`] = { key: panel.key, year: panel.year, subinfo: panel.subinfo };
         instance._years_.splice(i, 1, { year: panel.year, months: panel.months, marks: panel.marks });
         idxs.push(i);
@@ -183,7 +216,6 @@ export class PanelTool extends CalendarHandler {
 
   /**
    * 创建单个月/周面板
-   * @param date
    */
   public createPanel(
     date: CalendarDay,
@@ -207,7 +239,12 @@ export class PanelTool extends CalendarHandler {
     return { ...month, key: panelKey, offset, wdx };
   }
 
-  public createYearPanel(year: number, key: number) {
+  /**
+   * 创建单个年度面板数据
+   * @param year 指定年
+   * @param key 指定key
+   */
+  public createAnnualPanel(year: number, key: number) {
     const instance = this._instance_;
     const weekstart = instance.data.weekstart;
     const panel = instance._calendar_.createYear(year, weekstart);

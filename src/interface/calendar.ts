@@ -8,6 +8,7 @@
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
+import { warn } from '../basic/tools';
 import {
   Nullable,
   isDate,
@@ -19,7 +20,7 @@ import {
   compareSame,
   includes
 } from '../utils/shared';
-import { PluginService } from '../basic/service';
+import { PluginService, isPluginConstructor } from '../basic/service';
 import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
 import type { ArrItem } from '../utils/shared';
@@ -555,7 +556,10 @@ interface ClearFilter {
   (plugin: PluginUse): boolean;
 }
 
-export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstructor>, U extends PluginConstructor = ArrItem<T>> {
+export class WxCalendar<
+  T extends Array<PluginConstructor> = Array<PluginConstructor>,
+  U extends PluginConstructor = ArrItem<T>
+> {
   /** 今天 */
   public static today = normalDate(new Date());
   /** 预设插件 */
@@ -598,10 +602,14 @@ export class WxCalendar<T extends Array<PluginConstructor> = Array<PluginConstru
     return y;
   }
 
-  public static use<T extends PluginConstructor>(plugin: T, options?: ConstructorParameters<T>[0]) {
-    const idx = this._PLUGINS_.findIndex(p => p.construct.KEY === plugin.KEY);
-    if (idx >= 0) this._PLUGINS_.splice(idx, 1);
-    this._PLUGINS_.push({ construct: plugin, options });
+  public static use<T extends { new (...args: any[]): any }>(plugin: T, options?: ConstructorParameters<T>[0]) {
+    if (isPluginConstructor(plugin)) {
+      const idx = this._PLUGINS_.findIndex(p => p.construct.KEY === plugin.KEY);
+      if (idx >= 0) this._PLUGINS_.splice(idx, 1);
+      this._PLUGINS_.push({ construct: plugin, options });
+    } else {
+      warn('Plugin missing static prop [KEY] !');
+    }
     return this;
   }
 
