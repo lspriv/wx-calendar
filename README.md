@@ -59,6 +59,9 @@ WxCalendar.use(LunarPlugin);
 Page({
   handleLoad(detail) {
     console.log('calendar load', detail);
+    
+    const calendar = this.selectComponent('#calendar');
+    console.log('calendar', calendar);
   }
 })
 ```
@@ -82,7 +85,7 @@ Page({
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
-alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当SIT，发pr到master打tag，拉取哪个分支自行考量
+alpha分支是最新开发分支，develop是测试包分支，master是稳定包分支
 
 #### 启动
 ```bash
@@ -107,7 +110,7 @@ npm run package
 
 #### 测试
 
-测试尚未写完，等我抽空就写 :rofl:
+测试尚未写完
 
 ### 多端支持
 #### Donut

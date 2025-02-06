@@ -245,7 +245,7 @@ export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
   info?: Nullable<WcScheduleInfo>;
 }
 
-export type CalendarCustomEvent<T> = WechatMiniprogram.CustomEvent<
+export type CalendarCustomEvent<T extends CalendarEventSimplified> = WechatMiniprogram.CustomEvent<
   T extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail
 >;
 

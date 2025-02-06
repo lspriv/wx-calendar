@@ -158,6 +158,11 @@ export interface PluginTracker {
 
 export interface Plugin extends PluginTracker, PluginEventHandler, PluginInterception {
   /**
+   * 是否总是存在日期下方标记
+   * 这个属性对年面板和主面板在日期垂直位置的显示保持一致
+   */
+  PRINTER_ALWAYS_DATE_MARK?: boolean;
+  /**
    * 对已提供的有效日期进行过滤
    * @param service PluginService实例
    * @param dates 日期数组
