@@ -343,7 +343,7 @@ var toggleView = function (e, instance) {
   instance.callMethod('refreshView', { view: viewState });
 };
 
-var updateAnuualCls = function (opacity, _, owner) {
+var updateAnnualCls = function (opacity, _, owner) {
   if (opacity != null) {
     if (opacity) {
       owner.selectComponent('.wc__header').addClass('wc__header--hidden');
@@ -380,7 +380,7 @@ module.exports = {
   toggleView,
   viewChange,
   offsetChange,
-  updateAnuualCls,
+  updateAnnualCls,
   initViewChange,
   transViewChange
 };

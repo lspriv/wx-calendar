@@ -7,7 +7,7 @@
 <view 
   class="wc__annual {{ !customNavBar ? 'wc__annual--non-custom' : '' }}" 
   style="top: {{ annualTop }};opacity: {{ annualOpacity }};"
-  change:opacity="{{ trans_wxs.updateAnuualCls }}" opacity="{{ annualOpacity }}"
+  change:opacity="{{ trans_wxs.updateAnnualCls }}" opacity="{{ annualOpacity }}"
   catch:touchmove>
   <view class="wc__annual-header">
     <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
