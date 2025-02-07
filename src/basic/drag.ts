@@ -7,12 +7,12 @@
  * @LastEditTime: 2024-07-27 23:53:34
  */
 import { CalendarHandler, CalendarInstance } from '../interface/component';
-import { applyAnimated, clearAnimated, circularDiff, Shared } from './tools';
+import { applyAnimated, clearAnimated, circularDiff, easingOpt, Shared } from './tools';
 import { SELECTOR, View, CALENDAR_PANELS } from './constants';
 import { Layout } from './layout';
 import { PanelTool } from './panel';
 import { offsetDate, normalDate } from '../interface/calendar';
-import { promises, easingOpt, Callable } from '../utils/shared';
+import { promises, Callable } from '../utils/shared';
 
 import type { CalendarDay } from '../interface/calendar';
 

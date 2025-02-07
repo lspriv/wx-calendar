@@ -22,8 +22,7 @@ export const isObject = (val: unknown): val is Record<any, any> => val !== null 
 export const isPromise = <T = any>(val: unknown): val is Promise<T> =>
   isObject(val) && isFunction(val.then) && isFunction(val.catch);
 
-export const nonNullable = <T>(val: T): val is NonNullable<T> => val !== void 0 && val !== null;
-export const isVoid = (val: unknown): val is undefined => val === void 0;
+export const nonNullable = <T>(val: T): val is NonNullable<T> => val != null;
 
 export type Union<T> = T extends [infer R, ...infer P] ? R | Union<P> : never;
 
@@ -63,11 +62,6 @@ export const promises = <T extends any[]>(all: T) => Promise.all(all.filter(isPr
 export const values = <T>(obj: Record<string, T>): T[] => Object.keys(obj).map(key => obj[key]);
 
 export const notEmptyObject = (val: Record<any, any>): boolean => !!Object.keys(val).length;
-
-export const easingOpt = (
-  duration: number,
-  easing: (...args: any[]) => any = wx.worklet.Easing.out(wx.worklet.Easing.sin)
-): WechatMiniprogram.TimingOption => ({ duration, easing });
 
 export const omit = <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]) =>
   Object.keys(obj).reduce(

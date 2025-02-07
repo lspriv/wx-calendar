@@ -87,6 +87,11 @@ export const InitWeeks = (weeks: string = WEEKS, prefix: string = 'w') =>
     label: weeks[i]
   }));
 
+export const easingOpt = (
+  duration: number,
+  easing: (...args: any[]) => any = wx.worklet.Easing.out(wx.worklet.Easing.sin)
+): WechatMiniprogram.TimingOption => ({ duration, easing });
+
 export const nextTick = <
   T extends Voidable<(...args: any[]) => any> = undefined,
   R = T extends NonNullable<T> ? Awaited<ReturnType<T>> : void

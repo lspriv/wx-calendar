@@ -7,10 +7,6 @@
  * @LastEditTime: 2024-09-11 13:24:17
  */
 
-var nonNullable = function (value) {
-  return value !== null && value !== undefined;
-};
-
 /**
  * 更新非当前面板垂直方向偏移
  * @param instance
@@ -348,7 +344,7 @@ var toggleView = function (e, instance) {
 };
 
 var updateAnuualCls = function (opacity, _, owner) {
-  if (nonNullable(opacity)) {
+  if (opacity != null) {
     if (opacity) {
       owner.selectComponent('.wc__header').addClass('wc__header--hidden');
       owner.selectComponent('.wc__bar').addClass('wc__bar--hidden');
