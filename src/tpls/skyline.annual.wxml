@@ -3,25 +3,25 @@
   Distributed under MIT license.
   See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  -->
-<view class="wc__annual" catch:touchmove>
-  <view class="wc__annual-header">
-    <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
-    <view class="wc__annual-header-tips">
+<view class="wc__a" catch:touchmove>
+  <view class="wc__ah wc-F wc-JS">
+    <view class="wc__aht">{{ years[annualCurr].year }}年</view>
+    <view class="wc__ahtp">
       <view 
         wx:for="{{ years[annualCurr].subinfo }}"
         wx:for-item="sub" 
         wx:key="key"
-        class="wc__annual-header-tip" 
-        style="--annual-tip-color: {{ sub.color }};">{{ sub.text }}</view>
+        class="wc__ahti" 
+        style="--atc: {{ sub.color }};">{{ sub.text }}</view>
     </view>
   </view>
-  <view class="wc__annual-panel-container">
+  <view class="wc__apc">
     <swiper 
       wx:if="{{ annualCurr !== null }}"
       circular 
       duration="{{ 300 }}" 
       current="{{ annualCurr }}" 
-      class="wc__annual-panel-swiper"
+      class="wc__aps"
       scroll-with-animation="{{ false }}"
       worklet:onscrollend="workletAnnualSwiperTransEnd">
       <swiper-item
@@ -30,12 +30,12 @@
         wx:for-index="ydx"
         wx:key="key"
         skip-hidden-item-layout>
-        <view class="wc__annual-panel">
+        <view class="wc__ap">
           <canvas 
             id="printer_{{ ydx }}" 
             type="2d" 
             data-ydx="{{ ydx }}" 
-            class="wc__annual-panel-canvas" 
+            class="wc__apcs" 
             catch:tap="selMonth" />
         </view>
       </swiper-item>

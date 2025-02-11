@@ -99,7 +99,7 @@ export type CalendarData = {
   /** 日历字体 */
   fonts: string;
   /** 暗黑模式 */
-  darkside: boolean;
+  dark: boolean;
   /** 属性 layout 的翻版 */
   areaHideCls: string;
 };

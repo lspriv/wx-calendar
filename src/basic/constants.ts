@@ -53,10 +53,10 @@ export const SELECTOR = {
   VIEW_BAR_1: '#view_bar_1',
   VIEW_BAR_2: '#view_bar_2',
   SCHEDULES: '.wc__panel-schedules',
-  BAR: '.wc__bar',
+  BAR: '.wc__b',
   BAR_1: '#control_1',
   BAR_2: '#control_2',
-  ANNUAL: '.wc__annual',
-  ANNUAL_SWIPER: '.wc__annual-panel-swiper',
+  ANNUAL: '.wc__a',
+  ANNUAL_SWIPER: '.wc__aps',
   ANNUAL_CANVAS: '#printer_'
 } as const;

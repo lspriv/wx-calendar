@@ -17,13 +17,6 @@
 	width: calc(100% / #{$columms});
 }
 
-@mixin column-rect {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-}
-
 @mixin month-week-rows ($length) {
 	height: calc(100% / #{$length});
 }
