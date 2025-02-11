@@ -3,23 +3,21 @@
   Distributed under MIT license.
   See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  -->
-<view class="wc__header">
+<view class="wc__header wc-F wc-FB">
   <view class="wc__header-title" catch:tap="selYear">
     <span>{{ panels[current].year }}年{{ panels[current].month }}月</span>
     <span class="wc__header-title-info">{{ info }}</span>
   </view>
-  <view class="wc__operators">
-    <view 
-      class="wc__operator wc__operator--today {{ (checked && !checked.today) ? 'wc__operator--show' : '' }}" 
-      catch:tap="toToday"></view>
-    <view class="wc__operator wc__operator--views" catch:tap="toggleView">
-      <view id="view_bar_1" class="wc__operator-view">
-        <view class="wc__operator-view-text">月</view>
+  <view class="wc__header-ops wc-F wc-JE">
+    <view class="wc__header-op wc-F wc__header-op--today {{ (checked && !checked.today) ? 'wc__header-op--show' : '' }}" catch:tap="toToday"></view>
+    <view class="wc__header-op wc-F wc__header-op--views" catch:tap="toggleView">
+      <view id="view_bar_1" class="wc__header-op-view">
+        <view class="wc__header-op-view-text wc-F">月</view>
       </view>
-      <view id="view_bar_2" class="wc__operator-view">
-        <view class="wc__operator-view-text">周</view>
+      <view id="view_bar_2" class="wc__header-op-view">
+        <view class="wc__header-op-view-text wc-F">周</view>
       </view>
-      <view id="view_bar" class="wx__views-bar"></view>
+      <view id="view_bar" class="wc__views-bar"></view>
     </view>
   </view>
 </view>

@@ -9,7 +9,7 @@
 @use 'theme' as *;
 
 @media (prefers-color-scheme: dark) {
-	.wcc.wcc--darkmode {
+	.wcc.wcc--dm {
   		@include theme-use($wc-theme-dark, 'dark');
 	}
 }

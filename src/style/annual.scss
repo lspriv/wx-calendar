@@ -8,7 +8,7 @@
 @use 'funcs' as *;
 @use 'mixin' as *;
 
-.wc__annual {
+.wc__a {
   width: 100vw;
   height: 100vh;
   top: -150vh;
@@ -19,50 +19,46 @@
   overflow: hidden;
   contain: layout style;
   @include if(non-custom) {
-    --wc-annual-bottom-height: 0px;
-    --wc-annual-header-height: calc(var(--wc-menu-bottom) - var(--wc-menu-top) + 30rpx);
-    .wc__annual-header {
-      height: var(--wc-annual-header-height);
+    --wc-abh: 0px;
+    --wc-ahh: calc(var(--wc-mb) - var(--wc-mt) + 30rpx);
+    .wc__ah {
+      height: var(--wc-ahh);
       padding-top: 15rpx;
       padding-bottom: 15rpx;
     }
-    .wc__annual-panel-container {
-      height: calc(100% - var(--wc-annual-header-height));
-      top: var(--wc-annual-header-height);
+    .wc__apc {
+      height: calc(100% - var(--wc-ahh));
+      top: var(--wc-ahh);
     }
   }
 }
 
 .wcc--skyline {
-  .wc__annual {
+  .wc__a {
     position: absolute;
   }
 }
 
 .wcc--webview {
-  .wc__annual {
+  .wc__a {
     position: fixed;
   }
 }
 
-.wc__annual-header {
-  height: calc(var(--wc-menu-bottom));
+.wc__ah {
+  height: calc(var(--wc-mb));
   position: absolute;
   left: 0;
   right: 0;
   padding: 0 30rpx;
-  padding-top: var(--wc-menu-top);
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  &-title {
+  padding-top: var(--wc-mt);
+  &t {
     font-size: theme(annual-title-size);
     line-height: 1;
     font-weight: bold;
     color: theme(annual-title-color);
   }
-  &-tips {
+  &tp {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -70,7 +66,7 @@
     align-items: start;
     height: 42rpx;
   }
-  &-tip {
+  &ti {
     position: relative;
     padding-left: 26rpx;
     margin-left: 16rpx;
@@ -85,32 +81,32 @@
       width: 14rpx;
       left: 0;
       top: 50%;
-      background-color: var(--annual-tip-color);
+      background-color: var(--atc);
       border-radius: 2rpx;
       transform: translateY(-50%);
     }
   }
 }
 
-.wc__annual-panel-container {
+.wc__apc {
   position: absolute;
   width: 100%;
-  height: calc(100% - var(--wc-menu-bottom));
-  top: var(--wc-menu-bottom);
+  height: calc(100% - var(--wc-mb));
+  top: var(--wc-mb);
   left: 0;
   right: 0;
 }
 
-.wc__annual-panel {
+.wc__ap {
   width: 100vw;
-  height: calc(100% - var(--wc-annual-bottom-height));
-  &-canvas {
+  height: calc(100% - var(--wc-abh));
+  &cs {
     width: 100%;
     height: 100%;
   }
 }
 
-.wc__annual-panel-swiper {
+.wc__aps {
   width: 100%;
   height: 100%;
 }

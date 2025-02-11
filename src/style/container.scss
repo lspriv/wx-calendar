@@ -7,8 +7,12 @@
   @include theme-values($wc-theme-size);
   @include theme-values($wc-theme-light, 'light');
   @include theme-use($wc-theme-light, 'light');
-  @include if(darkmode) {
+  @include if(dm) {
     @include theme-values($wc-theme-dark, 'dark');
+    .wc {
+      --wc-op-bg: var(--wc-op-bg-dark);
+      --wc-op-color: var(--wc-op-color-dark);
+    }
   }
 }
 
@@ -27,4 +31,33 @@ $fixed-view-sub: 20rpx;
   flex-direction: column;
   z-index: 1024;
   overflow: hidden;
+  --wc-op-bg: var(--wc-op-bg-light);
+  --wc-op-color: var(--wc-op-color-light);
+}
+
+.wc-F {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.wc-FV {
+  flex-direction: column;
+} 
+
+.wc-FB {
+  justify-content: space-between;
+}
+
+.wc-JS {
+  justify-content: flex-start;
+}
+
+.wc-JE {
+  justify-content: flex-end;
+}
+
+.wc-AE {
+  align-items: flex-end;
 }

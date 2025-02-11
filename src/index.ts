@@ -135,7 +135,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     annualOpacity: 0,
     annualDuration: 300,
     offsetChange: false,
-    darkside: true,
+    dark: true,
     areaHideCls: '',
     layout: null,
     pointer: null,
@@ -222,7 +222,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         gesture: this.data.viewGesture,
         info: getDateInfo(checked, this.data.weekstart, isWeekView),
         pointer: createPointer(),
-        darkside: this.data.darkmode && Layout.darkmode,
+        dark: this.data.darkmode && Layout.darkmode,
         areaHideCls
       };
 
@@ -504,10 +504,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     darkmode: function (darkmode: boolean) {
       if (!darkmode) Layout.theme = 'light';
       if (this._loaded_) {
-        const darkside = darkmode && Layout.darkmode;
-        if (darkside !== this.data.darkside) {
-          this.setData({ darkside });
-          if (darkside) this._printer_.bindThemeChange();
+        const dark = darkmode && Layout.darkmode;
+        if (dark !== this.data.dark) {
+          this.setData({ dark });
+          if (dark) this._printer_.bindThemeChange();
           else this._printer_.cancelThemeChange();
         }
       }

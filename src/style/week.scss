@@ -10,7 +10,6 @@
 @use 'theme' as *;
 
 .wc__week {
-  @include column-rect;
   height: $wc-calendar-weeks-height;
   padding: 10rpx 10rpx 0;
   position: relative;

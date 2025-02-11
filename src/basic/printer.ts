@@ -220,10 +220,10 @@ export class YearPrinter extends CalendarHandler {
   public renderCheckedBg: boolean = true;
 
   public async initialize() {
-    const { fonts, weekstart, darkside } = this._instance_.data;
+    const { fonts, weekstart, dark } = this._instance_.data;
     this._font_ = fonts;
     this._weeks_ = sortWeeks(weekstart);
-    if (darkside) this.bindThemeChange();
+    if (dark) this.bindThemeChange();
     this.initializeSize();
     this.initializeColors();
     return this.initializeRender();

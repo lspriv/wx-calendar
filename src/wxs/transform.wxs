@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*
  * Copyright 2023 lspriv. All Rights Reserved.
  * Distributed under MIT license.
@@ -178,22 +179,9 @@ var touchMove = function (e, instance) {
 
   /** 计算左上角视图控制的位置 */
   var translateX = Math.max(0, Math.min(60, ((mark.main - height) * 60) / (mark.main - mark.min)));
-  var monthBarWidth = Math.max(52 - translateX, 8);
-  var weekBarWidth = Math.max(translateX - 8, 8);
-
   instance.selectComponent('#view_bar').setStyle({
     transition: 'unset',
-    transform: 'translateX(' + translateX + 'rpx) translateZ(0px)'
-  });
-
-  instance.selectComponent('#view_bar_1').setStyle({
-    transition: 'unset',
-    width: monthBarWidth + 'rpx'
-  });
-
-  instance.selectComponent('#view_bar_2').setStyle({
-    transition: 'unset',
-    width: weekBarWidth + 'rpx'
+    'background-position': translateX + 'rpx 0'
   });
 
   /** 计算日程透明度  */
@@ -246,22 +234,9 @@ var touchEnd = function (e, instance) {
   });
 
   var translateX = toMin ? 'var(--wc-operator-side)' : 0;
-  var monthBarWidth = toMin ? 0 : 'calc(var(--wc-operator-side) - var(--wc-operator-padding))';
-  var weekBarWidth = toMin ? 'calc(var(--wc-operator-side) - var(--wc-operator-padding))' : 0;
-
   instance.selectComponent('#view_bar').setStyle({
     transition: 'all .3s ease',
-    transform: 'translateX(' + translateX + ') translateZ(0px)'
-  });
-
-  instance.selectComponent('#view_bar_1').setStyle({
-    transition: 'all .3s ease',
-    width: monthBarWidth
-  });
-
-  instance.selectComponent('#view_bar_2').setStyle({
-    transition: 'all .3s ease',
-    width: weekBarWidth
+    'background-position': translateX + ' 0'
   });
 
   /** 计算日程透明度  */
@@ -295,20 +270,9 @@ var offsetChange = function (change, _, owner, instance) {
 
 /** 视图样式类更新 */
 var updateViewCls = function (view, instance) {
-  var minWidth = 'var(--wc-operator-padding)';
-  var maxWidth = 'calc(var(--wc-operator-side) - var(--wc-operator-padding))';
-
-  instance.selectComponent('#view_bar_1').setStyle({
-    width: view === 'week' ? minWidth : maxWidth
-  });
-
-  instance.selectComponent('#view_bar_2').setStyle({
-    width: view === 'week' ? maxWidth : minWidth
-  });
-
-  var translateX = view === 'week' ? 'var(--wc-operator-side)' : 0;
+  var x = view === 'week' ? 'var(--wc-operator-side)' : 0;
   instance.selectComponent('#view_bar').setStyle({
-    transform: 'translateX(' + translateX + ') translateZ(0px)'
+    'background-position': x + ' 0'
   });
 };
 
@@ -347,10 +311,10 @@ var updateAnnualCls = function (opacity, _, owner) {
   if (opacity != null) {
     if (opacity) {
       owner.selectComponent('.wc__header').addClass('wc__header--hidden');
-      owner.selectComponent('.wc__bar').addClass('wc__bar--hidden');
+      owner.selectComponent('.wc__b').addClass('wc__b--hidden');
     } else {
       owner.selectComponent('.wc__header').removeClass('wc__header--hidden');
-      owner.selectComponent('.wc__bar').removeClass('wc__bar--hidden');
+      owner.selectComponent('.wc__b').removeClass('wc__b--hidden');
     }
   }
 };
@@ -373,6 +337,84 @@ var transViewChange = function (view, old, owner, instance) {
   }
 };
 
+var normalizeRgb = function (rgb) {
+  var color = rgb.match(getRegExp('\\d+', 'g'));
+  if (!color || color.length < 3) return null;
+  return [+color[0], +color[1], +color[2]];
+};
+
+var hexToRgb = function (hex) {
+  hex = hex.replace(getRegExp('^#'), '');
+  // 如果是缩写形式，如 #03F
+  if (hex.length === 3) {
+    hex = hex.replace(getRegExp('([a-f\\d])', 'gi'), '$1$1');
+  }
+
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return [r, g, b];
+};
+
+var invertColor = function (color) {
+  var r = Math.min(255, parseInt(((255 - color[0]) * 10) / 9));
+  var g = Math.min(255, parseInt(((255 - color[1]) * 10) / 9));
+  var b = Math.min(255, parseInt(((255 - color[2]) * 10) / 9));
+  return [r, g, b, color[3] ? color[3] : 1];
+};
+
+var getStyle = function (style, key) {
+  var value = style.match(getRegExp('(?<=' + key + '\\s*:)[^;]+'));
+  if (!value || !value.length || !value[0]) return null;
+  return value[0].replace(getRegExp('[\\r\\n]+', 'g'), '').trim();
+};
+
+var styleChange = function (view, _, owner) {
+  var light = getStyle(view, '--wc-opt-color-light');
+  var dark = getStyle(view, '--wc-opt-color-dark');
+  var rgbReg = getRegExp('^rgba?');
+  var styles = {};
+
+  if (light) {
+    if (rgbReg.test(light)) {
+      light = normalizeRgb(light);
+    } else {
+      light = hexToRgb(light);
+    }
+  } else {
+    light = hexToRgb('#409EFF');
+  }
+
+  var invert_light = invertColor(light);
+  styles['--wc-opo-color-light'] = 'rgba(' + light.join(',') + ')';
+  styles['--wc-opo-bg-light'] = 'rgba(' + light.slice(0, 3).join(',') + ',0.1' + ')';
+  styles['--wc-op-color-light'] = 'rgba(' + invert_light.join(',') + ')';
+  styles['--wc-op-bg-light'] = 'rgba(' + invert_light.slice(0, 3).join(',') + ',0.1' + ')';
+
+  if (dark) {
+    if (rgbReg.test(dark)) {
+      dark = normalizeRgb(dark);
+    } else {
+      dark = hexToRgb(dark);
+    }
+  } else {
+    dark = hexToRgb('#409EFF');
+  }
+
+  var invert_dark = invertColor(dark);
+  styles['--wc-opo-color-dark'] = 'rgba(' + dark.join(',') + ')';
+  styles['--wc-opo-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
+  styles['--wc-op-color-dark'] = 'rgba(' + invert_dark.join(',') + ')';
+  styles['--wc-op-bg-dark'] = 'rgba(' + invert_dark.slice(0, 3).join(',') + ',0.1' + ')';
+
+  var container = owner.selectComponent('.wc');
+  if (container) {
+    container.setStyle(styles);
+  }
+};
+
 module.exports = {
   touchStart,
   touchMove,
@@ -382,5 +424,6 @@ module.exports = {
   offsetChange,
   updateAnnualCls,
   initViewChange,
-  transViewChange
+  transViewChange,
+  styleChange
 };
