@@ -6,7 +6,7 @@
   width: 100vw;
   @include theme-values($wc-theme-size);
   @include theme-values($wc-theme-light, 'light');
-  @include theme-use($wc-theme-light, 'light');
+  @include theme-use($wc-theme-light, 'light', op-bg, op-color);
   @include if(dm) {
     @include theme-values($wc-theme-dark, 'dark');
     .wc {

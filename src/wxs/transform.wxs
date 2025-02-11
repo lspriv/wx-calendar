@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable no-undef */
 /*
  * Copyright 2023 lspriv. All Rights Reserved.
@@ -338,16 +339,32 @@ var transViewChange = function (view, old, owner, instance) {
 };
 
 var normalizeRgb = function (rgb) {
-  var color = rgb.match(getRegExp('\\d+', 'g'));
+  var color = rgb.match(getRegExp('[0-9]+%?', 'g'));
   if (!color || color.length < 3) return null;
-  return [+color[0], +color[1], +color[2]];
+  var percentReg = getRegExp('%$');
+  var r = percentReg.test(color[0]) ? parseFloat(color[0]) / 100 : +color[0];
+  var g = percentReg.test(color[1]) ? parseFloat(color[1]) / 100 : +color[1];
+  var b = percentReg.test(color[2]) ? parseFloat(color[2]) / 100 : +color[2];
+  var a = color[3] ? (percentReg.test(color[3]) ? parseFloat(color[3]) / 100 : +color[3]) : 1;
+
+  r = Math.min(255, r < 1 ? Math.round(r * 255) : r);
+  g = Math.min(255, g < 1 ? Math.round(g * 255) : g);
+  b = Math.min(255, b < 1 ? Math.round(b * 255) : b);
+
+  return [r, g, b, a];
 };
 
 var hexToRgb = function (hex) {
   hex = hex.replace(getRegExp('^#'), '');
+  var a = 1;
   // 如果是缩写形式，如 #03F
   if (hex.length === 3) {
-    hex = hex.replace(getRegExp('([a-f\\d])', 'gi'), '$1$1');
+    hex = hex.replace(getRegExp('([a-f0-9])', 'gi'), '$1$1');
+  }
+
+  if (hex.length === 8) {
+    hex = hex.slice(0, 6);
+    a = Math.round((parseInt(hex.slice(6, 8), 16) * 100) / 0xff) / 100;
   }
 
   const bigint = parseInt(hex, 16);
@@ -355,9 +372,16 @@ var hexToRgb = function (hex) {
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;
 
-  return [r, g, b];
+  return [r, g, b, a];
 };
 
+/**
+ * 容器 css 设置了 filter: invert(1) 取反，Color = 255 - Cr
+ * 文本使用了 mix-blend-mode: difference; 差值
+ * 所以，根据 blend difference 公式 Cr = (1 - ab) * Cs + ab * | Cb - Cs |
+ * 又背景色一致，只是透明度 ab 不同，所以 Cr = (1 - ab) * Cs，其中背景透明度常设 0.1
+ * 则需要设置主色调 Cs = (255 - Color) / (1 - ab) = (255 - Color) / 0.9
+ */
 var invertColor = function (color) {
   var r = Math.min(255, parseInt(((255 - color[0]) * 10) / 9));
   var g = Math.min(255, parseInt(((255 - color[1]) * 10) / 9));
@@ -366,7 +390,7 @@ var invertColor = function (color) {
 };
 
 var getStyle = function (style, key) {
-  var value = style.match(getRegExp('(?<=' + key + '\\s*:)[^;]+'));
+  var value = style.match(getRegExp('(?<=' + key + ' *:)([^;]+)'));
   if (!value || !value.length || !value[0]) return null;
   return value[0].replace(getRegExp('[\\r\\n]+', 'g'), '').trim();
 };
@@ -387,11 +411,9 @@ var styleChange = function (view, _, owner) {
     light = hexToRgb('#409EFF');
   }
 
-  var invert_light = invertColor(light);
-  styles['--wc-opo-color-light'] = 'rgba(' + light.join(',') + ')';
-  styles['--wc-opo-bg-light'] = 'rgba(' + light.slice(0, 3).join(',') + ',0.1' + ')';
-  styles['--wc-op-color-light'] = 'rgba(' + invert_light.join(',') + ')';
-  styles['--wc-op-bg-light'] = 'rgba(' + invert_light.slice(0, 3).join(',') + ',0.1' + ')';
+  light = invertColor(light);
+  styles['--wc-op-color-light'] = 'rgba(' + light.join(',') + ')';
+  styles['--wc-op-bg-light'] = 'rgba(' + light.slice(0, 3).join(',') + ',0.1' + ')';
 
   if (dark) {
     if (rgbReg.test(dark)) {
@@ -403,11 +425,9 @@ var styleChange = function (view, _, owner) {
     dark = hexToRgb('#409EFF');
   }
 
-  var invert_dark = invertColor(dark);
-  styles['--wc-opo-color-dark'] = 'rgba(' + dark.join(',') + ')';
-  styles['--wc-opo-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
-  styles['--wc-op-color-dark'] = 'rgba(' + invert_dark.join(',') + ')';
-  styles['--wc-op-bg-dark'] = 'rgba(' + invert_dark.slice(0, 3).join(',') + ',0.1' + ')';
+  dark = invertColor(dark);
+  styles['--wc-op-color-dark'] = 'rgba(' + dark.join(',') + ')';
+  styles['--wc-op-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
 
   var container = owner.selectComponent('.wc');
   if (container) {
