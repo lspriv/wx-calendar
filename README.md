@@ -416,10 +416,7 @@ type ScheduleEventDetail = {
     --wc-bg-light: #FFF; /* 主背景色 */
     --wc-title-color-light: #333; /* 左上角日期标题 */
     --wc-title-sub-color-light: #7A7A7A; /* 左上角日期标题的右侧描述 */
-    --wc-opt-bg-light: #D9ECFF; /* 视图控制背景色 */
-    --wc-opt-checked-bg-light: #409EFF; /* 视图控制按钮背景色 */
-    --wc-opt-color-light: #409EFF; /* 视图控制字体 */
-    --wc-opt-checked-color-light: #FFF; /* 视图控制选中字体 */
+    --wc-opt-color-light: #409EFF; /* 视图控制条主色 */
     --wc-week-color-light: #ABABAB; /* 星期 */
     --wc-date-color-light: #333; /* 日期 */
     --wc-mark-color-light: #ABABAB; /* 日期下方信息 */
@@ -450,10 +447,7 @@ type ScheduleEventDetail = {
     --wc-bg-dark: #000;
     --wc-title-color-dark: #E5E5E5;
     --wc-title-sub-color-dark: #7A7A7A;
-    --wc-opt-bg-dark: #332D2D80;
-    --wc-opt-checked-bg-dark: #409EFF;
     --wc-opt-color-dark: #409EFF;
-    --wc-opt-checked-color-dark: #FFF;
     --wc-week-color-dark: #ABABAB;
     --wc-date-color-dark: #E5E5E5;
     --wc-mark-color-dark: #5F5F5F;
