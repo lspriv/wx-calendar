@@ -76,10 +76,12 @@
 	transition-delay: $transition-delay;
 }
 
-@mixin theme-use($theme, $type) {
+@mixin theme-use($theme, $type, $excludes...) {
 	$keys: map.keys($theme);
 	@each $key in $keys {
-		#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		@if not list.index($excludes, $key) {
+			#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		}
 	}
 }
 

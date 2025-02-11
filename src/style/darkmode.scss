@@ -10,6 +10,6 @@
 
 @media (prefers-color-scheme: dark) {
 	.wcc.wcc--dm {
-  		@include theme-use($wc-theme-dark, 'dark');
+  		@include theme-use($wc-theme-dark, 'dark', op-bg, op-color);
 	}
 }
