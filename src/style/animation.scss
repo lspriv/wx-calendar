@@ -8,7 +8,7 @@
 @use 'mixin' as *;
 
 @mixin animation-pointer {
-	@include animation(pointer, ease, .28s) {
+	@include animation(pt, ease, .28s) {
 		0%,
 		100% {
 			transform: scale(1);
@@ -20,7 +20,7 @@
 }
 
 @mixin animation-fade {
-	@include animation(dotfade, ease, .28s, $fill-mode: both) {
+	@include animation(df, ease, .28s, $fill-mode: both) {
 		from {
 			opacity: 0;
 		}

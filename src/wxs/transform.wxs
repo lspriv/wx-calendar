@@ -424,20 +424,17 @@ var styleChange = function (view, _, owner) {
     styles['--wc-op-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
   }
 
+  owner.selectComponent('.wc').setStyle(styles);
+
   if (primary) {
     if (rgbReg.test(primary)) {
       primary = normalizeRgb(primary);
     } else {
       primary = hexToRgb(primary);
     }
-    styles['--wc-primary'] = 'rgba(' + primary.join(',') + ')';
-    styles['--wc-primary-2'] = 'rgba(' + primary.slice(0, 3).join(',') + ',0.8' + ')';
-    styles['--wc-primary-3'] = 'rgba(' + primary.slice(0, 3).join(',') + ',0.1' + ')';
-  }
-
-  var container = owner.selectComponent('.wc');
-  if (container) {
-    container.setStyle(styles);
+    owner.selectComponent('.wcc').setStyle({
+      '--wc-primary-2': 'rgba(' + primary.slice(0, 3).join(',') + ',0.1' + ')'
+    });
   }
 };
 

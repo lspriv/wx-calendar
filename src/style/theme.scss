@@ -42,8 +42,7 @@ $wc-calendar-pointer-size: 100rpx;
 
 $wc-theme-topic: (
 	primary: $wc-primary,
-	primary-2: rgba($color: $wc-primary, $alpha: 0.8),
-	primary-3: rgba($color: $wc-primary, $alpha: 0.1),
+	primary-2: rgba($color: $wc-primary, $alpha: 0.1),
 );
 
 $wc-theme-size: (
@@ -96,7 +95,7 @@ $wc-theme-light: (
 	mark-color: $wc-text-4, // 日期下方信息字体色
 	dot-color: $wc-text-4, // 日期上方‘･’的颜色
 	schedule-color: theme(primary), // 日程默认字体色
-	schedule-bg: theme(primary-3), // 日程默认背景色
+	schedule-bg: theme(primary-2), // 日程默认背景色
 	today-color: theme(primary), // 日期字体色（今日）
 	solar-color: theme(primary), // 日期下方信息字体色（节气，节假日）
 
@@ -130,8 +129,8 @@ $wc-theme-dark: (
 	date-color: $wc-text-5,
 	mark-color: #5F5F5F,
 	dot-color: $wc-text-4,
-	schedule-color: theme(primary-2),
-	schedule-bg: rgba($color: #332D2D, $alpha: 0.5),
+	schedule-color: theme(primary),
+	schedule-bg: theme(primary-2),
 	today-color: theme(primary),
 	solar-color: theme(primary),
 
