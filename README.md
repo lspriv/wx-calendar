@@ -412,6 +412,8 @@ type ScheduleEventDetail = {
 组件开启了样式隔离，仅可以调整字体大小和色号，可通过传入style属性修改以下css变量调整主题
 ```css
 .wcc {
+    --wc-primary: #409EFF; /* 主题色 */
+    
     /* 浅色主题 */
     --wc-bg-light: #FFF; /* 主背景色 */
     --wc-title-color-light: #333; /* 左上角日期标题 */

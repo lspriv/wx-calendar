@@ -85,6 +85,15 @@
 	}
 }
 
+@mixin theme-use-part($theme, $type, $includes) {
+	$keys: map.keys($theme);
+	@each $key in $keys {
+		@if list.index($includes, $key) {
+			#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		}
+	}
+}
+
 @mixin theme-values($theme, $type: null) {
 	$keys: map.keys($theme);
 	$suffix: string.unquote("");
