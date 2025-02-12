@@ -64,7 +64,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   properties: {
     darkmode: {
       type: Boolean,
-      value: true
+      value: false
     },
     date: {
       type: Number,

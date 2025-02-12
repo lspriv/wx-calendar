@@ -1,8 +1,6 @@
 @use 'theme' as *;
 @use 'mixin' as *;
 
-$themeTopicParts: checked-today-bg, schedule-color, schedule-bg, today-color, solar-color;
-
 .wcc {
   width: 100vw;
   @include theme-values($wc-theme-topic);
@@ -14,7 +12,6 @@ $themeTopicParts: checked-today-bg, schedule-color, schedule-bg, today-color, so
     .wc {
       --wc-op-bg: var(--wc-op-bg-dark);
       --wc-op-color: var(--wc-op-color-dark);
-      @include theme-use-part($wc-theme-dark, 'dark', $themeTopicParts);
     }
   }
 }
@@ -36,7 +33,6 @@ $fixed-view-sub: 20rpx;
   overflow: hidden;
   --wc-op-bg: var(--wc-op-bg-light);
   --wc-op-color: var(--wc-op-color-light);
-  @include theme-use-part($wc-theme-light, 'light', $themeTopicParts);
 }
 
 .wc-F {
