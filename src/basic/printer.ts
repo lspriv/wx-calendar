@@ -10,7 +10,7 @@ import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises, strToStyle } from '../utils/shared';
+import { Nullable, promises, strToStyle, getStyle } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset, warn } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
@@ -147,6 +147,8 @@ interface AnnualColors {
 
 type AnnualThemeColors = Record<'dark' | 'light', AnnualColors>;
 
+const PRIMARY_COLOR = '#409EFF';
+
 /** 深浅模式色号 */
 const PrinterTheme: AnnualThemeColors = {
   light: {
@@ -155,7 +157,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#333',
     rest: '#ABABAB',
     checked: '#FFF',
-    present: '#409EFF',
+    present: PRIMARY_COLOR,
     'checked-bg': '#F5F5F5'
   },
   dark: {
@@ -164,7 +166,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#D9D9D9',
     rest: '#484848',
     checked: '#D9D9D9',
-    present: '#409EFF',
+    present: PRIMARY_COLOR,
     'checked-bg': '#262626'
   }
 };
@@ -283,8 +285,11 @@ export class YearPrinter extends CalendarHandler {
   }
 
   private initializeColors() {
-    const styles = strToStyle(this._instance_.data.style || '');
+    const style = this._instance_.data.style || '';
+    const styles = strToStyle(style);
+    const primary = getStyle(style, '--wc-primary') || PRIMARY_COLOR;
     const { light, dark } = PrinterTheme;
+    light.present = dark.present = primary;
     const initColors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
     this._colors_ = Object.keys(styles).reduce((acc, key) => {
       const match = key.match(/^--wc-annual-cv-(.+)-(dark|light)/);

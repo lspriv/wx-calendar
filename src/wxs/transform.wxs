@@ -396,8 +396,9 @@ var getStyle = function (style, key) {
 };
 
 var styleChange = function (view, _, owner) {
-  var light = getStyle(view, '--wc-opt-color-light');
-  var dark = getStyle(view, '--wc-opt-color-dark');
+  var primary = getStyle(view, '--wc-primary');
+  var light = getStyle(view, '--wc-opt-color-light') || primary;
+  var dark = getStyle(view, '--wc-opt-color-dark') || primary;
   var rgbReg = getRegExp('^rgba?');
   var styles = {};
 
@@ -407,13 +408,10 @@ var styleChange = function (view, _, owner) {
     } else {
       light = hexToRgb(light);
     }
-  } else {
-    light = hexToRgb('#409EFF');
+    light = invertColor(light);
+    styles['--wc-op-color-light'] = 'rgba(' + light.join(',') + ')';
+    styles['--wc-op-bg-light'] = 'rgba(' + light.slice(0, 3).join(',') + ',0.1' + ')';
   }
-
-  light = invertColor(light);
-  styles['--wc-op-color-light'] = 'rgba(' + light.join(',') + ')';
-  styles['--wc-op-bg-light'] = 'rgba(' + light.slice(0, 3).join(',') + ',0.1' + ')';
 
   if (dark) {
     if (rgbReg.test(dark)) {
@@ -421,13 +419,21 @@ var styleChange = function (view, _, owner) {
     } else {
       dark = hexToRgb(dark);
     }
-  } else {
-    dark = hexToRgb('#409EFF');
+    dark = invertColor(dark);
+    styles['--wc-op-color-dark'] = 'rgba(' + dark.join(',') + ')';
+    styles['--wc-op-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
   }
 
-  dark = invertColor(dark);
-  styles['--wc-op-color-dark'] = 'rgba(' + dark.join(',') + ')';
-  styles['--wc-op-bg-dark'] = 'rgba(' + dark.slice(0, 3).join(',') + ',0.1' + ')';
+  if (primary) {
+    if (rgbReg.test(primary)) {
+      primary = normalizeRgb(primary);
+    } else {
+      primary = hexToRgb(primary);
+    }
+    styles['--wc-primary'] = 'rgba(' + primary.join(',') + ')';
+    styles['--wc-primary-2'] = 'rgba(' + primary.slice(0, 3).join(',') + ',0.8' + ')';
+    styles['--wc-primary-3'] = 'rgba(' + primary.slice(0, 3).join(',') + ',0.1' + ')';
+  }
 
   var container = owner.selectComponent('.wc');
   if (container) {

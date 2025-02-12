@@ -5,15 +5,13 @@
  * @Description: 基础样式，主题
  * @Author: lspriv
  */
+@use 'func' as *;
 
 /** css变量前缀 **/
 $wc-theme-prefix: --wc-;
 
-$wc-primary-1: #409EFF; 
-$wc-primary-2: #66B1FF; 
-$wc-primary-3: #8CC5FF;
-$wc-primary-4: #D9ECFF;
-$wc-primary-5: #EAEEF2;
+$wc-primary: #409EFF; 
+$wc-primary-invert: diffBlendingInvert($wc-primary); 
 
 $wc-text-1: #111;
 $wc-text-2: #333;
@@ -37,6 +35,16 @@ $wc-calendar-bar-height: 50rpx;
 $wc-calendar-panel-height: 600rpx;
 $wc-calendar-spare-height: 100rpx;
 $wc-calendar-pointer-size: 100rpx;
+
+@function theme ($theme-key) {
+	@return var(#{$wc-theme-prefix}#{$theme-key});
+}
+
+$wc-theme-topic: (
+	primary: $wc-primary,
+	primary-2: rgba($color: $wc-primary, $alpha: 0.8),
+	primary-3: rgba($color: $wc-primary, $alpha: 0.1),
+);
 
 $wc-theme-size: (
 	/** header **/
@@ -70,8 +78,8 @@ $wc-theme-light: (
 	/** header **/
 	title-color: $wc-text-2, // 左上角日期标题字体色
 	title-sub-color: $wc-text-3, // 左上角日期标题右侧描述信息字体色
-	op-bg: rgba($color: #d46c00, $alpha: 0.1), // 视图控制按钮背景色
-	op-color: #d46c00, // 视图控制主色
+	op-bg: rgba($color: $wc-primary-invert, $alpha: 0.1), // 视图控制按钮背景色
+	op-color: $wc-primary-invert, // 视图控制主色
 
 	/** week **/
 	week-color: $wc-text-4, // 星期字体色
@@ -82,15 +90,15 @@ $wc-theme-light: (
 	checked-dot-color: $wc-text-4, // 被选日期上方‘･’的颜色
 	checked-today-color: $wc-text-6, // 被选日期字体色（今日）
 	checked-bg: $wc-bg-3, // 被选择日期背景圆圈色
-	checked-today-bg: $wc-primary-1, // 被选择日期背景圆圈色（今日）
+	checked-today-bg: theme(primary), // 被选择日期背景圆圈色（今日）
 
 	date-color: $wc-text-2, // 日期字体色
 	mark-color: $wc-text-4, // 日期下方信息字体色
 	dot-color: $wc-text-4, // 日期上方‘･’的颜色
-	schedule-color: $wc-primary-1, // 日程默认字体色
-	schedule-bg: $wc-primary-5, // 日程默认背景色
-	today-color: $wc-primary-1, // 日期字体色（今日）
-	solar-color: $wc-primary-1, // 日期下方信息字体色（节气，节假日）
+	schedule-color: theme(primary), // 日程默认字体色
+	schedule-bg: theme(primary-3), // 日程默认背景色
+	today-color: theme(primary), // 日期字体色（今日）
+	solar-color: theme(primary), // 日期下方信息字体色（节气，节假日）
 
 	/** control bar **/
 	control-bg: $wc-bg-5, // 底部控制条背景色
@@ -107,8 +115,8 @@ $wc-theme-dark: (
 
 	title-color: $wc-text-5, 
 	title-sub-color: $wc-text-3,
-	op-bg: rgba($color: #d46c00, $alpha: 0.1), // 视图控制按钮背景色
-	op-color: #d46c00, // 视图控制主色
+	op-bg: rgba($color: $wc-primary-invert, $alpha: 0.1), // 视图控制按钮背景色
+	op-color: $wc-primary-invert, // 视图控制主色
 
 	week-color: $wc-text-4, 
 
@@ -117,15 +125,15 @@ $wc-theme-dark: (
 	checked-dot-color: $wc-text-4,
 	checked-today-color: $wc-text-5,
 	checked-bg: #262626, 
-	checked-today-bg: $wc-primary-1, 
+	checked-today-bg: theme(primary), 
 	
 	date-color: $wc-text-5,
 	mark-color: #5F5F5F,
 	dot-color: $wc-text-4,
-	schedule-color: $wc-primary-2,
+	schedule-color: theme(primary-2),
 	schedule-bg: rgba($color: #332D2D, $alpha: 0.5),
-	today-color: $wc-primary-1,
-	solar-color: $wc-primary-1,
+	today-color: theme(primary),
+	solar-color: theme(primary),
 
 	control-bg: #262626,
 
