@@ -178,7 +178,7 @@ type CalendarDay = {
         <td>darkmode</td>
         <td>boolean</td>
         <td>深色模式（跟随系统）</td>
-        <td>true</td>
+        <td>false</td>
     </tr>
     <tr>
         <td>date</td>
