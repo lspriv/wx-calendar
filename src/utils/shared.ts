@@ -21,6 +21,8 @@ export const isFunction = (val: unknown): val is Callable => typeof val === 'fun
 export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
 export const isPromise = <T = any>(val: unknown): val is Promise<T> =>
   isObject(val) && isFunction(val.then) && isFunction(val.catch);
+export const hasOwn = (val: object, key: string | symbol): key is keyof typeof val =>
+  Object.prototype.hasOwnProperty.call(val, key);
 
 export const nonNullable = <T>(val: T): val is NonNullable<T> => val != null;
 

@@ -10,7 +10,7 @@ import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises, strToStyle, getStyle } from '../utils/shared';
+import { Nullable, promises, getStyle, hasOwn } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset, warn } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
@@ -213,7 +213,7 @@ export class YearPrinter extends CalendarHandler {
 
   /** 字体 */
   private _font_: string;
-
+  private _style_: string;
   private _colors_: AnnualThemeColors;
 
   /** 处理系统深色模式的监听 */
@@ -284,28 +284,29 @@ export class YearPrinter extends CalendarHandler {
     this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
   }
 
-  private initializeColors() {
-    const style = this._instance_.data.style || '';
-    const styles = strToStyle(style);
+  public initializeColors() {
+    if (this._style_ === this._instance_.data.style) return;
+    const style = (this._style_ = this._instance_.data.style || '');
     const primary = getStyle(style, '--wc-primary') || PRIMARY_COLOR;
     const { light, dark } = PrinterTheme;
     light.present = dark.present = primary;
-    const initColors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
-    this._colors_ = Object.keys(styles).reduce((acc, key) => {
-      const match = key.match(/^--wc-annual-cv-(.+)-(dark|light)/);
-      if (match) {
-        const value = `${styles[key]}`;
+    const matches = style.match(/--wc-annual-cv-.*?-(?:dark|light):[^;]+;?/g);
+    const colors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
+    this._colors_ =
+      matches?.reduce((acc, key) => {
+        const match = key.match(/--wc-annual-cv-(.+)-(dark|light)\s*:\s*([^;]+);?/)!;
+        const [, name, theme, value] = match;
         if (/^var\(/.test(value)) {
-          warn(`年面板颜色样式不支持css变量：${key}: ${value};`);
+          warn(`年面板颜色样式不支持css变量：--wc-annual-cv-${name}-${theme}: ${value};`);
           return acc;
         }
-        const [, name, theme] = match;
         const _name = name.replace(/-color$/, '');
-        acc[theme] = acc[theme] || {};
-        acc[theme][_name] = value;
-      }
-      return acc;
-    }, initColors);
+        if (hasOwn(acc[theme], _name)) {
+          acc[theme] = acc[theme] || {};
+          acc[theme][_name] = value.trim();
+        }
+        return acc;
+      }, colors) || colors;
   }
 
   private initializeCanvas(id: string) {

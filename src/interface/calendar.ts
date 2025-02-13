@@ -157,8 +157,7 @@ export interface WcScheduleInfo {
 
 export const styleParse = (style: string | DateStyle | null) => {
   if (typeof style === 'string') {
-    const trimstr = style.trim();
-    if (!trimstr) return {};
+    if (!style.trim()) return {};
     return strToStyle(style);
   }
   return style;
