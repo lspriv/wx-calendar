@@ -427,14 +427,17 @@ var styleChange = function (view, _, owner) {
   owner.selectComponent('.wc').setStyle(styles);
 
   if (primary) {
-    if (rgbReg.test(primary)) {
-      primary = normalizeRgb(primary);
-    } else {
-      primary = hexToRgb(primary);
+    var primary2 = getStyle(view, '--wc-primary-2');
+    if (!primary2) {
+      if (rgbReg.test(primary)) {
+        primary = normalizeRgb(primary);
+      } else {
+        primary = hexToRgb(primary);
+      }
+      owner.selectComponent('.wcc').setStyle({
+        '--wc-primary-2': 'rgba(' + primary.slice(0, 3).join(',') + ',0.1' + ')'
+      });
     }
-    owner.selectComponent('.wcc').setStyle({
-      '--wc-primary-2': 'rgba(' + primary.slice(0, 3).join(',') + ',0.1' + ')'
-    });
   }
 };
 
