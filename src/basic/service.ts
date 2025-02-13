@@ -305,7 +305,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
 
   private initialize() {
     this.traversePlugins(plugin => {
-      (plugin.PLUGIN_ON_INITIALIZE || plugin.PLUGIN_INITIALIZE)?.(this);
+      (plugin.PLUGIN_ON_INITIALIZE || plugin.PLUGIN_INITIALIZE)?.call(plugin, this);
     });
   }
 
