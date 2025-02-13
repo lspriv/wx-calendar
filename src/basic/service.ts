@@ -8,7 +8,7 @@
  */
 import { nextTick, OnceEmitter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
-import { camelToSnake, notEmptyObject, compareSame } from '../utils/shared';
+import { camelToSnake, notEmptyObject, compareSame, hasOwn } from '../utils/shared';
 import {
   monthDiff,
   sameAnnualMarks,
@@ -185,7 +185,7 @@ export interface PluginConstructor {
 }
 
 export const isPluginConstructor = (constructor: unknown): constructor is PluginConstructor => {
-  return typeof constructor === 'function' && Object.prototype.hasOwnProperty.call(constructor, 'KEY');
+  return typeof constructor === 'function' && hasOwn(constructor, 'KEY');
 };
 
 interface TraverseCallback {
