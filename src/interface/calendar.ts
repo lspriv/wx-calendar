@@ -212,6 +212,7 @@ export const getScheduleDetail = (
   const parse = parseMarkKey(schedule.key);
   const plugin = parse?.plugin ? service.getPlugin(parse.plugin as typeof MARK_PLUGIN_KEY) : void 0;
   return {
+    date: { ...date },
     text: schedule.text,
     style: schedule.style,
     plugin: parse?.plugin,
