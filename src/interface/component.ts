@@ -241,6 +241,7 @@ export interface CalendarEventDetail {
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
+  date: CalendarDay;
   plugin?: string;
   info?: Nullable<WcScheduleInfo>;
 }
