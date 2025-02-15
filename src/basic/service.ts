@@ -8,7 +8,7 @@
  */
 import { nextTick, OnceEmitter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
-import { camelToSnake, notEmptyObject, compareSame } from '../utils/shared';
+import { camelToSnake, notEmptyObject, compareSame, hasOwn } from '../utils/shared';
 import {
   monthDiff,
   sameAnnualMarks,
@@ -68,7 +68,9 @@ export type TrackYearResult = {
 export interface EventIntercept {
   (signal?: number): never;
 }
-interface PluginInterception {
+
+// 不导出
+export interface PluginInterception {
   /**
    * 捕获日期点击动作
    * @param service PliginService实例
@@ -90,7 +92,13 @@ interface PluginInterception {
   PLUGIN_CATCH_MANUAL?(service: PluginService, date: CalendarDay, intercept: EventIntercept): void;
 }
 
-interface PluginEventHandler {
+// 不导出
+export interface PluginEventHandler {
+  /**
+   * PluginService实例初始化完成
+   * @param service PluginService实例
+   */
+  PLUGIN_ON_INITIALIZE?(service: PluginService): void;
   /**
    * 日历组件attache阶段
    * @param service PluginService实例
@@ -128,12 +136,8 @@ interface PluginEventHandler {
   PLUGIN_ON_DETACHED?(service: PluginService): void;
 }
 
-export interface Plugin extends PluginEventHandler, PluginInterception {
-  /**
-   * PluginService实例初始化完成
-   * @param service PluginService实例
-   */
-  PLUGIN_INITIALIZE?(service: PluginService): void;
+// 不导出
+export interface PluginTracker {
   /**
    * 捕获日期
    * @param date 日期
@@ -150,12 +154,22 @@ export interface Plugin extends PluginEventHandler, PluginInterception {
    * @param id plugin内部id
    */
   PLUGIN_TRACK_SCHEDULE?(date: CalendarDay, id?: string): Nullable<WcScheduleInfo>;
+}
+
+export interface Plugin extends PluginTracker, PluginEventHandler, PluginInterception {
+  /**
+   * 是否总是存在日期下方标记
+   * 这个属性对年面板和主面板在日期垂直位置的显示保持一致
+   */
+  PRINTER_ALWAYS_DATE_MARK?: boolean;
   /**
    * 对已提供的有效日期进行过滤
    * @param service PluginService实例
    * @param dates 日期数组
    */
   PLUGIN_DATES_FILTER?(service: PluginService, dates: Array<CalendarDay | DateRange>): Array<CalendarDay | DateRange>;
+  /** others */
+  [P: string | symbol]: any;
 }
 
 export interface PluginConstructor {
@@ -168,25 +182,22 @@ export interface PluginConstructor {
    * 插件版本
    */
   VERSION?: string;
-  /**
-   * 日历组件版本
-   */
-  REQUIRE_VERSION?: string;
-  /**
-   * 原型
-   */
-  readonly prototype: Plugin;
 }
+
+export const isPluginConstructor = (constructor: unknown): constructor is PluginConstructor => {
+  return typeof constructor === 'function' && hasOwn(constructor, 'KEY');
+};
 
 interface TraverseCallback {
   (plugin: Plugin, key: string): void;
 }
 
-type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
+// type ConstructorUse<T extends Array<PluginConstructor>> = T extends Array<infer R> ? R : never;
 
-export interface PluginUse<T extends Array<PluginConstructor> = Array<PluginConstructor>> {
-  construct: ConstructorUse<T>;
+export interface PluginUse<T extends PluginConstructor = any> {
+  construct: T;
   options?: Record<string, any>;
+  keys?: string[];
 }
 
 interface RegistPlugin {
@@ -271,6 +282,7 @@ class PluginInterceptError extends Error {
 export const intercept = (signal?: number): never => {
   throw new PluginInterceptError(void 0, signal);
 };
+
 export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> {
   /** 日历组件实例 */
   public component: CalendarInstance;
@@ -278,7 +290,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
   /** 插件队列 */
   private _plugins_: Array<RegistPlugin> = [];
 
-  constructor(component: CalendarInstance, services: Array<PluginUse<T>>) {
+  constructor(component: CalendarInstance, services: PluginUse[]) {
     this.component = component;
     this._plugins_ = (services || []).flatMap(service => {
       return service.construct.KEY
@@ -293,7 +305,7 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
 
   private initialize() {
     this.traversePlugins(plugin => {
-      plugin.PLUGIN_INITIALIZE?.(this);
+      (plugin.PLUGIN_ON_INITIALIZE || plugin.PLUGIN_INITIALIZE)?.call(plugin, this);
     });
   }
 
@@ -627,6 +639,15 @@ export class PluginService<T extends PluginConstructor[] = PluginConstructor[]> 
     for (let i = this._plugins_.length; i--; ) {
       const plugin = this._plugins_[i];
       callback(plugin.instance, plugin.key);
+    }
+  }
+
+  // 获取插件有效配置
+  public getConf<T>(key: string | symbol): T | undefined {
+    let i = this._plugins_.length;
+    while (i--) {
+      const plugin = this._plugins_[i].instance;
+      if (plugin[key] != null) return plugin[key];
     }
   }
 }

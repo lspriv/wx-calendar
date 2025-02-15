@@ -99,7 +99,7 @@ export type CalendarData = {
   /** 日历字体 */
   fonts: string;
   /** 暗黑模式 */
-  darkside: boolean;
+  dark: boolean;
   /** 属性 layout 的翻版 */
   areaHideCls: string;
 };
@@ -241,11 +241,12 @@ export interface CalendarEventDetail {
 }
 
 export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
+  date: CalendarDay;
   plugin?: string;
   info?: Nullable<WcScheduleInfo>;
 }
 
-export type CalendarCustomEvent<T> = WechatMiniprogram.CustomEvent<
+export type CalendarCustomEvent<T extends CalendarEventSimplified> = WechatMiniprogram.CustomEvent<
   T extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail
 >;
 

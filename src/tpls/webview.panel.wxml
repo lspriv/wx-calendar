@@ -57,7 +57,7 @@
           wx:for-item="week" 
           wx:for-index="wdx"
           wx:key="key"
-          class="wc__panel-week {{ panel.weeks.length > 5 && (wdx === panel.wdx + 1) ? 'wc__panel-week--next' : '' }}">
+          class="wc__panel-week wc-F wc-FB {{ panel.weeks.length > 5 && (wdx === panel.wdx + 1) ? 'wc__panel-week--next' : '' }}">
           <view 
             wx:for="{{ week.days }}" 
             wx:for-item="day" 
@@ -72,7 +72,7 @@
               {{ tool_wxs.isChecked(pointer, day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
             ">
-            <view class="wc__panel-day" style="{{ day.style }}" catch:tap="selDate">
+            <view class="wc__panel-day wc-F wc-FV" style="{{ day.style }}" catch:tap="selDate">
               <view 
                 class="wc__panel-solar" 
                 style="{{ day.solar ? day.solar.style : '' }}">{{ day.solar ? day.solar.text : day.day }}<view 

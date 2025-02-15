@@ -64,7 +64,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   properties: {
     darkmode: {
       type: Boolean,
-      value: true
+      value: false
     },
     date: {
       type: Number,
@@ -135,7 +135,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     annualOpacity: 0,
     annualDuration: 300,
     offsetChange: false,
-    darkside: true,
+    dark: true,
     areaHideCls: '',
     layout: null,
     pointer: null,
@@ -197,7 +197,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const isWeekView = this._view_ & View.week;
 
       const panels = isWeekView ? this._panel_.createWeekPanels(checked) : this._panel_.createMonthPanels(checked);
-      const _years = this._panel_.createYearPanels(checked);
+      const _years = this._panel_.createAnnualPanels(checked);
       const years: Array<WcYear> = _years.map(({ key, year, subinfo }) => ({ key, year, subinfo }));
       this._years_ = _years.map(({ year, months, marks }) => ({ year, months, marks }));
 
@@ -222,7 +222,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         gesture: this.data.viewGesture,
         info: getDateInfo(checked, this.data.weekstart, isWeekView),
         pointer: createPointer(),
-        darkside: this.data.darkmode && Layout.darkmode,
+        dark: this.data.darkmode && Layout.darkmode,
         areaHideCls
       };
 
@@ -504,10 +504,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     darkmode: function (darkmode: boolean) {
       if (!darkmode) Layout.theme = 'light';
       if (this._loaded_) {
-        const darkside = darkmode && Layout.darkmode;
-        if (darkside !== this.data.darkside) {
-          this.setData({ darkside });
-          if (darkside) this._printer_.bindThemeChange();
+        const dark = darkmode && Layout.darkmode;
+        if (dark !== this.data.dark) {
+          this.setData({ dark });
+          if (dark) this._printer_.bindThemeChange();
           else this._printer_.cancelThemeChange();
         }
       }

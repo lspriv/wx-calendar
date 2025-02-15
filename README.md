@@ -20,6 +20,8 @@
 
 [![pizCOOg.png](https://s11.ax1x.com/2024/01/06/pizCOOg.png)](https://imgse.com/i/pizCOOg)
 
+[![pEKJ3wD.png](https://s21.ax1x.com/2025/02/15/pEKJ3wD.png)](https://imgse.com/i/pEKJ3wD)
+
 
 
 ### 使用
@@ -59,6 +61,9 @@ WxCalendar.use(LunarPlugin);
 Page({
   handleLoad(detail) {
     console.log('calendar load', detail);
+    
+    const calendar = this.selectComponent('#calendar');
+    console.log('calendar', calendar);
   }
 })
 ```
@@ -82,7 +87,7 @@ Page({
 > 请在 bindload 事件后执行 selectComponent('#calendar') 操作。
 
 ### 二次开发
-alpha分支是我的工作分支也是进度最新的分支，issue/*分支是解决issue里提到的问题，develop分支相当SIT，发pr到master打tag，拉取哪个分支自行考量
+alpha分支是最新开发分支，develop是测试包分支，master是稳定包分支
 
 #### 启动
 ```bash
@@ -107,7 +112,7 @@ npm run package
 
 #### 测试
 
-测试尚未写完，等我抽空就写 :rofl:
+测试尚未写完
 
 ### 多端支持
 #### Donut
@@ -175,7 +180,7 @@ type CalendarDay = {
         <td>darkmode</td>
         <td>boolean</td>
         <td>深色模式（跟随系统）</td>
-        <td>true</td>
+        <td>false</td>
     </tr>
     <tr>
         <td>date</td>
@@ -409,14 +414,13 @@ type ScheduleEventDetail = {
 组件开启了样式隔离，仅可以调整字体大小和色号，可通过传入style属性修改以下css变量调整主题
 ```css
 .wcc {
+    --wc-primary: #409EFF; /* 主题色 */
+    
     /* 浅色主题 */
     --wc-bg-light: #FFF; /* 主背景色 */
     --wc-title-color-light: #333; /* 左上角日期标题 */
     --wc-title-sub-color-light: #7A7A7A; /* 左上角日期标题的右侧描述 */
-    --wc-opt-bg-light: #D9ECFF; /* 视图控制背景色 */
-    --wc-opt-checked-bg-light: #409EFF; /* 视图控制按钮背景色 */
-    --wc-opt-color-light: #409EFF; /* 视图控制字体 */
-    --wc-opt-checked-color-light: #FFF; /* 视图控制选中字体 */
+    --wc-opt-color-light: #409EFF; /* 视图控制条主色 */
     --wc-week-color-light: #ABABAB; /* 星期 */
     --wc-date-color-light: #333; /* 日期 */
     --wc-mark-color-light: #ABABAB; /* 日期下方信息 */
@@ -447,10 +451,7 @@ type ScheduleEventDetail = {
     --wc-bg-dark: #000;
     --wc-title-color-dark: #E5E5E5;
     --wc-title-sub-color-dark: #7A7A7A;
-    --wc-opt-bg-dark: #332D2D80;
-    --wc-opt-checked-bg-dark: #409EFF;
     --wc-opt-color-dark: #409EFF;
-    --wc-opt-checked-color-dark: #FFF;
     --wc-week-color-dark: #ABABAB;
     --wc-date-color-dark: #E5E5E5;
     --wc-mark-color-dark: #5F5F5F;
@@ -551,7 +552,7 @@ class MyPlugin implements Plugin {
    * 在日历组件 created 阶段最后，在插件实例化后
    * @param service PliginService实例
    */
-  PLUGIN_INITIALIZE(service: PluginService): void {
+  PLUGIN_ON_INITIALIZE(service: PluginService): void {
     // 获取日历组件实例
     const component = service.component;
   }
@@ -772,6 +773,34 @@ class MyPlugin implements Plugin {
   }
 }
 ```
+
+#### 使用装饰器声明上述钩子
+```typescript
+import { WcPlugin, Track, Catch, On, Filter } from '@lspriv/wx-calendar/lib';
+
+export const MY_PLUGIN_KEY = 'my-plugin';
+
+@WcPlugin(MY_PLUGIN_KEY) // 声明插件和KEY
+class MyPlugin {
+
+  @Track('date')
+  trackDate() {}
+
+  @Track('year')
+  trackYear() {}
+
+  @Catch('tap')
+  catchTap() {}
+
+  @On('load')
+  onLoad() {}
+
+  @Filter
+  datesFilter() {}
+}
+
+```
+
 
 #### 插件说明
 - `数据标记` 后引入的插件数据覆盖先引入的插件数据

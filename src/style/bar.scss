@@ -5,19 +5,14 @@
  * @Description: 面板底部控制条
  * @Author: lspriv
  */
-@use 'funcs' as *;
 @use 'mixin' as *;
 @use 'theme' as *;
 
-.wc__bar {
+.wc__b {
   width: 100%;
   height: $wc-calendar-bar-height;
   position: relative;
   z-index: 1024;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
   background: transparent;
   opacity: 1;
   transform: translateY(0);
@@ -29,39 +24,34 @@
     transform: translateY(100%);
     transition: unset;
   }
-  &-control {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    &-item {
-      width: 30rpx;
-      height: 40rpx;
-      overflow: hidden;
-      position: relative;
-      &-bar {
-        width: 60rpx;
-        height: 6rpx;
-        background: theme(control-bg);
-        position: absolute;
-        top: calc(50% - 8rpx);
-      }
-      &:first-child &-bar {
-        transform-origin: 0 50%;
-        border-radius: 4rpx 0 0 4rpx;
-        left: 0;
-      }
-      &:last-child &-bar {
-        transform-origin: 100% 50%;
-        border-radius: 0 4rpx 4rpx 0;
-        right: 0;
-      }
+  &ci {
+    width: 30rpx;
+    height: 40rpx;
+    overflow: hidden;
+    position: relative;
+    &b {
+      width: 60rpx;
+      height: 6rpx;
+      background: theme(control-bg);
+      position: absolute;
+      top: calc(50% - 8rpx);
+    }
+    &:first-child &b {
+      transform-origin: 0 50%;
+      border-radius: 4rpx 0 0 4rpx;
+      left: 0;
+    }
+    &:last-child &b {
+      transform-origin: 100% 50%;
+      border-radius: 0 4rpx 4rpx 0;
+      right: 0;
     }
   }
 }
 
 .wc {
   @include if(hide-dragbar) {
-    .wc__bar {
+    .wc__b {
       opacity: 0 !important;
       height: 20rpx !important;
       padding: 0 !important;

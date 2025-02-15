@@ -5,17 +5,12 @@
  * @Description: 头部
  * @Author: lspriv
  */
-@use 'funcs' as *;
 @use 'mixin' as *;
 @use 'theme' as *;
  
 .wc__header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   height: $wc-calendar-header-height;
   padding: 20rpx 40rpx 0;
-  align-items: center;
   position: relative;
   z-index: 1024;
   background: transparent;
@@ -55,11 +50,7 @@
   }
 }
 
-.wc__operators {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
+.wc__header-ops {
   transition: all .28s ease 0s;
   opacity: 1;
   overflow: hidden;
@@ -68,109 +59,98 @@
   --wc-operator-inner-side: calc(var(--wc-operator-side) - var(--wc-operator-padding) * 2);
 }
 
-.wc__operator {
-  width: calc(var(--wc-operator-side) * 2);
-  height: var(--wc-operator-side);
-  margin-left: 16rpx;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: calc(var(--wc-operator-side) / 2);
-  background-color: theme(opt-bg);
-  overflow: hidden;
+.wc__header-op {
   position: relative;
-  @include if(today) {
-    width: var(--wc-operator-side);
+  width: var(--wc-operator-side);
+  height: var(--wc-operator-side);
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: theme(op-bg);
+  background-image: radial-gradient(circle at center, theme(op-color) 0%, theme(op-color) 50.5%, transparent 51.5%);
+  background-repeat: no-repeat;
+  background-size: var(--wc-operator-side) var(--wc-operator-side);
+  background-position: 0 0;
+  transform: translateZ(0);
+  filter: invert(1);
+  &::before, 
+  &::after {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: center;
-    transition: all .28s ease 0s;
+    width: var(--wc-operator-side);
+    height: var(--wc-operator-side);
+    color: theme(op-color);
+    font-size: theme(operator-size);
+    line-height: 1;
+    font-weight: bold;
+    mix-blend-mode: difference;
+  }
+  @include if (today) {
     opacity: 0;
-    overflow: hidden;
     border-radius: 50%;
     transform: scale(.3) translateZ(0px);
+    transition: all .28s ease 0s;
     &::before {
       content: "今";
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      width: var(--wc-operator-inner-side);
-      height: var(--wc-operator-inner-side);
-      color: theme(opt-checked-color);
-      background: theme(opt-checked-bg);
-      font-size: theme(operator-size);
-      border-radius: 50%;
-      line-height: 1;
-      font-weight: bold;
+    }
+    &::after {
+      display: none;
     }
   }
-  @include if(today, show) {
-    opacity: 1;
-    transform: scale(1) translateZ(0px);
-  }
-  @include if(views) {
-    color: theme(opt-color);
-    transform-origin: 100% 50%;
+  @include if (views) {
+    width: calc(var(--wc-operator-side) * 2);
+    border-radius: calc(var(--wc-operator-side) / 2);
+    justify-content: space-between;
+    margin-left: 16rpx;
     transition: all .28s ease;
-    &::before, &::after {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      width: var(--wc-operator-side);
-      height: var(--wc-operator-side);
-      color: inherit;
-      font-size: theme(operator-size);
-      line-height: 1;
-      font-weight: bold;
-      position: relative;
-      z-index: 1;
-    }
     &::before {
       content: "月";
     }
     &::after {
       content: "周";
     }
-    .wc__operator-view {
+  }
+  @include if(today, show) {
+    opacity: 1;
+    transform: scale(1) translateZ(0px);
+  }
+
+  .wc__header-op-view {
+    width: var(--wc-operator-side);
+    height: var(--wc-operator-inner-side);
+    position: absolute;
+    top: var(--wc-operator-padding);
+    left: var(--wc-operator-side);
+    z-index: 100;
+    border-radius: calc(var(--wc-operator-inner-side) / 2);
+    overflow: hidden;
+    &-text {
       width: var(--wc-operator-side);
       height: var(--wc-operator-inner-side);
       position: absolute;
-      top: var(--wc-operator-padding);
-      left: var(--wc-operator-side);
-      z-index: 1024;
-      border-radius: calc(var(--wc-operator-inner-side) / 2);
-      overflow: hidden;
-      &-text {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        width: var(--wc-operator-side);
-        height: var(--wc-operator-inner-side);
-        position: absolute;
-        top: 0;
-        color: theme(opt-checked-color);
-        font-size: theme(operator-size);
-        line-height: 1;
-        font-weight: bold;
+      top: 0;
+      color: theme(bg);
+      filter: invert(1);
+      font-size: theme(operator-size);
+      line-height: 1;
+      font-weight: bold;
+    }
+    &:first-child {
+      transform: translateX(-100%);
+      .wc__header-op-view-text {
+        right: 0;
       }
-      &:first-child {
-        transform: translateX(-100%);
-        .wc__operator-view-text {
-          right: 0;
-        }
-      }
-      &:last-child {
-        .wc__operator-view-text {
-          left: 0;
-        }
+    }
+    &:last-child {
+      .wc__header-op-view-text {
+        left: 0;
       }
     }
   }
 }
 
-.wx__views-bar {
+.wc__views-bar {
   position: absolute;
   width: var(--wc-operator-inner-side);
   height: var(--wc-operator-inner-side);
@@ -178,16 +158,8 @@
   left: var(--wc-operator-padding);
   border-radius: 50%;
   transform: translateX(0) translateZ(0px);
-  background: theme(opt-checked-bg);
+  background: theme(op-color);
   z-index: 10;
-}
-
-.wcc--webview {
-  .wc__operator--views {
-    .wc__operator-view, .wx__views-bar {
-      transition: all .28s ease;
-    }
-  }
 }
 
 .wc {
@@ -209,14 +181,48 @@
     
   }
   @include or(hide-today, hide-header) {
-    .wc__operator--today {
+    .wc__header-op--today {
       display: none !important;
     }
     
   }
   @include or(hide-viewbar, hide-header) {
-    .wc__operator--views {
+    .wc__header-op--views {
       display: none !important;
+    }
+  }
+}
+
+.wcc--skyline {
+  .wc__header-op {
+    background-image: unset;
+  }
+  .wc__header-op--today {
+    &::before {
+      content: "";
+      width: var(--wc-operator-inner-side);
+      height: var(--wc-operator-inner-side);
+      background-color: theme(op-color);
+      border-radius: 50%;
+    }
+    &::after {
+      content: "今";
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: theme(bg);
+      filter: invert(1);
+    }
+  }
+  .wc__header-op--views {
+    transform-origin: 100% 50%;
+    transition: all .28s ease;
+    &::before,
+    &::after {
+      color: theme(op-color);
+      position: relative;
+      z-index: 1;
     }
   }
 }

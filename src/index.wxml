@@ -6,8 +6,8 @@
 <wxs src="./wxs/tool.wxs" module="tool_wxs" />
 <wxs src="./wxs/transform.wxs" module="trans_wxs" />
 <view 
-  class="wcc wcc--{{ renderer }} {{ darkside ? 'wcc--darkmode' : '' }} i-class"
-  style="--wc-menu-top: {{ layout.menuTop }}px;--wc-menu-bottom: {{ layout.menuBottom }}px;--wc-annual-bottom-height: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
+  class="wcc wcc--{{ renderer }} {{ dark ? 'wcc--dm' : '' }} i-class"
+  style="--wc-mt: {{ layout.menuTop }}px;--wc-mb: {{ layout.menuBottom }}px;--wc-abh: {{ layout.safeBottom }}px;font-family: {{ fonts }};{{ style }}">
   <view 
     id="calendar"
     mark:main="{{ layout.mainHeight }}"
@@ -29,7 +29,7 @@
     <!-- Calendar Header Start -->
 
     <!-- Calendar Week Start -->
-    <view class="wc__week">
+    <view class="wc__week wc-F wc-FB">
       <view class="wc__week-item" wx:for="{{ weeks }}" wx:key="key">{{ item.label }}</view>
     </view>
     <!-- Calendar Week End -->

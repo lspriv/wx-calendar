@@ -10,7 +10,7 @@ import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises, strToStyle } from '../utils/shared';
+import { Nullable, promises, getStyle, hasOwn } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset, warn } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
@@ -147,6 +147,8 @@ interface AnnualColors {
 
 type AnnualThemeColors = Record<'dark' | 'light', AnnualColors>;
 
+const PRIMARY_COLOR = '#409EFF';
+
 /** 深浅模式色号 */
 const PrinterTheme: AnnualThemeColors = {
   light: {
@@ -155,7 +157,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#333',
     rest: '#ABABAB',
     checked: '#FFF',
-    present: '#409EFF',
+    present: PRIMARY_COLOR,
     'checked-bg': '#F5F5F5'
   },
   dark: {
@@ -164,7 +166,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#D9D9D9',
     rest: '#484848',
     checked: '#D9D9D9',
-    present: '#409EFF',
+    present: PRIMARY_COLOR,
     'checked-bg': '#262626'
   }
 };
@@ -211,7 +213,7 @@ export class YearPrinter extends CalendarHandler {
 
   /** 字体 */
   private _font_: string;
-
+  private _style_: string;
   private _colors_: AnnualThemeColors;
 
   /** 处理系统深色模式的监听 */
@@ -220,16 +222,18 @@ export class YearPrinter extends CalendarHandler {
   public renderCheckedBg: boolean = true;
 
   public async initialize() {
-    const { fonts, weekstart, darkside } = this._instance_.data;
+    const { fonts, weekstart, dark } = this._instance_.data;
     this._font_ = fonts;
     this._weeks_ = sortWeeks(weekstart);
-    if (darkside) this.bindThemeChange();
+    if (dark) this.bindThemeChange();
     this.initializeSize();
     this.initializeColors();
     return this.initializeRender();
   }
 
   private initializeSize() {
+    const instance = this._instance_;
+
     const titleSizeMin = Layout.rpxToPx(40);
     const titleSizeMax = Layout.rpxToPx(60);
     this._title_size_ = createState(titleSizeMax, titleSizeMin);
@@ -263,39 +267,46 @@ export class YearPrinter extends CalendarHandler {
     const markHeightMax = Layout.rpxToPx(8);
     this._mark_height_ = createState(markHeightMax, markHeightMin);
 
+    const PRINTER_ALWAYS_DATE_MARK = instance._calendar_.service.getConf<boolean>('PRINTER_ALWAYS_DATE_MARK');
+    const markOffset = PRINTER_ALWAYS_DATE_MARK ? 24 : 0;
+
     this._title_height_ = Layout.rpxToPx(100);
     this._title_padding_y_ = Layout.rpxToPx(20);
     this._week_height_ = Layout.rpxToPx(50);
-    this._date_height_ = Layout.rpxToPx(100 - 24);
+    this._date_height_ = Layout.rpxToPx(100 - markOffset);
     this._checked_radius_max_ = Layout.rpxToPx(50);
-    this._checked_offset_max_ = Layout.rpxToPx(12);
+    this._checked_offset_max_ = Layout.rpxToPx(markOffset / 2);
 
-    if (!this._instance_.data.customNavBar) {
+    if (!instance.data.customNavBar) {
       this._header_offset_ = Layout.layout!.menuBottom - this._title_height_;
     }
-    const hasHeader = hasLayoutArea(this._instance_.data.areaHideCls, 'header');
+    const hasHeader = hasLayoutArea(instance.data.areaHideCls, 'header');
     this._header_offset_ -= hasHeader ? 0 : Layout.rpxToPx(80);
   }
 
-  private initializeColors() {
-    const styles = strToStyle(this._instance_.data.style || '');
+  public initializeColors() {
+    if (this._style_ === this._instance_.data.style) return;
+    const style = (this._style_ = this._instance_.data.style || '');
+    const primary = getStyle(style, '--wc-primary') || PRIMARY_COLOR;
     const { light, dark } = PrinterTheme;
-    const initColors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
-    this._colors_ = Object.keys(styles).reduce((acc, key) => {
-      const match = key.match(/^--wc-annual-cv-(.+)-(dark|light)/);
-      if (match) {
-        const value = `${styles[key]}`;
+    light.present = dark.present = primary;
+    const matches = style.match(/--wc-annual-cv-.*?-(?:dark|light):[^;]+;?/g);
+    const colors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
+    this._colors_ =
+      matches?.reduce((acc, key) => {
+        const match = key.match(/--wc-annual-cv-(.+)-(dark|light)\s*:\s*([^;]+);?/)!;
+        const [, name, theme, value] = match;
         if (/^var\(/.test(value)) {
-          warn(`年面板颜色样式不支持css变量：${key}: ${value};`);
+          warn(`年面板颜色样式不支持css变量：--wc-annual-cv-${name}-${theme}: ${value};`);
           return acc;
         }
-        const [, name, theme] = match;
         const _name = name.replace(/-color$/, '');
-        acc[theme] = acc[theme] || {};
-        acc[theme][_name] = value;
-      }
-      return acc;
-    }, initColors);
+        if (hasOwn(acc[theme], _name)) {
+          acc[theme] = acc[theme] || {};
+          acc[theme][_name] = value.trim();
+        }
+        return acc;
+      }, colors) || colors;
   }
 
   private initializeCanvas(id: string) {
@@ -391,8 +402,8 @@ export class YearPrinter extends CalendarHandler {
     const titleHeightTo = isMax ? row! * 2 : this._title_height_;
     const titleHeight = iframe(titleHeightFr, titleHeightTo, frame);
 
-    const titleYMax = this._title_height_ / 2 + this._title_padding_y_ / 2 + this._title_size_.max / 2;
-    const titleYMin = row + row / 2 + this._week_size_.min / 2;
+    const titleYMax = (this._title_height_ + this._title_padding_y_ + this._title_size_.max) / 2;
+    const titleYMin = row + (row + this._week_size_.min) / 2;
 
     /** 月标题字体垂直偏移 */
     const titleOffsetYFr = isMax ? titleYMax : titleYMin;

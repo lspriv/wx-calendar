@@ -5,27 +5,27 @@
  -->
 <wxs src="../wxs/transform.wxs" module="trans_wxs" />
 <view 
-  class="wc__annual {{ !customNavBar ? 'wc__annual--non-custom' : '' }}" 
+  class="wc__a {{ !customNavBar ? 'wc__a--non-custom' : '' }}" 
   style="top: {{ annualTop }};opacity: {{ annualOpacity }};"
-  change:opacity="{{ trans_wxs.updateAnuualCls }}" opacity="{{ annualOpacity }}"
+  change:opacity="{{ trans_wxs.updateAnnualCls }}" opacity="{{ annualOpacity }}"
   catch:touchmove>
-  <view class="wc__annual-header">
-    <view class="wc__annual-header-title">{{ years[annualCurr].year }}年</view>
-    <view class="wc__annual-header-tips">
+  <view class="wc__ah wc-F wc-JS">
+    <view class="wc__aht">{{ years[annualCurr].year }}年</view>
+    <view class="wc__ahtp">
       <view 
         wx:for="{{ years[annualCurr].subinfo }}"
         wx:for-item="sub" 
         wx:key="key"
-        class="wc__annual-header-tip" 
-        style="--annual-tip-color: {{ sub.color }};">{{ sub.text }}</view>
+        class="wc__ahti" 
+        style="--atc: {{ sub.color }};">{{ sub.text }}</view>
     </view>
   </view>
-  <view class="wc__annual-panel-container">
+  <view class="wc__apc">
     <swiper 
       circular 
       duration="{{ annualDuration }}" 
       current="{{ annualCurr }}" 
-      class="wc__annual-panel-swiper"
+      class="wc__aps"
       data-type="annual"
       bind:transition="swiperTrans"
       bind:animationfinish="swiperTransEnd">
@@ -35,12 +35,12 @@
         wx:for-index="ydx"
         wx:key="key"
         skip-hidden-item-layout>
-        <view class="wc__annual-panel">
+        <view class="wc__ap">
           <canvas 
             id="printer_{{ ydx }}" 
             type="2d" 
             data-ydx="{{ ydx }}" 
-            class="wc__annual-panel-canvas" 
+            class="wc__apcs" 
             catch:tap="selMonth" />
         </view>
       </swiper-item>

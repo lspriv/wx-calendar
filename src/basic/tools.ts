@@ -56,17 +56,18 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
 
 export type CalendarView = (typeof VIEWS)[keyof typeof VIEWS];
 
-export const viewFlag = (view: string, defaultView = VIEWS.MONTH): View => {
-  const inputView = view.match(/^(\w+)(?:-fixed)?$/)?.[1] || defaultView;
-  return Math.max(0, 1 << values(VIEWS).indexOf(inputView as CalendarView));
+export const viewFlag = (view: string): View => {
+  const inputView = view || VIEWS.MONTH;
+  const idx = values(VIEWS).indexOf(inputView as CalendarView);
+  return idx < 0 ? View.month : 1 << idx;
 };
 
 export const isView = (view: unknown): view is View =>
   view === View.week || view === View.month || view === View.schedule;
 
-export const flagView = (flag: number) => values(VIEWS)[Math.log2(flag)];
+export const flagView = (flag: View) => values(VIEWS)[Math.log2(flag)];
 
-export const middle = (count: number) => Math.floor((count - 1) / 2);
+export const middle = (count: number) => count >> 1;
 
 export const isSkyline = (renderer?: string): renderer is 'skyline' => renderer === 'skyline';
 
@@ -78,13 +79,18 @@ export const circularDiff = (idx: number, curr: number): number => {
 };
 
 export const InitPanels = <T>(prefix: string, mixin: Record<string, any> = {}) =>
-  Array.from({ length: CALENDAR_PANELS }, (_, i) => ({ key: `${prefix}_${i}`, ...mixin }) as T);
+  Array.from<undefined, T>({ length: CALENDAR_PANELS }, (_, i) => ({ key: `${prefix}_${i}`, ...mixin }) as T);
 
 export const InitWeeks = (weeks: string = WEEKS, prefix: string = 'w') =>
-  Array.from<unknown, CalendarWeek>({ length: weeks.length }, (_, i) => ({
+  Array.from<undefined, CalendarWeek>({ length: weeks.length }, (_, i) => ({
     key: `${prefix}_${i}`,
     label: weeks[i]
   }));
+
+export const easingOpt = (
+  duration: number,
+  easing: (...args: any[]) => any = wx.worklet.Easing.out(wx.worklet.Easing.sin)
+): WechatMiniprogram.TimingOption => ({ duration, easing });
 
 export const nextTick = <
   T extends Voidable<(...args: any[]) => any> = undefined,
@@ -100,11 +106,8 @@ export const nextTick = <
 };
 
 export const severalTicks = async (times: number) => {
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (!times) break;
+  while (times--) {
     await nextTick();
-    times--;
   }
 };
 
@@ -182,9 +185,8 @@ export const onceEmitter = (instance: ComponentInstance, event: string): OnceEmi
   let emits = 0;
   return {
     emit: function (...detail: any[]) {
-      if (emits) return;
+      if (emits++) return;
       instance.triggerEvent(event, ...detail);
-      emits++;
     },
     cancel: function () {
       emits++;

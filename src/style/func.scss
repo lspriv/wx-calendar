@@ -1,0 +1,16 @@
+@use 'sass:math';
+@use 'sass:color';
+
+@function diffBlendingInvert($color) {
+    $scale: calc(10 / 9 - 1);
+    $invert: color.invert($color, $space: rgb);
+    $red: color.channel($invert, 'red', $space: rgb);
+    $green: color.channel($invert, 'green', $space: rgb);
+    $blue: color.channel($invert, 'blue', $space: rgb);
+
+    $deltaRed: math.round(calc($red * $scale));
+    $deltaGreen: math.round(calc($green * $scale));
+    $deltaBlue: math.round(calc($blue * $scale));
+
+    @return color.adjust($invert, $red: $deltaRed, $green: $deltaGreen, $blue: $deltaBlue);
+}

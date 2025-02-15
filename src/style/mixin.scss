@@ -17,13 +17,6 @@
 	width: calc(100% / #{$columms});
 }
 
-@mixin column-rect {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-}
-
 @mixin month-week-rows ($length) {
 	height: calc(100% / #{$length});
 }
@@ -83,10 +76,21 @@
 	transition-delay: $transition-delay;
 }
 
-@mixin theme-use($theme, $type) {
+@mixin theme-use($theme, $type, $excludes...) {
 	$keys: map.keys($theme);
 	@each $key in $keys {
-		#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		@if not list.index($excludes, $key) {
+			#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		}
+	}
+}
+
+@mixin theme-use-part($theme, $type, $includes) {
+	$keys: map.keys($theme);
+	@each $key in $keys {
+		@if list.index($includes, $key) {
+			#{$wc-theme-prefix}#{$key}: var(#{$wc-theme-prefix}#{$key}-#{$type});
+		}
 	}
 }
 

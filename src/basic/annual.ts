@@ -153,7 +153,9 @@ export class AnnualPanelSwitch extends CalendarHandler {
        * _panel_.toYear方法中setData后触发视图更新
        * 虽然没有接口获取视图层更新的时机，可以等待几个时间片后执行动画
        */
-      await severalTicks(10);
+      await severalTicks(60);
+
+      instance._printer_.initializeColors();
 
       /** 执行年度面板打开动画 */
       await instance._printer_.open(mon, rect, () => {
@@ -169,7 +171,7 @@ export class AnnualPanelSwitch extends CalendarHandler {
       /** 日历跳转到指定月 */
       await instance._panel_.toAnnualMonth(mon, !(instance._view_ & View.week));
       /** 等待视图更新 */
-      await severalTicks(10);
+      await severalTicks(60);
       /** 执行年度面板关闭动画 */
       await instance._printer_.close(mon);
       /** 设置年度面板为隐藏 */
