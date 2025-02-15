@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.8.4](https://github.com/lspriv/wx-calendar/compare/v1.8.3...v1.8.4) (2025-02-15)
+
+
+### Bug Fixes
+
+* 优化代码 ([c4b7441](https://github.com/lspriv/wx-calendar/commit/c4b7441a67fdfdabda3827181037aa03ec70d9a0))
+* 优化右上控制条 ([c34c7a5](https://github.com/lspriv/wx-calendar/commit/c34c7a5cf8aa7eb30d3e2c1443c96e008623bf58))
+* 优化年面板开闭 ([ca792e4](https://github.com/lspriv/wx-calendar/commit/ca792e41222c5fd6814f776e6f4a4ef8dd1d7677))
+* 修复PLUGIN_ON_INITIALIZE钩子bug ([5eb0360](https://github.com/lspriv/wx-calendar/commit/5eb0360e8b261f6a07a7fdc79b26554a468a65d1))
+* 添加主题色 ([10bce1c](https://github.com/lspriv/wx-calendar/commit/10bce1c4afe87f3c43a0801e3b78a4c1975202cc))
+* 补充插件装饰器 ([7ad446f](https://github.com/lspriv/wx-calendar/commit/7ad446fa573ab0fbbf39e5f24f5747c79f90b228))
+* 补充日程点击事件日期信息 ([ccbe090](https://github.com/lspriv/wx-calendar/commit/ccbe090a1b1bb11c92dfa79aede0822225672446))
+* 调整 ([92a3ff1](https://github.com/lspriv/wx-calendar/commit/92a3ff1d17fc62b2be7daa9b000fdb7c24e6454a))
+* 调整panel方法 ([49b7a66](https://github.com/lspriv/wx-calendar/commit/49b7a668bbe5d2a9f7bd18568b21e50e29760406))
+* 调整主题色bug ([e76c5ec](https://github.com/lspriv/wx-calendar/commit/e76c5ecefa6ea4186a3eb8658942d24db75ed8d9))
+* 调整主题色配置 ([37e1824](https://github.com/lspriv/wx-calendar/commit/37e1824cbe679c846f39c655de6ac8187a21b779))
+* 调整年面板主题 ([c24dfa7](https://github.com/lspriv/wx-calendar/commit/c24dfa7a1829650a2f78de1cdf551c29bb02fa32))
+* 调整年面板日期偏移 ([5391541](https://github.com/lspriv/wx-calendar/commit/5391541ab7a574d1df78a152f35f3d8fba0b1120))
+
 ## [1.8.3](https://github.com/lspriv/wx-calendar/compare/v1.8.2...v1.8.3) (2025-01-24)
 
 
