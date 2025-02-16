@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 插件服务
  * @Author: lspriv
- * @LastEditTime: 2025-01-12 16:07:34
+ * @LastEditTime: 2025-02-16 13:34:32
  */
 import { nextTick, OnceEmitter } from './tools';
 import { CALENDAR_PANELS, GREGORIAN_MONTH_DAYS, MS_ONE_DAY } from './constants';
@@ -110,30 +110,35 @@ export interface PluginEventHandler {
    * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
+  PLUGIN_ON_LOAD?(service: PluginService, detail: CalendarEventDetail<'load'>, emiter: OnceEmitter): void;
   /**
    * 日期点击触发
    * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
+  PLUGIN_ON_CLICK?(service: PluginService, detail: CalendarEventDetail<'click'>, emiter: OnceEmitter): void;
   /**
    * 日期变化触发
    * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
+  PLUGIN_ON_CHANGE?(service: PluginService, detail: CalendarEventDetail<'change'>, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
    * @param service PluginService实例
    * @param detail 事件详情数据
    */
-  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail, emiter: OnceEmitter): void;
+  PLUGIN_ON_VIEWCHANGE?(service: PluginService, detail: CalendarEventDetail<'viewchange'>, emiter: OnceEmitter): void;
   /**
    * 视图变化触发
    * @param service PluginService实例
    */
   PLUGIN_ON_DETACHED?(service: PluginService): void;
+  /**
+   * 主题色变化触发
+   * @param service PluginService实例
+   */
+  PLUGIN_ON_THEMECHANGE?(service: PluginService): void;
 }
 
 // 不导出

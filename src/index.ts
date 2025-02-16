@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: wx-calendar组件
  * @Author: lspriv
- * @LastEditTime: 2024-12-01 19:14:53
+ * @LastEditTime: 2025-02-16 13:51:54
  */
 
 import {
@@ -37,7 +37,7 @@ import {
   onceEmitter,
   layoutHideCls
 } from './basic/tools';
-import { promises, omit } from './utils/shared';
+import { promises, omit, getStyle } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
 import type { WcYear, CalendarMark, CalendarStyleMark } from './interface/calendar';
@@ -50,7 +50,7 @@ import type {
   CalendarPanel,
   CalendarExport,
   CalendarEventDetail,
-  ScheduleEventDetail
+  EventSchedule
 } from './interface/component';
 
 const initCurrent = middle(CALENDAR_PANELS);
@@ -174,6 +174,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
        * 实例化拖拽控制器
        */
       isSkyline(this.renderer) && (this._dragger_ = new Dragger(this));
+      /**
+       * 初始化主题色
+       */
+      this._theme_ = $_THEME_COLOR;
       /**
        * 实例化WxCalendar处理数据和插件
        */
@@ -424,9 +428,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       return this._annual_.switch(false, mon);
     },
     trigger(event, detail, dispatchPlugin = true) {
-      detail = detail || <CalendarEventDetail>{};
-      detail.checked = detail.checked || this.data.checked!;
-      detail.view = detail.view || this.data.currView;
+      const eventDetail = { ...detail } as CalendarEventDetail<typeof event>;
+      eventDetail.checked = eventDetail.checked || this.data.checked!;
+      eventDetail.view = eventDetail.view || this.data.currView;
 
       if (event === 'change' || event === 'load') {
         const panels = this.data.panels;
@@ -438,15 +442,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         const lastWeeks = panels[last].weeks;
         const lastDays = lastWeeks.slice(-1)[0].days;
         const [{ year: ey, month: em, day: ed }] = lastDays.slice(-1);
-        detail.range = [
+        (eventDetail as CalendarEventDetail<'load' | 'change'>).range = [
           { year: sy, month: sm, day: sd },
           { year: ey, month: em, day: ed }
         ];
       }
 
       const emitter = onceEmitter(this, event);
-      dispatchPlugin && this._calendar_.service.dispatchEvent(event, detail, emitter);
-      emitter.emit(detail);
+      dispatchPlugin && this._calendar_.service.dispatchEvent(event, eventDetail, emitter);
+      emitter.emit(eventDetail);
     },
     selSchedule(e) {
       const { wdx, ddx } = e.mark!;
@@ -454,7 +458,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const panel = this.data.panels[this.data.current];
       const date = panel.weeks[wdx].days[ddx];
       if (all) {
-        const schedules: Array<ScheduleEventDetail> = date.schedules.map(schedule =>
+        const schedules: Array<EventSchedule> = date.schedules.map(schedule =>
           getScheduleDetail(date, schedule, this._calendar_.service)
         );
         this.triggerEvent('schedule', { schedules, all: true });
@@ -509,6 +513,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
           this.setData({ dark });
           if (dark) this._printer_.bindThemeChange();
           else this._printer_.cancelThemeChange();
+        }
+      }
+    },
+    style: function (style: string) {
+      if (this._loaded_) {
+        const theme = getStyle(style, $_THEME_KEY);
+        if (theme !== this._theme_) {
+          this._theme_ = theme || $_THEME_COLOR;
+          this.trigger('themechange', { theme: this._theme_ });
         }
       }
     }

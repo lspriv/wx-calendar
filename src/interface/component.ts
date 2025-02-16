@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 组件实例
  * @Author: lishen
- * @LastEditTime: 2025-01-19 13:21:50
+ * @LastEditTime: 2025-02-16 13:46:35
  */
 import type { CalendarDay, WxCalendar, WcMonth, WcYear, WcSubYear, WcScheduleMark, WcScheduleInfo } from './calendar';
 import { isSkyline, type CalendarView, Shared } from '../basic/tools';
@@ -231,23 +231,46 @@ interface CalendarEventHandlers {
   calendarTransitionEnd(): void;
 }
 
-export type CalendarEventSimplified = 'load' | 'click' | 'change' | 'viewchange' | 'schedule';
+type CalendarTriggerType = Exclude<PluginEventNames, 'initialize' | 'attach' | 'detached'>;
 
-export interface CalendarEventDetail {
-  checked?: CalendarDay;
-  view?: CalendarView;
-  range?: [startDate: CalendarDay, endDate: CalendarDay];
+export type CalendarEventSimplified = CalendarTriggerType | 'schedule';
+
+export interface CalendarEventDetailBase {
+  checked: CalendarDay;
+  view: CalendarView;
   source?: 'click' | 'gesture' | 'annual' | 'manual'; // 点击 ｜ 手势滑动 ｜ 年面板点击 ｜ 方法控制
 }
 
-export interface ScheduleEventDetail extends Omit<WcScheduleMark, 'key'> {
+export interface CalendarRangeEventDetail extends CalendarEventDetailBase {
+  range: [startDate: CalendarDay, endDate: CalendarDay];
+}
+
+export interface CalendarThemeEventDetail extends CalendarEventDetailBase {
+  theme: string;
+}
+
+export interface EventSchedule extends Omit<WcScheduleMark, 'key'> {
   date: CalendarDay;
   plugin?: string;
   info?: Nullable<WcScheduleInfo>;
 }
 
+export interface ScheduleEventDetail {
+  schedules?: Array<EventSchedule>;
+  schedule?: EventSchedule;
+  all: boolean;
+}
+
+export type CalendarEventDetail<T extends CalendarEventSimplified> = T extends 'schedule'
+  ? ScheduleEventDetail
+  : T extends 'themechange'
+    ? CalendarThemeEventDetail
+    : T extends 'load' | 'change'
+      ? CalendarRangeEventDetail
+      : CalendarEventDetailBase;
+
 export type CalendarCustomEvent<T extends CalendarEventSimplified> = WechatMiniprogram.CustomEvent<
-  T extends 'schedule' ? ScheduleEventDetail : CalendarEventDetail
+  CalendarEventDetail<T>
 >;
 
 export type CalendarEvents = {
@@ -261,7 +284,11 @@ export interface CalendarMethod
   /**
    * 触发事件
    */
-  trigger<T extends PluginEventNames>(event: T, detail?: CalendarEventDetail, dispatchPlugin?: boolean): void;
+  trigger<T extends CalendarTriggerType>(
+    event: T,
+    detail?: Partial<CalendarEventDetail<T>>,
+    dispatchPlugin?: boolean
+  ): void;
   /**
    * 刷新周/月面板数据
    * 单独写这个方法是worklet的需要
@@ -306,6 +333,8 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   _printer_: YearPrinter;
   /** 处理数据渲染和服务注册的实例对象 */
   _calendar_: WxCalendar<DEFAULT_PLUGINS>;
+  /** 主题色 **/
+  _theme_: string;
   /**
    * [Webview] Swiper组件transition事件dx（或dy）初始值为初始所在滑块的位置偏移量
    * 这个值用在首次触摸判断，进一步判断dx初始值是否被消费

@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: Description
  * @Author: lspriv
- * @LastEditTime: 2024-02-08 20:33:23
+ * @LastEditTime: 2025-02-16 13:50:12
  */
 const path = require('path');
 const globals = require('./globals');
@@ -57,7 +57,8 @@ module.exports.wxsMiniOpts = {
   compress: {
     hoist_funs: true,
     join_vars: false,
-    collapse_vars: false
+    collapse_vars: false,
+    global_defs: globals
   }
 };
 

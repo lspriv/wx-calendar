@@ -4,10 +4,8 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 常量配置
  * @Author: lspriv
- * @LastEditTime: 2024-11-12 19:14:56
+ * @LastEditTime: 2025-02-16 13:39:08
  */
-declare const $_VERSION: string;
-declare const $_PKG_NAME: string;
 
 export const VERSION = $_VERSION;
 export const PKG_NAME = $_PKG_NAME;

@@ -4,13 +4,13 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 年度面板绘制
  * @Author: lspriv
- * @LastEditTime: 2024-11-30 12:37:21
+ * @LastEditTime: 2025-02-16 13:38:51
  */
 import { CalendarHandler } from '../interface/component';
 import { WxCalendar, getAnnualMarkKey, isToday, inMonthDate, sortWeeks, themeStyle } from '../interface/calendar';
 import { Layout } from './layout';
 import { CALENDAR_PANELS, SELECTOR } from './constants';
-import { Nullable, promises, getStyle, hasOwn } from '../utils/shared';
+import { Nullable, promises, hasOwn } from '../utils/shared';
 import { hasLayoutArea, nodeRect, viewportOffset, warn } from './tools';
 
 import type { CalendarDay, CalendarMonth, WcAnnualDateStyle, WcAnnualMonth, WcFullYear } from '../interface/calendar';
@@ -147,8 +147,6 @@ interface AnnualColors {
 
 type AnnualThemeColors = Record<'dark' | 'light', AnnualColors>;
 
-const PRIMARY_COLOR = '#409EFF';
-
 /** 深浅模式色号 */
 const PrinterTheme: AnnualThemeColors = {
   light: {
@@ -157,7 +155,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#333',
     rest: '#ABABAB',
     checked: '#FFF',
-    present: PRIMARY_COLOR,
+    present: '',
     'checked-bg': '#F5F5F5'
   },
   dark: {
@@ -166,7 +164,7 @@ const PrinterTheme: AnnualThemeColors = {
     date: '#D9D9D9',
     rest: '#484848',
     checked: '#D9D9D9',
-    present: PRIMARY_COLOR,
+    present: '',
     'checked-bg': '#262626'
   }
 };
@@ -287,9 +285,8 @@ export class YearPrinter extends CalendarHandler {
   public initializeColors() {
     if (this._style_ === this._instance_.data.style) return;
     const style = (this._style_ = this._instance_.data.style || '');
-    const primary = getStyle(style, '--wc-primary') || PRIMARY_COLOR;
     const { light, dark } = PrinterTheme;
-    light.present = dark.present = primary;
+    light.present = dark.present = this._instance_._theme_;
     const matches = style.match(/--wc-annual-cv-.*?-(?:dark|light):[^;]+;?/g);
     const colors: AnnualThemeColors = { light: { ...light }, dark: { ...dark } };
     this._colors_ =

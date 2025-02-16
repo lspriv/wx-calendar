@@ -4,7 +4,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 日期处理
  * @Author: lspriv
- * @LastEditTime: 2024-11-25 22:12:17
+ * @LastEditTime: 2025-02-16 12:12:36
  */
 import { Layout } from '../basic/layout';
 import { WEEKS } from '../basic/constants';
@@ -25,7 +25,7 @@ import { MARK_PLUGIN_KEY, MarkPlugin } from '../plugins/mark';
 
 import type { ArrItem } from '../utils/shared';
 import type { PluginConstructor, PluginKeys, PluginUse, ServicePlugins } from '../basic/service';
-import type { CalendarInstance, UsePluginService, ScheduleEventDetail, DEFAULT_PLUGINS } from './component';
+import type { CalendarInstance, UsePluginService, EventSchedule, DEFAULT_PLUGINS } from './component';
 
 export interface CalendarDay {
   year: number;
@@ -208,7 +208,7 @@ export const getScheduleDetail = (
   date: CalendarDay,
   schedule: WcScheduleMark,
   service: PluginService<DEFAULT_PLUGINS>
-): ScheduleEventDetail => {
+): EventSchedule => {
   const parse = parseMarkKey(schedule.key);
   const plugin = parse?.plugin ? service.getPlugin(parse.plugin as typeof MARK_PLUGIN_KEY) : void 0;
   return {

@@ -6,7 +6,7 @@
  * See File LICENSE for detail or copy at https://opensource.org/licenses/MIT
  * @Description: 面板过渡
  * @Author: lspriv
- * @LastEditTime: 2024-09-11 13:24:17
+ * @LastEditTime: 2025-02-16 13:50:39
  */
 
 /**
@@ -396,7 +396,7 @@ var getStyle = function (style, key) {
 };
 
 var styleChange = function (view, _, owner) {
-  var primary = getStyle(view, '--wc-primary');
+  var primary = getStyle(view, $_THEME_KEY);
   var light = getStyle(view, '--wc-opt-color-light') || primary;
   var dark = getStyle(view, '--wc-opt-color-dark') || primary;
   var rgbReg = getRegExp('^rgba?');
