@@ -484,7 +484,7 @@ const weekOrder = (date: CalendarDay, weekstart = 0) => {
   const { year, month, day } = date;
   const curr = new Date(year, month - 1, day);
   /** 以1月4号所在周的周首日作为起始日 */
-  const start = new Date(year, 0, 4);
+  const start = new Date(curr.getFullYear(), 0, 4);
   start.setDate(start.getDate() - ((start.getDay() + 7 - weekstart) % 7));
   // 作为上一年的最后一周
   if (curr < start) return weekOrder({ year, month: 1, day: 0 }, weekstart);
