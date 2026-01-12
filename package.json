@@ -10,7 +10,14 @@
     "dist/"
   ],
   "exports": {
-    ".": "./dist/lib.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./lib": {
+      "types": "./dist/lib.d.ts",
+      "default": "./dist/lib.js"
+    }
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",

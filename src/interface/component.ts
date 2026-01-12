@@ -278,9 +278,7 @@ export type CalendarEvents = {
 };
 
 export interface CalendarMethod
-  extends WechatMiniprogram.Component.MethodOption,
-    CalendarInitialize,
-    CalendarEventHandlers {
+  extends WechatMiniprogram.Component.MethodOption, CalendarInitialize, CalendarEventHandlers {
   /**
    * 触发事件
    */

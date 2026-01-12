@@ -42,6 +42,8 @@ import type {
 
 const initCurrent = middle(CALENDAR_PANELS);
 
+const DAMPING_FACTOR = 0.75;
+
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
   externalClasses: ['i-class'],
@@ -369,11 +371,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       const { dragMax, minHeight, maxHeight, mainHeight } = Layout.layout!;
 
       const direct = e.deltaY < 0 ? -1 : 1;
-      const delta = direct * Math.min(Math.abs(e.deltaY), 10);
 
       /** 计算面板的高度 */
-      const height = this.$_drag_panel_height!.value + delta * 0.6;
-      const usefulHeight = Math.min(dragMax, Math.max(minHeight, height));
+      const height = this.$_drag_panel_height!.value + e.deltaY * DAMPING_FACTOR;
+
+      const usefulHeight = Math.min(dragMax, Math.max(height, 0));
       this.$_drag_panel_height!.value = usefulHeight;
 
       /** 计算控制条的角度 */
@@ -397,7 +399,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       this._dragger_!.bindScheduleAnimation();
     },
     async dragGestureEnd(e) {
-      const view = await this._dragger_!.dragout(e.velocityY * 0.6);
+      const view = await this._dragger_!.dragout(e.velocityY * DAMPING_FACTOR);
       wx.nextTick(this.refreshView.bind(this, { view }));
     },
     async selYear() {

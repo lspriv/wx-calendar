@@ -9,23 +9,18 @@ Page({
   data: {
     padding: 0,
     markers: [
-      { year: 2024, month: 11, day: 19, type: 'festival', text: '国庆节', style: { color: '#409EFF' } },
-      {
-        year: 2024,
-        month: 11,
-        day: 19,
-        type: 'corner',
-        text: '休',
-        style: { color: '#409EFF' }
-      },
-      {
-        year: 2025,
-        month: 1,
-        day: 25,
-        type: 'schedule',
-        text: '呵呵',
-        style: { color: '#409EFF' }
-      }
+      // { 
+      //   year: 2026, 
+      //   month: 1, 
+      //   day: 6, 
+      //   type: 'style', 
+      //   style: { 
+      //     backgroundImage: 'radial-gradient(circle at center, #409EFF 50%, transparent 50%)',
+      //     backgroundSize: '40rpx 40rpx',
+      //     backgroundRepeat: 'no-repeat',
+      //     backgroundPosition: 'center calc(100% + 40rpx)'
+      //   } 
+      // },
     ]
   },
   onLoad() {

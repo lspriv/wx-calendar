@@ -30,21 +30,45 @@ declare global {
       out(easing?: Callable): any;
       inOut(easing?: Callable): any;
       sin(...args: any[]): any;
-      bezier(x1: number, y1: number, x2: number, y2: number): any;
+      cubicBezier(x1: number, y1: number, x2: number, y2: number): any;
     }
   }
 }
 
-const { shared, timing, sequence, Easing, delay, runOnJS } = wx.worklet;
+interface CalculateTargetParams {
+  dragMax: number;
+  currHeight: number;
+  velocityY: number;
+  mainHeight: number;
+  minHeight: number;
+  maxHeight: number;
+}
+interface CalculateTarget {
+  target: number;
+  animations: Array<{
+    target: number;
+    duration: number;
+    easing: [x1: number, y1: number, x2: number, y2: number];
+  }>;
+}
+
+interface CalculateFlingDistance {
+  distance: number;
+  duration: number;
+}
+
+const { shared, timing, sequence, Easing, runOnJS } = wx.worklet;
 
 /** 视图控制单元宽度，单位rpx */
 const VIEW_BAR_WIDTH = 60;
 /** 视图控制单元内边距，单位rpx */
 const VIEW_BAR_PADDING = 8;
 /** 拖拽结束后的动画时长 */
-const DRAG_OUT_DURATION = 280;
+const DRAG_OUT_DURATION = 300;
 /** 弹性系数 */
-const ELASTIC_COE = 220;
+// const ELASTIC_COE = 220;
+
+// const VELOCITY_THRESHOLD = 500;
 
 export const easingOpt = (
   duration: number,
@@ -263,43 +287,109 @@ export class Dragger extends CalendarHandler {
   }
 
   /**
-   * 处理拖拽结束
-   * @param velocity 拖拽结束时纵向速度
+   * 计算放手后的滑出距离（基于初速度和减速度）
    */
-  public dragout(velocity: number): Promise<View> {
-    const instance = this._instance_;
-    const { minHeight, maxHeight, mainHeight } = Layout.layout!;
+  private calculateFlingDistance(velocity: number): CalculateFlingDistance {
+    // 减速度（px/s²），模拟摩擦力
+    const DECELERATION = 16000;
+    // 使用运动学公式: v² = v₀² + 2as
+    // 当 v = 0 时，s = -v₀² / (2a)
+    // 由于是减速，a 为负值
+    const distance = -(velocity * velocity) / (2 * -DECELERATION);
 
-    const panelHeight = instance.$_drag_panel_height!.value;
-    const maxBounce = minHeight;
+    const duration = velocity / DECELERATION;
+    // 转换为毫秒
+    const durationMs = Math.abs(duration * 1000);
+    return { distance, duration: durationMs };
+  }
+
+  private calculateTargetHeight({
+    dragMax,
+    currHeight,
+    velocityY,
+    mainHeight,
+    minHeight,
+    maxHeight
+  }: CalculateTargetParams): CalculateTarget {
+    // 计算放手后会滑动的距离
+    const direct = velocityY > 0 ? 1 : -1;
+    const { distance, duration } = this.calculateFlingDistance(velocityY);
+    const predictedHeight = currHeight + distance * direct;
+
+    const target =
+      predictedHeight <= (minHeight + mainHeight) / 2
+        ? minHeight
+        : predictedHeight <= (mainHeight + maxHeight) / 2
+          ? mainHeight
+          : maxHeight;
+
+    const needFling =
+      (target > predictedHeight && currHeight > predictedHeight) ||
+      (target < predictedHeight && currHeight < predictedHeight);
+
+    if (needFling) {
+      const flingTarget = Math.min(Math.max(0, predictedHeight), dragMax);
+      let flingDuration = duration;
+      if (flingTarget !== predictedHeight) {
+        flingDuration = (Math.abs(flingTarget - currHeight) / Math.abs(predictedHeight - currHeight)) * duration;
+      }
+
+      return {
+        target,
+        animations: [
+          {
+            target: flingTarget,
+            duration: flingDuration,
+            easing: [0.25, 0.46, 0.45, 0.94]
+          },
+          {
+            target,
+            duration: DRAG_OUT_DURATION,
+            easing: [0.34, 1.56, 0.64, 1]
+          }
+        ]
+      };
+    } else {
+      return {
+        target,
+        animations: [
+          {
+            target,
+            duration: DRAG_OUT_DURATION,
+            easing: [0.34, 1.56, 0.64, 1]
+          }
+        ]
+      };
+    }
+  }
+
+  /**
+   * 处理拖拽结束
+   * @param velocityY 拖拽结束时纵向速度
+   */
+  public dragout(velocityY: number): Promise<View> {
+    const instance = this._instance_;
+    const { minHeight, maxHeight, mainHeight, dragMax } = Layout.layout!;
+
+    const currHeight = instance.$_drag_panel_height!.value;
 
     const view = shared(0) as unknown as Shared<View>;
 
-    if (instance._view_ & View.week) {
-      const dy = panelHeight - minHeight;
-      view.value = velocity > 0 ? View.month : dy < maxBounce ? View.week : View.month;
-    } else if (instance._view_ & View.schedule) {
-      const dy = panelHeight - maxBounce;
-      view.value = dy > -maxBounce ? (velocity < 0 ? View.month : View.schedule) : View.month;
-    } else {
-      const dy = panelHeight - mainHeight;
-      if (!velocity) {
-        view.value = dy < -maxBounce ? View.week : dy > maxBounce ? View.schedule : View.month;
-      } else {
-        if (dy > 0) {
-          view.value = velocity > 0 ? View.schedule : View.month;
-        } else {
-          view.value = velocity < 0 ? View.week : View.month;
-        }
-      }
-    }
+    const { target, animations } = this.calculateTargetHeight({
+      dragMax,
+      currHeight,
+      velocityY,
+      mainHeight,
+      minHeight,
+      maxHeight
+    });
+
+    view.value = target === minHeight ? View.week : target === maxHeight ? View.schedule : View.month;
 
     const toMin = view.value & View.week;
     const toMax = view.value & View.schedule;
 
-    const finalHeight = toMin ? minHeight : toMax ? maxHeight : mainHeight;
-
-    const animOpt = easingOpt(DRAG_OUT_DURATION);
+    const animationEasing = easingOpt(DRAG_OUT_DURATION);
 
     return new Promise<View>(resolve => {
       const callback = () => {
@@ -307,40 +397,25 @@ export class Dragger extends CalendarHandler {
         runOnJS(resolve)(view.value);
       };
 
-      if (!velocity) {
-        instance.$_drag_panel_height!.value = timing(finalHeight, animOpt);
-        instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
+      if (!velocityY) {
+        instance.$_drag_panel_height!.value = timing(target, animationEasing);
       } else {
-        const ms = Math.ceil(Math.abs((finalHeight - panelHeight) / velocity) * 1000);
-
-        if (ms >= DRAG_OUT_DURATION || panelHeight <= minHeight || panelHeight >= maxHeight) {
-          instance.$_drag_panel_height!.value = timing(finalHeight, animOpt);
-          instance.$_drag_bar_rotate!.value = timing(0, animOpt, callback);
-        } else {
-          const bounceHeight = maxBounce - (maxBounce * ms) / DRAG_OUT_DURATION;
-          const bounceDuration = Math.floor(Math.asin(bounceHeight / maxBounce) * ELASTIC_COE);
-          const bounceOpt = easingOpt(bounceDuration);
-
-          const linearOpt = easingOpt(ms, Easing.bezier(0, 0, 1, 1));
-
-          const dragoutHeight = toMin
-            ? finalHeight - bounceHeight
-            : toMax
-              ? finalHeight + bounceHeight
-              : velocity > 0
-                ? finalHeight + bounceHeight
-                : finalHeight - bounceHeight;
-          instance.$_drag_panel_height!.value = sequence(
-            timing(finalHeight, linearOpt, callback),
-            timing(dragoutHeight, bounceOpt),
-            timing(finalHeight, bounceOpt)
+        if (animations.length === 1) {
+          const animation = animations[0];
+          instance.$_drag_panel_height!.value = timing(
+            animation.target,
+            easingOpt(animation.duration, Easing.cubicBezier(...animation.easing)),
+            callback
           );
-
-          instance.$_drag_bar_rotate!.value = delay(bounceDuration + ms, timing(0, animOpt));
+        } else {
+          instance.$_drag_panel_height!.value = sequence(
+            ...animations.map(ease => timing(ease.target, easingOpt(ease.duration, Easing.cubicBezier(...ease.easing))))
+          );
         }
       }
-      instance.$_drag_view_bar_translate_!.value = timing(toMin ? 60 : 0, animOpt);
-      instance.$_drag_schedule_opacity!.value = timing(toMax ? 1 : 0, animOpt);
+      instance.$_drag_bar_rotate!.value = timing(0, animationEasing, callback);
+      instance.$_drag_view_bar_translate_!.value = timing(toMin ? 60 : 0, animationEasing);
+      instance.$_drag_schedule_opacity!.value = timing(toMax ? 1 : 0, animationEasing);
     });
   }
 
