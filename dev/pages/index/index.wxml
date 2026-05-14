@@ -3,6 +3,7 @@
     id="calendar" 
     marks="{{ markers }}" 
     disabledDates="{{ disabledDates }}"
+    disabledDatesMode="include"
     bindload="handleLoad"
     bindclick="handleClick"
     bindchange="handleChange" 

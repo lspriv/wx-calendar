@@ -3,7 +3,7 @@
  * @Author: lishen
  * @Date: 2023-08-31 16:46:44
  * @LastEditors: Michael ONE oneone0508@qq.com
- * @LastEditTime: 2026-05-13 18:44:44
+ * @LastEditTime: 2026-05-14 16:19:23
  */
 Page({
   data: {
@@ -29,6 +29,8 @@ Page({
     ],
     disabledDates: [
       '2026-5-12',
+      '2026-5-13',
+      '2025-5-13',
     ]
   },
   onLoad() {
