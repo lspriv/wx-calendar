@@ -2,6 +2,7 @@
   <calendar 
     id="calendar" 
     marks="{{ markers }}" 
+    disabledDates="{{ disabledDates }}"
     bindload="handleLoad"
     bindclick="handleClick"
     bindchange="handleChange" 

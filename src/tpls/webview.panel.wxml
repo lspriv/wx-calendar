@@ -63,6 +63,7 @@
             wx:for-item="day" 
             wx:for-index="ddx"
             wx:key="key"
+            mark:pdx="{{ pdx }}"
             mark:wdx="{{ wdx }}"
             mark:ddx="{{ ddx }}"
             class="
@@ -71,6 +72,7 @@
               {{ day.today ? 'wc__panel-date--today' : '' }}
               {{ tool_wxs.isChecked(pointer, day, checked) ? 'wc__panel-date--checked' : '' }}
               {{ day.schedules.length ? 'wc__panel-date--scheduled' : '' }}
+              {{ day.disabled ? 'wc__panel-date--disabled' : '' }}
             ">
             <view class="wc__panel-day wc-F wc-FV" style="{{ day.style }}" catch:tap="selDate">
               <view 

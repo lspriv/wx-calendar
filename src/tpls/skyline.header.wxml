@@ -5,8 +5,7 @@
  -->
 <view class="wc__header wc-F wc-FB">
   <view class="wc__header-title" catch:tap="selYear">
-    <span>{{ panels[current].year }}年{{ panels[current].month }}月</span>
-    <span class="wc__header-title-info">{{ info }}</span>
+    <span>{{ info }}</span>
   </view>
   <view class="wc__header-ops wc-F wc-JE">
     <view class="wc__header-op wc-F wc__header-op--today {{ (checked && !checked.today) ? 'wc__header-op--show' : '' }}" catch:tap="toToday"></view>

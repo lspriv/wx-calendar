@@ -75,6 +75,7 @@ export type MarkDict<T extends CalendarMarkTypes, Style, Schedule, CF> = T exten
 export interface WcDate extends Required<CalendarDay> {
   key: string;
   kind: 'last' | 'current' | 'next';
+  disabled: boolean;
   style: Nullable<string>;
   solar: Nullable<WcMark>;
   mark: Nullable<WcMark>;
@@ -179,6 +180,9 @@ export const themeStyle = (style?: WcDateStyle): string | number | undefined => 
 
 export const getAnnualMarkKey = (day: Pick<CalendarDay, 'month' | 'day'>) => `${day.month}_${day.day}`;
 
+export const getDateKey = (day: Pick<CalendarDay, 'year' | 'month' | 'day'>) =>
+  `${day.year}_${day.month}_${day.day}`;
+
 /**
  * 生成 mark key
  * @param id 插件内部识别id，会整体回传给插件 PLUGIN_MARK_DATA 方法
@@ -276,7 +280,7 @@ export const isLeapYear = (y: number) => (y % 100 != 0 && y % 4 === 0) || y % 40
 const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
   const { year, month, day, week } = normalDate(date);
   const today = isToday({ year, month, day });
-  const key = `${year}_${month}_${day}`;
+  const key = getDateKey({ year, month, day });
   return {
     key,
     year,
@@ -285,6 +289,7 @@ const createCalendarDay = (date: CalendarDay, kind: WcDate['kind']): WcDate => {
     week: week!,
     kind,
     today,
+    disabled: false,
     style: '',
     mark: null,
     solar: null,
@@ -511,6 +516,19 @@ const createYearMonth = (mon: CalendarMonth, weekstart: number = 0): WcAnnualMon
   const last = Math.abs(week + 7 - weekstart) % 7;
   const weeks = Math.ceil((days + last) / 7);
   return { key: `y_${year}_m_${month}`, year, month, weeks, days: days + last, start: last };
+};
+
+/**
+ * 获取标题日期信息
+ * @param date 指定日期
+ */
+export const getHeaderDateInfo = (date: CalendarDay) => {
+  const start = new Date(WxCalendar.today.year, WxCalendar.today.month - 1, WxCalendar.today.day);
+  const end = new Date(date.year, date.month - 1, date.day);
+  const diff = Math.floor((end.getTime() - start.getTime()) / 86400000);
+  if (diff === 0) return '今天';
+  if (diff === -1) return '昨天';
+  return `${date.month}月${date.day}日`;
 };
 
 /**

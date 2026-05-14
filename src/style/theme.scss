@@ -94,6 +94,8 @@ $wc-theme-light: (
 	date-color: $wc-text-2, // 日期字体色
 	mark-color: $wc-text-4, // 日期下方信息字体色
 	dot-color: $wc-text-4, // 日期上方‘･’的颜色
+	disabled-color: $wc-text-4, // 禁用日期字体色
+	disabled-bg: $wc-bg-1, // 禁用日期背景色
 	schedule-color: theme(primary), // 日程默认字体色
 	schedule-bg: theme(primary-2), // 日程默认背景色
 	today-color: theme(primary), // 日期字体色（今日）
@@ -129,6 +131,8 @@ $wc-theme-dark: (
 	date-color: $wc-text-5,
 	mark-color: #5F5F5F,
 	dot-color: $wc-text-4,
+	disabled-color: #5F5F5F,
+	disabled-bg: #262626,
 	schedule-color: theme(primary),
 	schedule-bg: theme(primary-2),
 	today-color: theme(primary),
@@ -140,4 +144,3 @@ $wc-theme-dark: (
 	annual-title-color: $wc-text-5,
 	annual-title-sub-color: #3F3F3F
 );
-
