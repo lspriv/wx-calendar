@@ -58,6 +58,9 @@ import type {
 const initCurrent = middle(CALENDAR_PANELS);
 
 const disabledDatePattern = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+const DISABLED_DATES_MODE_INCLUDE = 'include';
+
+type DisabledDatesMode = 'exclude' | typeof DISABLED_DATES_MODE_INCLUDE;
 
 const normalizedDisabledDateKey = (date: unknown) => {
   if (typeof date === 'string') {
@@ -84,6 +87,36 @@ const normalizeDisabledDateKeys = (dates: unknown) => {
   return keys;
 };
 
+const normalizeDisabledDatesMode = (mode: unknown): DisabledDatesMode => {
+  return mode === DISABLED_DATES_MODE_INCLUDE ? DISABLED_DATES_MODE_INCLUDE : 'exclude';
+};
+
+const isDisabledDate = (date: CalendarDay, keys: Set<string>, mode: DisabledDatesMode) => {
+  const includes = keys.has(getDateKey(date));
+  return mode === DISABLED_DATES_MODE_INCLUDE ? !includes : includes;
+};
+
+const firstNormalizedDate = (dates: unknown) => {
+  if (!Array.isArray(dates)) return null;
+  for (let i = 0; i < dates.length; i++) {
+    const key = normalizedDisabledDateKey(dates[i]);
+    if (!key) continue;
+    const [year, month, day] = key.split('_').map(Number);
+    return normalDate({ year, month, day });
+  }
+  return null;
+};
+
+const normalizeCheckedDate = (
+  checked: CalendarDay,
+  dates: unknown,
+  keys: Set<string>,
+  mode: DisabledDatesMode
+) => {
+  if (!isDisabledDate(checked, keys, mode)) return checked;
+  return mode === DISABLED_DATES_MODE_INCLUDE ? firstNormalizedDate(dates) || checked : checked;
+};
+
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
   externalClasses: ['i-class'],
@@ -103,6 +136,10 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     disabledDates: {
       type: Array,
       value: []
+    },
+    disabledDatesMode: {
+      type: String,
+      value: 'exclude'
     },
     view: {
       type: String,
@@ -225,10 +262,17 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         this._swiper_flag_ = false;
       }
 
-      const checked = normalDate(this.data.date) || WxCalendar.today;
+      this._disabledDateKeys_ = normalizeDisabledDateKeys(this.data.disabledDates);
+      this._disabledDatesMode_ = normalizeDisabledDatesMode(this.data.disabledDatesMode);
+
+      const checked = normalizeCheckedDate(
+        normalDate(this.data.date) || WxCalendar.today,
+        this.data.disabledDates,
+        this._disabledDateKeys_,
+        this._disabledDatesMode_
+      );
       const weeks = InitWeeks(sortWeeks(this.data.weekstart));
       const isWeekView = this._view_ & View.week;
-      this._disabledDateKeys_ = normalizeDisabledDateKeys(this.data.disabledDates);
 
       const panels = isWeekView ? this._panel_.createWeekPanels(checked) : this._panel_.createMonthPanels(checked);
       const _years = this._panel_.createAnnualPanels(checked);
@@ -339,9 +383,13 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       await this._panel_.refresh(...args);
       this.trigger('change', { source: 'gesture' });
     },
-    refreshDisabledDates(dates) {
+    refreshDisabledDates(dates, mode) {
       this._disabledDateKeys_ = normalizeDisabledDateKeys(dates);
-      if (this._loaded_) this._panel_.updateDisabledDates();
+      this._disabledDatesMode_ = normalizeDisabledDatesMode(mode ?? this.data.disabledDatesMode);
+      if (this._loaded_) {
+        this._panel_.updateDisabledDates();
+        this._pointer_.update();
+      }
     },
     refreshAnnualPanels(...args) {
       this._panel_.refreshAnnualPanels(...args);
@@ -529,6 +577,9 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     disabledDates: function (dates: unknown) {
       this.refreshDisabledDates(dates);
+    },
+    disabledDatesMode: function (mode: unknown) {
+      this.refreshDisabledDates(this.data.disabledDates, mode);
     },
     view: function (view: string) {
       const _view = viewFlag(view);

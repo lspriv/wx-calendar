@@ -55,6 +55,8 @@ export interface CalendarWeek {
 
 export type CalendarSwiperType = 'panel' | 'annual';
 
+export type DisabledDatesMode = 'exclude' | 'include';
+
 type FullProperty<T extends WechatMiniprogram.Component.PropertyType> = WechatMiniprogram.Component.FullProperty<T>;
 
 export type LayoutArea = 'header' | 'title' | 'subinfo' | 'today' | 'viewbar' | 'dragbar';
@@ -111,6 +113,8 @@ export type CalendarProp = {
   date: FullProperty<StringConstructor> | FullProperty<NumberConstructor>;
   /** 禁用日期 */
   disabledDates: FullProperty<ArrayConstructor>;
+  /** 禁用日期模式，exclude: 数组内日期不可选，include: 只有数组内日期可选 */
+  disabledDatesMode: FullProperty<StringConstructor>;
   /** 日程、角标和节假日 */
   marks: FullProperty<ArrayConstructor>;
   /** 视图分月视图，周视图和日程视图 */
@@ -280,7 +284,7 @@ export interface CalendarMethod
   /**
    * 刷新禁用日期
    */
-  refreshDisabledDates(dates: unknown): void;
+  refreshDisabledDates(dates: unknown, mode?: unknown): void;
   /**
    * [Skyline] 处理周/月面板手势拖动开始
    */
@@ -302,6 +306,8 @@ export interface CalendarCustomProp extends WechatMiniprogram.IAnyObject {
   _years_: Array<WcSubYear>;
   /** 禁用日期 key 集合 */
   _disabledDateKeys_: Set<string>;
+  /** 禁用日期模式 */
+  _disabledDatesMode_: DisabledDatesMode;
   /** 控制选中日期圆圈的实例对象 */
   _pointer_: Pointer;
   /** 处理周/月/年面板数据的实例对象 */

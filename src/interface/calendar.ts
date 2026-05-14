@@ -526,6 +526,7 @@ export const getHeaderDateInfo = (date: CalendarDay) => {
   const start = new Date(WxCalendar.today.year, WxCalendar.today.month - 1, WxCalendar.today.day);
   const end = new Date(date.year, date.month - 1, date.day);
   const diff = Math.floor((end.getTime() - start.getTime()) / 86400000);
+  if (date.year !== WxCalendar.today.year) return `${date.year}年${date.month}月${date.day}日`;
   if (diff === 0) return '今天';
   if (diff === -1) return '昨天';
   return `${date.month}月${date.day}日`;

@@ -257,6 +257,7 @@ export class PanelTool extends CalendarHandler {
           const date = week.days[ddx];
           const disabled = this.isDisabledDate(date);
           if (date.disabled !== disabled) {
+            date.disabled = disabled;
             sets[`panels[${pdx}].weeks[${wdx}].days[${ddx}].disabled`] = disabled;
           }
         }
@@ -276,8 +277,9 @@ export class PanelTool extends CalendarHandler {
     }
   }
 
-  private isDisabledDate(date: CalendarDay) {
-    return !!this._instance_._disabledDateKeys_?.has(getDateKey(date));
+  public isDisabledDate(date: CalendarDay) {
+    const includes = !!this._instance_._disabledDateKeys_?.has(getDateKey(date));
+    return this._instance_._disabledDatesMode_ === 'include' ? !includes : includes;
   }
 
   /**
@@ -308,6 +310,7 @@ export class PanelTool extends CalendarHandler {
     const d = normalDate(date);
 
     return instance._calendar_.service.interceptEvent('manual', d, async () => {
+      if (this.isDisabledDate(d)) return;
       const { current, panels, checked } = instance.data;
       if (isSameDate(d, checked!)) return;
       const isWeekView = instance._view_ & View.week;
@@ -359,6 +362,7 @@ export class PanelTool extends CalendarHandler {
     if (isCurrMonth && (instance._view_ & View.month || !toMonthView)) return;
 
     const date = inMonthDate(mon.year, mon.month, checked!.day);
+    if (this.isDisabledDate(date)) return;
 
     const idx = panels.findIndex(p => p.year === mon.year && p.month === mon.month);
 

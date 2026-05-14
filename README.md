@@ -173,8 +173,14 @@ type CalendarDay = {
     <tr>
         <td>disabledDates</td>
         <td>string[]</td>
-        <td>禁用日期，格式为 ['2026-01-01']</td>
+        <td>日期数组，格式为 ['2026-01-01']；默认模式下数组内日期不可选</td>
         <td>[]</td>
+    </tr>
+    <tr>
+        <td>disabledDatesMode</td>
+        <td>string</td>
+        <td>禁用日期模式，exclude 表示 disabledDates 为不可选日期；include 表示只有 disabledDates 内日期可选</td>
+        <td>exclude</td>
     </tr>
     <tr>
         <td>vibrate</td>
