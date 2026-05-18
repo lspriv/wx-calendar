@@ -22,6 +22,8 @@ interface PointerIndexLocation {
   ddx: number;
   wdx: number;
   len: number;
+  disabled: boolean;
+  found: boolean;
 }
 
 export interface CalendarPointer {
@@ -38,7 +40,11 @@ export const createPointer = (opts?: Partial<CalendarPointer>) =>
 const calcCurrIdx = (mon: WcMonth, checked: CalendarDay): PointerIndexLocation => {
   const { month, day } = checked;
   const idx = findDateIndex(mon.weeks, date => date.month == month && date.day == day);
-  return { ddx: idx % 7, wdx: Math.floor(idx / 7), len: mon.weeks.length };
+  const found = idx >= 0;
+  const ddx = found ? idx % 7 : 0;
+  const wdx = found ? Math.floor(idx / 7) : 0;
+  const disabled = found ? !!mon.weeks[wdx].days[ddx].disabled : true;
+  return { ddx, wdx, len: mon.weeks.length, disabled, found };
 };
 
 const calcPosition = (mon: WcMonth, checked: CalendarDay, centres: number[]): PointerLocation => {
@@ -75,20 +81,22 @@ export class Pointer extends CalendarHandler {
 
     this._vibrate_ = vibrate;
 
+    const { disabled, found } = calcCurrIdx(panel, checked);
     const { x, y } = calcPosition(panel, checked, instance._centres_);
+    const show = this.show && found && !disabled;
 
     if (sets?.pointer) {
-      sets.pointer = { ...sets.pointer, x, y, show: this.show, animate: true };
+      sets.pointer = { ...sets.pointer, x, y, show, animate: true };
     } else if (sets) {
       sets[`pointer.x`] = x;
       sets[`pointer.y`] = y;
-      sets[`pointer.show`] = this.show;
+      sets[`pointer.show`] = show;
       sets[`pointer.animate`] = !flush;
     } else {
       instance.setData({
         [`pointer.x`]: x,
         [`pointer.y`]: y,
-        [`pointer.show`]: this.show,
+        [`pointer.show`]: show,
         [`pointer.animate`]: !flush
       });
     }

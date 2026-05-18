@@ -105,6 +105,23 @@
         @include animation-fade;
       }
     }
+    @include if(disabled) {
+      .wc__panel-day {
+        background-color: theme(disabled-bg) !important;
+      }
+      .wc__panel-day::after {
+        background-color: theme(disabled-color) !important;
+      }
+      .wc__panel-solar,
+      .wc__panel-mark,
+      .wc__panel-corner,
+      .wc__panel-schedule {
+        color: theme(disabled-color) !important;
+      }
+      .wc__panel-schedule {
+        background-color: theme(disabled-bg) !important;
+      }
+    }
   }
   &-day {
     width: 100%;
@@ -268,6 +285,9 @@
 }
 
 .wc.wc--same-checked {
+  .wc__panel-pointer-inner {
+    background: theme(checked-today-bg);
+  }
   .wc__panel-date {
     @include if (checked) {
       @extend %date-today-checked;

@@ -2,8 +2,8 @@
  * @Description: Description
  * @Author: lishen
  * @Date: 2023-08-31 16:46:44
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-11-25 22:22:23
+ * @LastEditors: Michael ONE oneone0508@qq.com
+ * @LastEditTime: 2026-05-14 16:19:23
  */
 Page({
   data: {
@@ -26,6 +26,11 @@ Page({
         text: '呵呵',
         style: { color: '#409EFF' }
       }
+    ],
+    disabledDates: [
+      '2026-5-12',
+      '2026-5-13',
+      '2025-5-13',
     ]
   },
   onLoad() {

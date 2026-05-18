@@ -13,8 +13,9 @@ import {
   sortWeeks,
   isSameDate,
   isSameWeek,
-  getDateInfo,
-  getScheduleDetail
+  getHeaderDateInfo,
+  getScheduleDetail,
+  getDateKey
 } from './interface/calendar';
 import { VERSION, CALENDAR_PANELS, View, PURE_PROPS, VIEWS, SELECTOR, FONT } from './basic/constants';
 import { Pointer, createPointer } from './basic/pointer';
@@ -35,12 +36,13 @@ import {
   InitWeeks,
   mergeStr,
   onceEmitter,
-  layoutHideCls
+  layoutHideCls,
+  circularDiff
 } from './basic/tools';
 import { promises, omit } from './utils/shared';
 import { add, sub, div } from './utils/calc';
 
-import type { WcYear, CalendarMark, CalendarStyleMark } from './interface/calendar';
+import type { WcYear, CalendarMark, CalendarStyleMark, CalendarDay } from './interface/calendar';
 import type { CalendarView } from './basic/tools';
 import type {
   CalendarData,
@@ -54,6 +56,66 @@ import type {
 } from './interface/component';
 
 const initCurrent = middle(CALENDAR_PANELS);
+
+const disabledDatePattern = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+const DISABLED_DATES_MODE_INCLUDE = 'include';
+
+type DisabledDatesMode = 'exclude' | typeof DISABLED_DATES_MODE_INCLUDE;
+
+const normalizedDisabledDateKey = (date: unknown) => {
+  if (typeof date === 'string') {
+    const match = date.trim().match(disabledDatePattern);
+    if (!match) return null;
+    const [, y, m, d] = match;
+    const normal = new Date(+y, +m - 1, +d);
+    if (normal.getFullYear() !== +y || normal.getMonth() + 1 !== +m || normal.getDate() !== +d) return null;
+    return getDateKey({ year: +y, month: +m, day: +d });
+  }
+
+  const normal = normalDate(date as string | number | Date | CalendarDay);
+  if (!normal || [normal.year, normal.month, normal.day].some(Number.isNaN)) return null;
+  return getDateKey(normal);
+};
+
+const normalizeDisabledDateKeys = (dates: unknown) => {
+  const keys = new Set<string>();
+  if (!Array.isArray(dates)) return keys;
+  dates.forEach(date => {
+    const key = normalizedDisabledDateKey(date);
+    if (key) keys.add(key);
+  });
+  return keys;
+};
+
+const normalizeDisabledDatesMode = (mode: unknown): DisabledDatesMode => {
+  return mode === DISABLED_DATES_MODE_INCLUDE ? DISABLED_DATES_MODE_INCLUDE : 'exclude';
+};
+
+const isDisabledDate = (date: CalendarDay, keys: Set<string>, mode: DisabledDatesMode) => {
+  const includes = keys.has(getDateKey(date));
+  return mode === DISABLED_DATES_MODE_INCLUDE ? !includes : includes;
+};
+
+const firstNormalizedDate = (dates: unknown) => {
+  if (!Array.isArray(dates)) return null;
+  for (let i = 0; i < dates.length; i++) {
+    const key = normalizedDisabledDateKey(dates[i]);
+    if (!key) continue;
+    const [year, month, day] = key.split('_').map(Number);
+    return normalDate({ year, month, day });
+  }
+  return null;
+};
+
+const normalizeCheckedDate = (
+  checked: CalendarDay,
+  dates: unknown,
+  keys: Set<string>,
+  mode: DisabledDatesMode
+) => {
+  if (!isDisabledDate(checked, keys, mode)) return checked;
+  return mode === DISABLED_DATES_MODE_INCLUDE ? firstNormalizedDate(dates) || checked : checked;
+};
 
 Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
   behaviors: ['wx://component-export'],
@@ -70,6 +132,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       type: Number,
       optionalTypes: [String],
       value: new Date().getTime()
+    },
+    disabledDates: {
+      type: Array,
+      value: []
+    },
+    disabledDatesMode: {
+      type: String,
+      value: 'exclude'
     },
     view: {
       type: String,
@@ -97,7 +167,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     sameChecked: {
       type: Boolean,
-      value: false
+      value: true
     },
     customNavBar: {
       type: Boolean,
@@ -192,7 +262,15 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         this._swiper_flag_ = false;
       }
 
-      const checked = normalDate(this.data.date) || WxCalendar.today;
+      this._disabledDateKeys_ = normalizeDisabledDateKeys(this.data.disabledDates);
+      this._disabledDatesMode_ = normalizeDisabledDatesMode(this.data.disabledDatesMode);
+
+      const checked = normalizeCheckedDate(
+        normalDate(this.data.date) || WxCalendar.today,
+        this.data.disabledDates,
+        this._disabledDateKeys_,
+        this._disabledDatesMode_
+      );
       const weeks = InitWeeks(sortWeeks(this.data.weekstart));
       const isWeekView = this._view_ & View.week;
 
@@ -220,7 +298,7 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
         currView: initView,
         initView,
         gesture: this.data.viewGesture,
-        info: getDateInfo(checked, this.data.weekstart, isWeekView),
+        info: getHeaderDateInfo(checked),
         pointer: createPointer(),
         dark: this.data.darkmode && Layout.darkmode,
         areaHideCls
@@ -270,20 +348,27 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     },
     selDate(e) {
       this._calendar_.service.interceptEvent('tap', e, async () => {
-        const { wdx, ddx } = e.mark!;
-        const panel = this.data.panels[this.data.current];
+        const { pdx = this.data.current, wdx, ddx } = e.mark!;
+        const current = this.data.current;
+        const panel = this.data.panels[pdx] || this.data.panels[current];
         const date = panel.weeks[wdx].days[ddx];
+        if (date.disabled) return;
         const isWeekView = this._view_ & View.week;
-        if (isWeekView && !isSameWeek(this.data.checked!, date, this.data.weekstart)) return;
+        const weekChecked = pdx === current ? this.data.checked! : panel.weeks[panel.wdx]?.days[0] || date;
+        if (isWeekView && !isSameWeek(weekChecked, date, this.data.weekstart)) return;
         this.trigger('click', { checked: date });
         if (isSameDate(date, this.data.checked!)) return;
         const checked = normalDate(date);
         if (date.kind === 'current') {
-          const sets = { info: getDateInfo(checked, this.data.weekstart, isWeekView), checked };
-          if (!isWeekView) this._panel_.refreshOffsets(sets, this.data.current, checked);
-          this._pointer_.update(sets, true);
-          this.setData(sets);
-          await this._panel_.update();
+          if (pdx !== current) {
+            await this._panel_.refresh(circularDiff(pdx, current), checked, pdx, true);
+          } else {
+            const sets = { info: getHeaderDateInfo(checked), checked };
+            if (!isWeekView) this._panel_.refreshOffsets(sets, current, checked);
+            this._pointer_.update(sets, true);
+            this.setData(sets);
+            await this._panel_.update();
+          }
         } else {
           if (isWeekView) await this._panel_.toWeekAdjoin(date);
           else await this._panel_.refresh(date.kind === 'last' ? -1 : +1, checked, void 0, true);
@@ -297,6 +382,14 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     async refreshPanels(...args) {
       await this._panel_.refresh(...args);
       this.trigger('change', { source: 'gesture' });
+    },
+    refreshDisabledDates(dates, mode) {
+      this._disabledDateKeys_ = normalizeDisabledDateKeys(dates);
+      this._disabledDatesMode_ = normalizeDisabledDatesMode(mode ?? this.data.disabledDatesMode);
+      if (this._loaded_) {
+        this._panel_.updateDisabledDates();
+        this._pointer_.update();
+      }
     },
     refreshAnnualPanels(...args) {
       this._panel_.refreshAnnualPanels(...args);
@@ -449,10 +542,11 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
       emitter.emit(detail);
     },
     selSchedule(e) {
-      const { wdx, ddx } = e.mark!;
+      const { pdx = this.data.current, wdx, ddx } = e.mark!;
       const { sdx, all } = e.currentTarget.dataset;
-      const panel = this.data.panels[this.data.current];
+      const panel = this.data.panels[pdx] || this.data.panels[this.data.current];
       const date = panel.weeks[wdx].days[ddx];
+      if (date.disabled) return;
       if (all) {
         const schedules: Array<ScheduleEventDetail> = date.schedules.map(schedule =>
           getScheduleDetail(date, schedule, this._calendar_.service)
@@ -480,6 +574,12 @@ Component<CalendarData, CalendarProp, CalendarMethod, CalendarCustomProp>({
     marks: function (marks: Array<CalendarMark | CalendarStyleMark>) {
       const mark = this._calendar_.service.getPlugin(MARK_PLUGIN_KEY);
       mark?.update(this, marks);
+    },
+    disabledDates: function (dates: unknown) {
+      this.refreshDisabledDates(dates);
+    },
+    disabledDatesMode: function (mode: unknown) {
+      this.refreshDisabledDates(this.data.disabledDates, mode);
     },
     view: function (view: string) {
       const _view = viewFlag(view);

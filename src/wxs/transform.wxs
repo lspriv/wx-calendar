@@ -255,7 +255,7 @@ var touchEnd = function (e, instance) {
  */
 var offsetChange = function (change, _, owner, instance) {
   var view = instance.getDataset().view;
-  if (view === 'week' && change) {
+  if (view === 'week') {
     var panels = owner.selectAllComponents('.wc__panel-container');
     for (var i = 0; i < panels.length; i++) {
       var panel = panels[i];

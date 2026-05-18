@@ -171,6 +171,18 @@ type CalendarDay = {
         <td>[]</td>
     </tr>
     <tr>
+        <td>disabledDates</td>
+        <td>string[]</td>
+        <td>日期数组，格式为 ['2026-01-01']；默认模式下数组内日期不可选</td>
+        <td>[]</td>
+    </tr>
+    <tr>
+        <td>disabledDatesMode</td>
+        <td>string</td>
+        <td>禁用日期模式，exclude 表示 disabledDates 为不可选日期；include 表示只有 disabledDates 内日期可选</td>
+        <td>exclude</td>
+    </tr>
+    <tr>
         <td>vibrate</td>
         <td>boolean</td>
         <td>点选日期是否震动</td>
@@ -222,7 +234,7 @@ type CalendarDay = {
         <td>sameChecked</td>
         <td>boolean</td>
         <td>保持选中日期样式一致</td>
-        <td>false</td>
+        <td>true</td>
     </tr>
     <tr>
         <td>customNavBar</td>
@@ -425,6 +437,8 @@ type ScheduleEventDetail = {
     --wc-date-color-light: #333; /* 日期 */
     --wc-mark-color-light: #ABABAB; /* 日期下方信息 */
     --wc-dot-color-light: #ABABAB; /* 日期上方‘･’ */
+    --wc-disabled-color-light: #ABABAB; /* 禁用日期文字 */
+    --wc-disabled-bg-light: #F5F5F5; /* 禁用日期背景 */
     --wc-schedule-color-light: #409EFF; /* 日程默认 */
     --wc-schedule-bg-light: #EAEEF2; /* 日程默认背景 */
     --wc-today-color-light: #409EFF; /* 日期（今日） */
@@ -456,6 +470,8 @@ type ScheduleEventDetail = {
     --wc-date-color-dark: #E5E5E5;
     --wc-mark-color-dark: #5F5F5F;
     --wc-dot-color-dark: #ABABAB;
+    --wc-disabled-color-dark: #5F5F5F;
+    --wc-disabled-bg-dark: #262626;
     --wc-schedule-color-dark: #66B1FF;
     --wc-schedule-bg-dark: #332D2D80;
     --wc-today-color-dark: #409EFF;
